@@ -2,11 +2,10 @@
 title: "STAT 5011: Course Introduction"
 ---
 
-# Syllabus
-
-{{< include macro.qmd >}}
 
 ## Course Description
+
+{{< include macro.qmd >}}
 
 ::: nonincremental
 -   This course provides an introduction to some commonly used models in deep learning:
