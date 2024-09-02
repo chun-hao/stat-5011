@@ -1,0 +1,36 @@
+project:
+  type: website
+  output-dir: docs
+  render: 
+    - "index.qmd"
+    - "resources.qmd"
+    - "slides/*.qmd"
+    - "!slides/macro.qmd"
+  
+website:
+  title: "STAT 5011"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: resources.qmd
+        text: Resources
+    tools:
+      - icon: github
+        href: https://github.com/chun-hao/stat-5011
+  page-footer:
+    right: "Built with [Quarto](https://quarto.org/)"
+    left: "&copy; Copyright 2024, Chun-Hao Yang"
+
+format:
+  html:
+    theme: simplex
+    toc: true
+    grid:
+      sidebar-width: 200px
+      body-width: 1000px
+      margin-width: 200px
+      gutter-width: 1.5rem
+
+editor: source
+

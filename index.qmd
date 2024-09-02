@@ -1,0 +1,32 @@
+---
+title: "Statistical Deep Learning (Fall 2024)"
+---
+
+## Course Schedule {.smaller}
+
+| Week | Date | Topics | Slides | Reading |
+|:---------:|-----------|----------------------------------------|-----------|----------|
+| 1 | 9/3 | Course Introduction | [Slide](slides/01-intro.qmd) |  |
+| 2 | 9/10 | Review of Linear Models |  |  |
+| 3 | 9/17 | No class (Mid-Autumn Festival) |  |  |
+| 4 | 9/24 | Machine Learning Basics |  | DL Ch. 5 |
+| 5 | 10/1 | Multilayer Perceptron |  | D2L Ch. 5 & DL Ch. 6 |
+| 6 | 10/8 | Regularization for Deep Learning |  | DL Ch. 6 |
+| 7 | 10/15 | Optimization for DL Models |  | D2L Ch. 12 & DL Ch. 7 |
+| 8 | 10/22 | Project Proposal |  |  |
+| 9 | 10/29 | Implementation of DL Models |  | D2L Ch. 6 |
+| 10 | 11/5 | Convolutional Networks |  | D2L Ch. 7, 8 & DL Ch. 9 |
+| 11 | 11/12 | Recurrent Networks |  | D2L Ch. 9, 10 & DL Ch. 10 |
+| 12 | 11/19 | Hyperparameter Optimization and Tuning |  | D2L Ch. 19 & DL Ch. 11 |
+| 13 | 11/26 | Generative Models: Autoencoders, GAN, Diffusion models |  | D2L Ch. 20 & DL Ch. 14 |
+| 14 | 12/3 | Additional Topics: Attention Mechanisms and Gaussian Process |  | D2L Ch. 11, 18 |
+| 15-16 | 12/10-17 | Final Project Presentation |  |  | 
+
+: {tbl-colwidths="\[5, 10, 60, 10, 15\]" .striped}
+
+
+## Important Dates:
+
+-  9/17: No Class (Mid-Autumn Festival)
+-  10/22: Proposal Presentation
+-  12/10-17: Final Project Presentation
