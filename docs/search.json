@@ -102,7 +102,7 @@
     "href": "slides/01-intro.html#biological-neuron-model",
     "title": "STAT 5011: Course Introduction",
     "section": "Biological Neuron Model",
-    "text": "Biological Neuron Model\n\n\n\n\n\n\n\nImage source: Wikipedia"
+    "text": "Biological Neuron Model\n\n\nimage/svg+xml\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nDendrite\n\n\n\n\n\n\n\n\nSoma (cell body)\n\n\n\n\n\n\n\n\n\n\nAxon terminal\n\n\n\n\n\n\n\n\n\n\n\n\nMyelinated axon trunk\n\n\n\n\n\n\n\n\n\n\nMyelin sheat\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nInputs\n\n\n\n\nOutputs\n\n\n\n\n\nInput points = synapses\nOutput points = synapses\n\n\n\n\n\nImage source: Wikipedia"
   },
   {
     "objectID": "slides/01-intro.html#artificial-neuron",
@@ -165,7 +165,7 @@
     "href": "slides/01-intro.html#example-of-sigmoid-functions",
     "title": "STAT 5011: Course Introduction",
     "section": "Example of sigmoid functions",
-    "text": "Example of sigmoid functions\n\n\n\n\n\n\n\nImage source: Wikipedia"
+    "text": "Example of sigmoid functions\n\n\n\n\nSigmoidal Functions\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\t\n\t\t\n\t\n\n\n\n  \n  \n\n\n\n  \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\t\n\t\n\t\n\t\n\n\n\n\n\t\n\t\n\t\n\n\n\n  \n  \n  \n  \n\n\n\n\t\n\n\n\n\n\t\n\t\t\n\t\t\n\t\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\n\t\n\n\n\n\n\t\n\t  \n\t  \n\t  \n\t\n\t\n\t  \n\t\n\t\n\t  \n\t  \n\t  \n\t\n\t\n\t  \n\t\n\t\n\t  \n\t  \n\t  \n\t\n\n\n\t\n\t  \n\t  \n\t  \n\t  \n\t\n\t\n\t  \n\t  \n\t\n\t\n\t  \n\t  \n\t  \n\t  \n\t\n\t\n\t  \n\t  \n\t\n\t\n\t  \n\t  \n\t  \n\t  \n\t\n\n\n\n\n\t\n\t\n\t\n\t  \n\t  \n\t  \n\t  \n\t\n\t\n\t  \n\t  \n\t  \n\t\n\t\n\t\n\n\n\n\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nImage source: Wikipedia"
   },
   {
     "objectID": "slides/01-intro.html#universal-approximation-theorem",

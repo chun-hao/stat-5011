@@ -26,6 +26,7 @@ format:
   html:
     theme: simplex
     toc: true
+    embed-resources: true
     grid:
       sidebar-width: 200px
       body-width: 1000px

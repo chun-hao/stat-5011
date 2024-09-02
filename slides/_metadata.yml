@@ -3,9 +3,9 @@ footer: "[Home](https://chunhaoy.com/stat-5011/)"
 format: 
     revealjs:
         theme: slides.scss
-        chalkboard: true
         slide-number: true
         html-math-method: mathjax
+        embed-resources: true
         incremental: true
         auto-stretch: false
         include-in-header: 
