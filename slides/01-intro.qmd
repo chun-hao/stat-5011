@@ -368,3 +368,4 @@ Goodfellow et al. (2016) pointed out
 -  The story of Frank Rosenblatt: [Professor’s perceptron paved the way for AI – 60 years too soon](https://news.cornell.edu/stories/2019/09/professors-perceptron-paved-way-ai-60-years-too-soon)  
 -  [What is ‘model collapse’? An expert explains the rumours about an impending AI doom.](https://theconversation.com/what-is-model-collapse-an-expert-explains-the-rumours-about-an-impending-ai-doom-236415)
 :::
+
