@@ -32,7 +32,7 @@
     "href": "slides/01-intro.html#other-resources",
     "title": "STAT 5011: Course Introduction",
     "section": "Other Resources",
-    "text": "Other Resources\n\n\nT. Hastie, R. Tibshirani, and J. Friedman (2009). The Elements of Statistical Learning.\nC. M. Bishop (2006). Pattern Recognition and Machine Learning.\nS. Shalev-Shwartz and S. Ben-David (2014). Understanding Machine Learning: From Theory to Algorithms.\nMIT 9.520\nHistory of AI\nV. Vapnik (2000). The Nature of Statistical Learning Theory"
+    "text": "Other Resources\n\n\nT. Hastie, R. Tibshirani, and J. Friedman (2009). The Elements of Statistical Learning.\nC. M. Bishop (2006). Pattern Recognition and Machine Learning.\nS. Shalev-Shwartz and S. Ben-David (2014). Understanding Machine Learning: From Theory to Algorithms.\nV. Vapnik (2000). The Nature of Statistical Learning Theory"
   },
   {
     "objectID": "slides/01-intro.html#schedule",
@@ -236,5 +236,12 @@
     "title": "Statistical Deep Learning (Fall 2024)",
     "section": "Important Dates:",
     "text": "Important Dates:\n\n9/17: No Class (Mid-Autumn Festival)\n10/22: Proposal Presentation\n12/10-17: Final Project Presentation"
+  },
+  {
+    "objectID": "resources.html",
+    "href": "resources.html",
+    "title": "Resources",
+    "section": "",
+    "text": "Goodfellow et al. (2016) Deep Learning\nZhang et al. (2023) Dive into Deep Learning\nT. Hastie, R. Tibshirani, and J. Friedman (2009). The Elements of Statistical Learning.\nC. M. Bishop (2006). Pattern Recognition and Machine Learning.\nS. Shalev-Shwartz and S. Ben-David (2014). Understanding Machine Learning: From Theory to Algorithms.\nV. Vapnik (2000). The Nature of Statistical Learning Theory"
   }
 ]

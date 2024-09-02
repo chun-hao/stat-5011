@@ -44,8 +44,6 @@ Dive into Deep Learning: <https://d2l.ai>
 -  T. Hastie, R. Tibshirani, and J. Friedman (2009). [The Elements of Statistical Learning.](https://link.springer.com/book/10.1007/978-0-387-84858-7)
 -  C. M. Bishop (2006). [Pattern Recognition and Machine Learning.](https://www.microsoft.com/en-us/research/uploads/prod/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf)
 -  S. Shalev-Shwartz and S. Ben-David (2014). [Understanding Machine Learning: From Theory to Algorithms.](https://www.cs.huji.ac.il/~shais/UnderstandingMachineLearning/index.html)
--  [MIT 9.520](https://poggio-lab.mit.edu/9-520)
--  [History of AI](https://en.wikipedia.org/wiki/History_of_artificial_intelligence)
 -  V. Vapnik (2000). [The Nature of Statistical Learning Theory](https://link.springer.com/book/10.1007/978-1-4757-3264-1) 
 :::
 
