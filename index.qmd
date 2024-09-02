@@ -22,7 +22,7 @@ title: "Statistical Deep Learning (Fall 2024)"
 | 14 | 12/3 | Additional Topics: Attention Mechanisms and Gaussian Process |  | D2L Ch. 11, 18 |
 | 15-16 | 12/10-17 | Final Project Presentation |  |  | 
 
-: {tbl-colwidths="\[5, 10, 60, 10, 15\]" .striped}
+: {tbl-colwidths="\[5, 10, 60, 10, 25\]" .striped}
 
 
 ## Important Dates:
