@@ -6,7 +6,6 @@ format:
         slide-number: true
         html-math-method: mathjax
         embed-resources: true
-        incremental: true
         auto-stretch: false
         include-in-header: 
             - text: 

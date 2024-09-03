@@ -4,14 +4,14 @@
     "href": "slides/01-intro.html#course-description",
     "title": "STAT 5011: Course Introduction",
     "section": "Course Description",
-    "text": "Course Description\n\n\\[\n\\newcommand{\\mc}[1]{\\mathcal{#1}}\n\\newcommand{\\R}{\\mathbb{R}}\n\\newcommand{\\E}{\\mathbb{E}}\n\\renewcommand{\\P}{\\mathbb{P}}\n\\newcommand{\\var}{{\\rm Var}} % Variance\n\\newcommand{\\mse}{{\\rm MSE}} % MSE\n\\newcommand{\\bias}{{\\rm Bias}} % MSE\n\\newcommand{\\cov}{{\\rm Cov}} % Covariance\n\\newcommand{\\iid}{\\stackrel{\\rm iid}{\\sim}}\n\\newcommand{\\ind}{\\stackrel{\\rm ind}{\\sim}}\n\\renewcommand{\\choose}[2]{\\binom{#1}{#2}}  % Choose\n\\newcommand{\\chooses}[2]{{}_{#1}C_{#2}}  % Small choose\n\\newcommand{\\cd}{\\stackrel{d}{\\rightarrow}}\n\\newcommand{\\cas}{\\stackrel{a.s.}{\\rightarrow}}\n\\newcommand{\\cp}{\\stackrel{p}{\\rightarrow}}\n\\newcommand{\\bin}{{\\rm Bin}}\n\\newcommand{\\ber}{{\\rm Ber}}\n\\DeclareMathOperator*{\\argmax}{argmax}\n\\DeclareMathOperator*{\\argmin}{argmin}\n\\]\n\n\n\nThis course provides an introduction to some commonly used models in deep learning:\n\nMultilayer Perceptron (MLP) or Fully-connected neural network (FCN)\nConvolutional Neural Network (CNN)\nRecurrent Neural Network (RNN)\nGenerative models\n\nThe course will cover the basic theory, practical implementation, and some applications of these models."
+    "text": "Course Description\n\n\\[\n\\newcommand{\\mc}[1]{\\mathcal{#1}}\n\\newcommand{\\R}{\\mathbb{R}}\n\\newcommand{\\E}{\\mathbb{E}}\n\\renewcommand{\\P}{\\mathbb{P}}\n\\newcommand{\\var}{{\\rm Var}} % Variance\n\\newcommand{\\mse}{{\\rm MSE}} % MSE\n\\newcommand{\\bias}{{\\rm Bias}} % MSE\n\\newcommand{\\cov}{{\\rm Cov}} % Covariance\n\\newcommand{\\iid}{\\stackrel{\\rm iid}{\\sim}}\n\\newcommand{\\ind}{\\stackrel{\\rm ind}{\\sim}}\n\\renewcommand{\\choose}[2]{\\binom{#1}{#2}}  % Choose\n\\newcommand{\\chooses}[2]{{}_{#1}C_{#2}}  % Small choose\n\\newcommand{\\cd}{\\stackrel{d}{\\rightarrow}}\n\\newcommand{\\cas}{\\stackrel{a.s.}{\\rightarrow}}\n\\newcommand{\\cp}{\\stackrel{p}{\\rightarrow}}\n\\newcommand{\\bin}{{\\rm Bin}}\n\\newcommand{\\ber}{{\\rm Ber}}\n\\DeclareMathOperator*{\\argmax}{argmax}\n\\DeclareMathOperator*{\\argmin}{argmin}\n\\]\n\n\nThis course provides an introduction to some commonly used models in deep learning:\n\nMultilayer Perceptron (MLP) or Fully-connected neural network (FCN)\nConvolutional Neural Network (CNN)\nRecurrent Neural Network (RNN)\nGenerative models\n\nThe course will cover the basic theory, practical implementation, and some applications of these models."
   },
   {
     "objectID": "slides/01-intro.html#prerequisites",
     "href": "slides/01-intro.html#prerequisites",
     "title": "STAT 5011: Course Introduction",
     "section": "Prerequisites",
-    "text": "Prerequisites\n\n\nKnowledge of linear algebra, calculus, probability, and statistics is required.\nExperiences in Python programming is also required (import libraries, write functions, etc.)\nKnowledge of object-oriented programming is a plus.\nKnowledge of machine learning would also be helpful (we will cover some basics in the course)."
+    "text": "Prerequisites\n\nKnowledge of linear algebra, calculus, probability, and statistics is required.\nExperiences in Python programming is also required (import libraries, write functions, etc.)\nKnowledge of object-oriented programming is a plus.\nKnowledge of machine learning would also be helpful (we will cover some basics in the course)."
   },
   {
     "objectID": "slides/01-intro.html#references",
@@ -32,42 +32,42 @@
     "href": "slides/01-intro.html#other-resources",
     "title": "STAT 5011: Course Introduction",
     "section": "Other Resources",
-    "text": "Other Resources\n\n\nT. Hastie, R. Tibshirani, and J. Friedman (2009). The Elements of Statistical Learning.\nC. M. Bishop (2006). Pattern Recognition and Machine Learning.\nS. Shalev-Shwartz and S. Ben-David (2014). Understanding Machine Learning: From Theory to Algorithms.\nV. Vapnik (2000). The Nature of Statistical Learning Theory\nC. C. Aggarwal (2023). Neural Networks and Deep Learning"
+    "text": "Other Resources\n\nT. Hastie, R. Tibshirani, and J. Friedman (2009). The Elements of Statistical Learning.\nC. M. Bishop (2006). Pattern Recognition and Machine Learning.\nS. Shalev-Shwartz and S. Ben-David (2014). Understanding Machine Learning: From Theory to Algorithms.\nV. Vapnik (2000). The Nature of Statistical Learning Theory\nC. C. Aggarwal (2023). Neural Networks and Deep Learning"
   },
   {
     "objectID": "slides/01-intro.html#schedule",
     "href": "slides/01-intro.html#schedule",
     "title": "STAT 5011: Course Introduction",
     "section": "Schedule",
-    "text": "Schedule\n\n\n\n\n\n\n\n\n\nWeek\nDate\nTopics\nReading\n\n\n\n\n1\n9/3\nCourse Introduction\n\n\n\n2\n9/10\nReview of Linear Models\n\n\n\n3\n9/17\nNo class (Mid-Autumn Festival)\n\n\n\n4\n9/24\nMachine Learning Basics\nDL Ch. 5\n\n\n5\n10/1\nMultilayer Perceptron\nD2L Ch. 5 & DL Ch. 6\n\n\n6\n10/8\nRegularization for Deep Learning\nDL Ch. 6\n\n\n7\n10/15\nOptimization for DL Models\nD2L Ch. 12 & DL Ch. 7\n\n\n8\n10/22\nProject Proposal\n\n\n\n9\n10/29\nImplementation of DL Models\nD2L Ch. 6\n\n\n10\n11/5\nConvolutional Networks\nD2L Ch. 7, 8 & DL Ch. 9\n\n\n11\n11/12\nRecurrent Networks\nD2L Ch. 9, 10 & DL Ch. 10\n\n\n12\n11/19\nHyperparameter Optimization and Tuning\nD2L Ch. 19 & DL Ch. 11\n\n\n13\n11/26\nGenerative Models: Autoencoders, GAN, Diffusion models\nD2L Ch. 20 & DL Ch. 14\n\n\n14\n12/3\nAdditional Topics: Attention Mechanisms and Gaussian Process\nD2L Ch. 11, 18\n\n\n15-16\n12/10-17\nFinal Project Presentation"
+    "text": "Schedule\n\n\n\n\n\n\n\n\n\nWeek\nDate\nTopics\nReading\n\n\n\n\n1\n9/3\nCourse Introduction\n\n\n\n2\n9/10\nReview of Linear Models\n\n\n\n3\n9/17\nNo class (Mid-Autumn Festival)\n\n\n\n4\n9/24\nMachine Learning Basics\nDL Ch. 5\n\n\n5\n10/1\nMultilayer Perceptron\nD2L Ch. 5 & DL Ch. 6\n\n\n6\n10/8\nRegularization for Deep Learning\nDL Ch. 7\n\n\n7\n10/15\nOptimization for DL Models\nD2L Ch. 12 & DL Ch. 8\n\n\n8\n10/22\nProject Proposal\n\n\n\n9\n10/29\nImplementation of DL Models\nD2L Ch. 6\n\n\n10\n11/5\nConvolutional Networks\nD2L Ch. 7, 8 & DL Ch. 9\n\n\n11\n11/12\nRecurrent Networks\nD2L Ch. 9, 10 & DL Ch. 10\n\n\n12\n11/19\nHyperparameter Optimization and Tuning\nD2L Ch. 19 & DL Ch. 11\n\n\n13\n11/26\nGenerative Models: Autoencoders, GAN, Diffusion models\nD2L Ch. 20 & DL Ch. 14\n\n\n14\n12/3\nAdditional Topics: Attention Mechanisms and Gaussian Process\nD2L Ch. 11, 18\n\n\n15-16\n12/10-17\nFinal Project Presentation"
   },
   {
     "objectID": "slides/01-intro.html#grading",
     "href": "slides/01-intro.html#grading",
     "title": "STAT 5011: Course Introduction",
     "section": "Grading",
-    "text": "Grading\n\n\nHomework: 30%\nProject proposal: 20%\n\nA 20-minute presentation\n\nFinal Project: 50%\n\nA 30-minute presentation (25%)\nA final report (25%)\n\nOffice hours: Tue. 15:00-17:00"
+    "text": "Grading\n\nHomework: 30%\nProject proposal: 20%\n\nA 20-minute presentation\n\nFinal Project: 50%\n\nA 30-minute presentation (25%)\nA final report (25%)\n\nOffice hours: Tue. 15:00-17:00"
   },
   {
     "objectID": "slides/01-intro.html#homework",
     "href": "slides/01-intro.html#homework",
     "title": "STAT 5011: Course Introduction",
     "section": "Homework",
-    "text": "Homework\n\n\nThere will be 3 homework assignments.\nHomework includes some math problems and programming exercises.\nProgramming assignments will be done using IPython notebooks and exported to PDF.\nMath problems will be submitted as a PDF file (using LaTeX preferably).\nDO NOT:\n\nPlagiarism: copy solution from others or from the internet.\nTake photos of your computer screen.\nTake photos of your handwritten solutions."
+    "text": "Homework\n\nThere will be 3 homework assignments.\nHomework includes some math problems and programming exercises.\nProgramming assignments will be done using IPython notebooks and exported to PDF.\nMath problems will be submitted as a PDF file (using LaTeX preferably).\nDO NOT:\n\nPlagiarism: copy solution from others or from the internet.\nTake photos of your computer screen.\nTake photos of your handwritten solutions."
   },
   {
     "objectID": "slides/01-intro.html#project-proposal",
     "href": "slides/01-intro.html#project-proposal",
     "title": "STAT 5011: Course Introduction",
     "section": "Project Proposal",
-    "text": "Project Proposal\n\n\nA group of 2-3 students\nPick a topic that you plan to solve using deep learning models, for example:\n\nimage classification/segmentation\nstock price prediction\nweather forcasting\n\nIt could be something related to your thesis research.\nThe proposal should include:\n\nDiscription of your problem\nExample dataset\nSummary of 1-2 references\n\nGive a 20-minute presentation on 10/22"
+    "text": "Project Proposal\n\nA group of 2-3 students\nPick a topic that you plan to solve using deep learning models, for example:\n\nimage classification/segmentation\nstock price prediction\nweather forcasting\n\nIt could be something related to your thesis research.\nThe proposal should include:\n\nDiscription of your problem\nExample dataset\nSummary of 1-2 references\n\nGive a 20-minute presentation on 10/22"
   },
   {
     "objectID": "slides/01-intro.html#final-project",
     "href": "slides/01-intro.html#final-project",
     "title": "STAT 5011: Course Introduction",
     "section": "Final Project",
-    "text": "Final Project\n\n\nOral Presentation (25%)\n\n30-minute presentation\nFocus the model you used, the dataset, and the results\nCompare to other models\n\nWritten Report (25%)\n\nUse the template: NeurIPS\n6-page including references; one report per group\nInclude: introduction, methods, results, and conclusion\n\nMore details will be provided later."
+    "text": "Final Project\n\nOral Presentation (25%)\n\n30-minute presentation\nFocus the model you used, the dataset, and the results\nCompare to other models\n\nWritten Report (25%)\n\nUse the template: NeurIPS\n6-page including references; one report per group\nInclude: introduction, methods, results, and conclusion\n\nMore details will be provided later."
   },
   {
     "objectID": "slides/01-intro.html#what-is-deep-learning",
@@ -81,21 +81,21 @@
     "href": "slides/01-intro.html#what-is-dlml",
     "title": "STAT 5011: Course Introduction",
     "section": "What is DL/ML?",
-    "text": "What is DL/ML?\n\n\nDeep learning is a subfield of machine learning that is based on deep neural networks (DNN).\nDNN is a powerful approximating class of parametric class of functions.\nML is a field of study that focuses on automatic detection/extraction of patterns from raw data.\nTo achieve this, ML uses a variety of statistical models:\n\nlinear regression, logistic regression,\ntree models,\n\\(k\\)-nearest neighbors (kNN), etc."
+    "text": "What is DL/ML?\n\nDeep learning is a subfield of machine learning that is based on deep neural networks (DNN).\nDNN is a powerful approximating class of parametric class of functions.\nML is a field of study that focuses on automatic detection/extraction of patterns from raw data.\nTo achieve this, ML uses a variety of statistical models:\n\nlinear regression, logistic regression,\ntree models,\n\\(k\\)-nearest neighbors (kNN), etc."
   },
   {
     "objectID": "slides/01-intro.html#turing-test",
     "href": "slides/01-intro.html#turing-test",
     "title": "STAT 5011: Course Introduction",
     "section": "Turing Test",
-    "text": "Turing Test\n\n\nThe Turing test, originally called the imitation game by Alan Turing in 1950, is a test of a machine’s ability to exhibit intelligent behaviour equivalent to that of a human.\nThe field of AI research was founded at a workshop at Dartmouth College in 1956.\n\n\n\n\n\n\n\n\n\nImage source: Wikipedia"
+    "text": "Turing Test\n\nThe Turing test, originally called the imitation game by Alan Turing in 1950, is a test of a machine’s ability to exhibit intelligent behaviour equivalent to that of a human.\nThe field of AI research was founded at a workshop at Dartmouth College in 1956.\n\n\n\n\n\n\n\n\nImage source: Wikipedia"
   },
   {
     "objectID": "slides/01-intro.html#hebbs-theory",
     "href": "slides/01-intro.html#hebbs-theory",
     "title": "STAT 5011: Course Introduction",
     "section": "Hebb’s Theory",
-    "text": "Hebb’s Theory\n\n\nIn 1949, Donald Hebb1 proposed a theory of learning in which the connection between two neurons is strengthened if they are activated simultaneously.\nHebbian learning rule:\n\nThe connection between two neurons: \\(w_{ij} \\leftarrow w_{ij} + \\Delta w_{ij}\\)\nThe change in the connection: \\(\\Delta w_{ij} = \\eta x_i x_j\\)\nwhere \\(\\eta\\) is the learning rate, \\(x_i\\) and \\(x_j\\) are the activities of the two neurons.\n\n\n\nHebb, D. O. (1949). The Organization of Behavior: A Neuropsychological Theory."
+    "text": "Hebb’s Theory\n\nIn 1949, Donald Hebb1 proposed a theory of learning in which the connection between two neurons is strengthened if they are activated simultaneously.\nHebbian learning rule:\n\nThe connection between two neurons: \\(w_{ij} \\leftarrow w_{ij} + \\Delta w_{ij}\\)\nThe change in the connection: \\(\\Delta w_{ij} = \\eta x_i x_j\\)\nwhere \\(\\eta\\) is the learning rate, \\(x_i\\) and \\(x_j\\) are the activities of the two neurons.\n\n\nHebb, D. O. (1949). The Organization of Behavior: A Neuropsychological Theory."
   },
   {
     "objectID": "slides/01-intro.html#biological-neuron-model",
@@ -109,14 +109,14 @@
     "href": "slides/01-intro.html#artificial-neuron",
     "title": "STAT 5011: Course Introduction",
     "section": "Artificial Neuron",
-    "text": "Artificial Neuron\n\n\nMcCulloch and Pitts (1943) proposed a simple mathematical model for neurons.\nA neuron has \\(n\\) inputs \\(x = (x_1, ... ,x_n) \\in \\R^n\\) and one output \\(y \\in \\{-1, 1\\}\\).\n\\((u * v)\\) is the inner product of two vectors, \\(b\\) is a threshold value, and \\(\\text{sign}(u)= 1\\) if \\(u &gt; 0\\) and \\(\\text{sign}(u)= -1\\) if \\(u\\leq 0\\).\nDuring the learning process, the model chooses appropriate coefficients \\(w, b\\) of the neuron."
+    "text": "Artificial Neuron\n\nMcCulloch and Pitts (1943) proposed a simple mathematical model for neurons.\nA neuron has \\(n\\) inputs \\(x = (x_1, ... ,x_n) \\in \\R^n\\) and one output \\(y \\in \\{-1, 1\\}\\).\n\\((u * v)\\) is the inner product of two vectors, \\(b\\) is a threshold value, and \\(\\text{sign}(u)= 1\\) if \\(u &gt; 0\\) and \\(\\text{sign}(u)= -1\\) if \\(u\\leq 0\\).\nDuring the learning process, the model chooses appropriate coefficients \\(w, b\\) of the neuron."
   },
   {
     "objectID": "slides/01-intro.html#rosenblatts-perceptron-1960s",
     "href": "slides/01-intro.html#rosenblatts-perceptron-1960s",
     "title": "STAT 5011: Course Introduction",
     "section": "Rosenblatt’s Perceptron (1960s)",
-    "text": "Rosenblatt’s Perceptron (1960s)\n\n\nRosenblatt considered a model that is a composition of several neurons.\nEach neuron has its own weight \\(w\\) and threshold \\(b\\)."
+    "text": "Rosenblatt’s Perceptron (1960s)\n\nRosenblatt considered a model that is a composition of several neurons.\nEach neuron has its own weight \\(w\\) and threshold \\(b\\)."
   },
   {
     "objectID": "slides/01-intro.html#perceptron-learning-algorithm-pla",
@@ -144,21 +144,21 @@
     "href": "slides/01-intro.html#theoretical-analysis-of-pla",
     "title": "STAT 5011: Course Introduction",
     "section": "Theoretical Analysis of PLA",
-    "text": "Theoretical Analysis of PLA\nIn 1962, Novikoff1 proved the first theorem about the PLA. If\n\n\nthe norm of the training vectors \\(z\\) is bounded by some constant \\(R\\) (\\(|z| \\leq R\\)),and\n(linear separability) the training data can be separated with margin \\(\\rho\\): \\[\n     \\sup_w \\min_i y_i(z_i \\cdot w) &gt; \\rho\n\\]\n\n\nThen after at most \\(N \\leq \\frac{R^2}{\\rho^2}\\) steps, the hyperplane that separates the training data will be constructed.\nNovikoff, A. B. J. (1962). On convergence proofs on perceptrons. In Proceedings of the Symposium on the Mathematical Theory of Automata, Vol. XII, pages 615–622."
+    "text": "Theoretical Analysis of PLA\nIn 1962, Novikoff1 proved the first theorem about the PLA. If\n\nthe norm of the training vectors \\(z\\) is bounded by some constant \\(R\\) (\\(|z| \\leq R\\)),and\n(linear separability) the training data can be separated with margin \\(\\rho\\): \\[\n     \\sup_w \\min_i y_i(z_i \\cdot w) &gt; \\rho\n\\]\n\nThen after at most \\(N \\leq \\frac{R^2}{\\rho^2}\\) steps, the hyperplane that separates the training data will be constructed.\nNovikoff, A. B. J. (1962). On convergence proofs on perceptrons. In Proceedings of the Symposium on the Mathematical Theory of Automata, Vol. XII, pages 615–622."
   },
   {
     "objectID": "slides/01-intro.html#learning-theory",
     "href": "slides/01-intro.html#learning-theory",
     "title": "STAT 5011: Course Introduction",
     "section": "Learning Theory",
-    "text": "Learning Theory\n\nNovikoff’s result and Rosenblatt’s experiment raised several questions:\n\n\nWhat can be learned?\nWhat is the principle for designing learning algorithms?\nHow can we assure that the algorithm is actually learning, not just memorizing?\n\n\nThese questions led to the development of the statistical learning theory during 70s-80s.\nImportant results include:\n\nVapnik-Chervonenkis (VC) theory (for characterizing the capacity of a model)\nProbably Approximately Correct (PAC) learning theory (for characterizing whether a model can learn from a finite sample)\nEmpirical Risk Minimization (ERM) principle (for designing learning algorithms)"
+    "text": "Learning Theory\n\nNovikoff’s result and Rosenblatt’s experiment raised several questions:\n\nWhat can be learned?\nWhat is the principle for designing learning algorithms?\nHow can we assure that the algorithm is actually learning, not just memorizing?\n\nThese questions led to the development of the statistical learning theory during 70s-80s.\nImportant results include:\n\nVapnik-Chervonenkis (VC) theory (for characterizing the capacity of a model)\nProbably Approximately Correct (PAC) learning theory (for characterizing whether a model can learn from a finite sample)\nEmpirical Risk Minimization (ERM) principle (for designing learning algorithms)"
   },
   {
     "objectID": "slides/01-intro.html#revival-of-neural-networks",
     "href": "slides/01-intro.html#revival-of-neural-networks",
     "title": "STAT 5011: Course Introduction",
     "section": "Revival of Neural Networks",
-    "text": "Revival of Neural Networks\n\n\nIn 1986, several authors independently proposed a method for simultaneously constructing the vector coefficients for all neurons of the Perceptron using the so-called back-propagation method12.\nThe idea is to replace to McCulloch-Pitts neuron model with a sigmoid approximation, i.e., \\[\n     y = S(w\\cdot x - b)\n\\] where \\(S(x)\\) is a sigmoid function (differentiable, monotonic, \\(S(-\\infty) = -1\\) and \\(S(\\infty) = 1\\)).\nThis allows us to apply gradient-based optimization methods to find the optimal weights.\n\n\nLe Cun, Y. (1986). Learning processes in an asymmetric threshold network, Disordered systems and biological organizations, Les Houches, France, Springer, pages 233-240.Rumelhart, D. E., Hinton, G. E., & Williams, R. J. (1986). Learning internal representations by error propagation, Parallel distributed processing: Explorations in the microstructure of cognition, Vol. I, Badford Books, Cambridge, MA., pages 318-362."
+    "text": "Revival of Neural Networks\n\nIn 1986, several authors independently proposed a method for simultaneously constructing the vector coefficients for all neurons of the Perceptron using the so-called back-propagation method12.\nThe idea is to replace to McCulloch-Pitts neuron model with a sigmoid approximation, i.e., \\[\n     y = S(w\\cdot x - b)\n\\] where \\(S(x)\\) is a sigmoid function (differentiable, monotonic, \\(S(-\\infty) = -1\\) and \\(S(\\infty) = 1\\)).\nThis allows us to apply gradient-based optimization methods to find the optimal weights.\n\nLe Cun, Y. (1986). Learning processes in an asymmetric threshold network, Disordered systems and biological organizations, Les Houches, France, Springer, pages 233-240.Rumelhart, D. E., Hinton, G. E., & Williams, R. J. (1986). Learning internal representations by error propagation, Parallel distributed processing: Explorations in the microstructure of cognition, Vol. I, Badford Books, Cambridge, MA., pages 318-362."
   },
   {
     "objectID": "slides/01-intro.html#example-of-sigmoid-functions",
@@ -172,7 +172,7 @@
     "href": "slides/01-intro.html#universal-approximation-theorem",
     "title": "STAT 5011: Course Introduction",
     "section": "Universal Approximation Theorem",
-    "text": "Universal Approximation Theorem\n\n\nIn 1989, Cybenko1 proved the universal approximation theorem for feedforward neural networks.\nThe theorem states that\n\n\n… networks with one internal layer and an arbitrary continuous sigmoidal function can approximate continuous functions wtih arbitrary precision providing that no constraints are placed on the number of nodes or the size of the weights.\n\n\nThat is, the finite sum \\(G(x) = \\sum_{i=1}^h a_i S(w_i \\cdot x - b_i)\\), \\(x \\in D \\subseteq \\R^n\\), is dense in the space of continuous functions on \\(D\\) where \\(D\\) is compact.\n\n\nCybenko, G. (1989). Approximation by superpositions of a sigmoidal function. Mathematics of Control, Signals, and Systems, 2(4), pages 303-314."
+    "text": "Universal Approximation Theorem\n\nIn 1989, Cybenko1 proved the universal approximation theorem for feedforward neural networks.\nThe theorem states that\n\n\n… networks with one internal layer and an arbitrary continuous sigmoidal function can approximate continuous functions wtih arbitrary precision providing that no constraints are placed on the number of nodes or the size of the weights.\n\n\nThat is, the finite sum \\(G(x) = \\sum_{i=1}^h a_i S(w_i \\cdot x - b_i)\\), \\(x \\in D \\subseteq \\R^n\\), is dense in the space of continuous functions on \\(D\\) where \\(D\\) is compact.\n\nCybenko, G. (1989). Approximation by superpositions of a sigmoidal function. Mathematics of Control, Signals, and Systems, 2(4), pages 303-314."
   },
   {
     "objectID": "slides/01-intro.html#in-the-1990s",
@@ -193,7 +193,7 @@
     "href": "slides/01-intro.html#three-waves-of-neural-networks",
     "title": "STAT 5011: Course Introduction",
     "section": "Three Waves of Neural Networks",
-    "text": "Three Waves of Neural Networks\n\n\nThe first wave: 1940s-1960s\n\nFundamental concepts: artificial neuron, perceptron\nPerceptron learning algorithm\n\nThe second wave: 1980s-1990s\n\nBack-propagation algorithm\nNetwork design strategies: convolutional networks, LSTM\n\nThe third wave: 2000s-present\n\nDeep neural networks\nLarge datasets and computational resources\nLarge Language Model (LLM), e.g., ChatGPT"
+    "text": "Three Waves of Neural Networks\n\nThe first wave: 1940s-1960s\n\nFundamental concepts: artificial neuron, perceptron\nPerceptron learning algorithm\n\nThe second wave: 1980s-1990s\n\nBack-propagation algorithm\nNetwork design strategies: convolutional networks, LSTM\n\nThe third wave: 2000s-present\n\nDeep neural networks\nLarge datasets and computational resources\nLarge Language Model (LLM), e.g., ChatGPT"
   },
   {
     "objectID": "slides/01-intro.html#the-end-of-the-second-wave",
@@ -207,14 +207,14 @@
     "href": "slides/01-intro.html#an-impending-ai-doom-model-collapse",
     "title": "STAT 5011: Course Introduction",
     "section": "An Impending AI Doom: Model Collapse",
-    "text": "An Impending AI Doom: Model Collapse\n\n\nShumailov et al. (2023)1 showed that training on generated data can make models forget.\nThey demonstrated that training on generated data can lead to catastrophic forgetting, a phenomenon where models forget how to perform well on real data.\n\n\n\n\n\n\n\nShumailov, I., Shumaylov, Z., Zhao, Y., Gal, Y., Papernot, N., & Anderson, R. (2023). The curse of recursion: Training on generated data makes models forget. arXiv preprint arXiv:2305.17493."
+    "text": "An Impending AI Doom: Model Collapse\n\nShumailov et al. (2023)1 showed that training on generated data can make models forget.\nThey demonstrated that training on generated data can lead to catastrophic forgetting, a phenomenon where models forget how to perform well on real data.\n\n\n\n\n\n\nShumailov, I., Shumaylov, Z., Zhao, Y., Gal, Y., Papernot, N., & Anderson, R. (2023). The curse of recursion: Training on generated data makes models forget. arXiv preprint arXiv:2305.17493."
   },
   {
     "objectID": "slides/01-intro.html#other-readings",
     "href": "slides/01-intro.html#other-readings",
     "title": "STAT 5011: Course Introduction",
     "section": "Other readings",
-    "text": "Other readings\n\n\nThe story of Frank Rosenblatt: Professor’s perceptron paved the way for AI – 60 years too soon\n\nWhat is ‘model collapse’? An expert explains the rumours about an impending AI doom.\n\n\n\n\n\nHome"
+    "text": "Other readings\n\nThe story of Frank Rosenblatt: Professor’s perceptron paved the way for AI – 60 years too soon\n\nWhat is ‘model collapse’? An expert explains the rumours about an impending AI doom.\n\n\n\n\nHome"
   },
   {
     "objectID": "index.html",
@@ -228,7 +228,7 @@
     "href": "index.html#course-schedule",
     "title": "Statistical Deep Learning (Fall 2024)",
     "section": "Course Schedule",
-    "text": "Course Schedule\n\n\n\n\n\n\n\n\n\n\nWeek\nDate\nTopics\nSlides\nReading\n\n\n\n\n1\n9/3\nCourse Introduction\nSlide\n\n\n\n2\n9/10\nReview of Linear Models\n\n\n\n\n3\n9/17\nNo class (Mid-Autumn Festival)\n\n\n\n\n4\n9/24\nMachine Learning Basics\n\nDL Ch. 5\n\n\n5\n10/1\nMultilayer Perceptron\n\nD2L Ch. 5 & DL Ch. 6\n\n\n6\n10/8\nRegularization for Deep Learning\n\nDL Ch. 6\n\n\n7\n10/15\nOptimization for DL Models\n\nD2L Ch. 12 & DL Ch. 7\n\n\n8\n10/22\nProject Proposal\n\n\n\n\n9\n10/29\nImplementation of DL Models\n\nD2L Ch. 6\n\n\n10\n11/5\nConvolutional Networks\n\nD2L Ch. 7, 8 & DL Ch. 9\n\n\n11\n11/12\nRecurrent Networks\n\nD2L Ch. 9, 10 & DL Ch. 10\n\n\n12\n11/19\nHyperparameter Optimization and Tuning\n\nD2L Ch. 19 & DL Ch. 11\n\n\n13\n11/26\nGenerative Models: Autoencoders, GAN, Diffusion models\n\nD2L Ch. 20 & DL Ch. 14\n\n\n14\n12/3\nAdditional Topics: Attention Mechanisms and Gaussian Process\n\nD2L Ch. 11, 18\n\n\n15-16\n12/10-17\nFinal Project Presentation"
+    "text": "Course Schedule\n\n\n\n\n\n\n\n\n\n\nWeek\nDate\nTopics\nSlides\nReading\n\n\n\n\n1\n9/3\nCourse Introduction\nSlide\n\n\n\n2\n9/10\nReview of Linear Models\n\n\n\n\n3\n9/17\nNo class (Mid-Autumn Festival)\n\n\n\n\n4\n9/24\nMachine Learning Basics\n\nDL Ch. 5\n\n\n5\n10/1\nMultilayer Perceptron\n\nD2L Ch. 5 & DL Ch. 6\n\n\n6\n10/8\nRegularization for Deep Learning\n\nDL Ch. 7\n\n\n7\n10/15\nOptimization for DL Models\n\nD2L Ch. 12 & DL Ch. 8\n\n\n8\n10/22\nProject Proposal\n\n\n\n\n9\n10/29\nImplementation of DL Models\n\nD2L Ch. 6\n\n\n10\n11/5\nConvolutional Networks\n\nD2L Ch. 7, 8 & DL Ch. 9\n\n\n11\n11/12\nRecurrent Networks\n\nD2L Ch. 9, 10 & DL Ch. 10\n\n\n12\n11/19\nHyperparameter Optimization and Tuning\n\nD2L Ch. 19 & DL Ch. 11\n\n\n13\n11/26\nGenerative Models: Autoencoders, GAN, Diffusion models\n\nD2L Ch. 20 & DL Ch. 14\n\n\n14\n12/3\nAdditional Topics: Attention Mechanisms and Gaussian Process\n\nD2L Ch. 11, 18\n\n\n15-16\n12/10-17\nFinal Project Presentation"
   },
   {
     "objectID": "index.html#important-dates",
