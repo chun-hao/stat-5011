@@ -87,7 +87,7 @@ Dive into Deep Learning: <https://d2l.ai>
 -  There will be 3 homework assignments.
 -  Homework includes some math problems and programming exercises.
 -  Programming assignments will be done using IPython notebooks and exported to PDF.
--  Math problems will be submitted as a PDF file (using LaTeX preferrably).
+-  Math problems will be submitted as a PDF file (using LaTeX preferably).
 -  **DO NOT**:
    -  Plagiarism: copy solution from others or from the internet.
    -  Take photos of your computer screen.
@@ -175,7 +175,7 @@ Image source: [Wikipedia](https://en.wikipedia.org/wiki/Turing_test)
 
 ## Biological Neuron Model
 
-![](images/lec01/neuron.svg){fig-align="center" width=70%}
+![](images/lec01/neuron.svg){fig-align="center" width=100%}
 
 :::{.aside}
 Image source: [Wikipedia](https://en.wikipedia.org/wiki/Biological_neuron_model)
@@ -277,7 +277,7 @@ Then after at most $N \leq \frac{R^2}{\rho^2}$ steps, the hyperplane that separa
 -  This allows us to apply gradient-based optimization methods to find the optimal weights.
 :::
 
-[^lecun1986]: LeCun, Y. (1986). Learning processes in an asymmetric threshold network, *Disordered systems and biological organizations*, Les Houches, France, Springer, pages 233-240.
+[^lecun1986]: Le Cun, Y. (1986). Learning processes in an asymmetric threshold network, *Disordered systems and biological organizations*, Les Houches, France, Springer, pages 233-240.
 [^rumelhart1986]: Rumelhart, D. E., Hinton, G. E., & Williams, R. J. (1986). Learning internal representations by error propagation, *Parallel distributed processing: Explorations in the microstructure of cognition*, Vol. I, Badford Books, Cambridge, MA., pages 318-362.
 
 ## Example of sigmoid functions
@@ -304,7 +304,7 @@ Image source: [Wikipedia](https://en.wikipedia.org/wiki/Sigmoid_function)
 
 ## In the 1990s
 
--  Le Cun (1989)[^cnn] proposed concolutional network for data with grid-like structure, e.g., images.
+-  Le Cun (1989)[^cnn] proposed convolutional network for data with grid-like structure, e.g., images.
 -  Hochreiter and Schmidhuber (1997)[^lstm] introduced the Long Short-Term Memory (LSTM) network to model sequential data, e.g., language and time series data.
 - Due to the difficulty in training, more attention is now focused on the alternatives to neural networks, for example,
    -  support vector machine (SVM, Cortes and Vapnik (1995))
