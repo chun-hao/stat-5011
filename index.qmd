@@ -12,7 +12,7 @@ title: "Statistical Deep Learning (Fall 2024)"
 | Week | Date | Topics | Slides | Reading |
 |:---------:|-----------|----------------------------------------|-----------|----------|
 | 1 | 9/3 | Course Introduction | [Slide](slides/01-intro.qmd) |  |
-| 2 | 9/10 | Review of Linear Models |  |  |
+| 2 | 9/10 | Review of Linear Models | [Slide](slides/02-lm.qmd) |  |
 | 3 | 9/17 | No class (Mid-Autumn Festival) |  |  |
 | 4 | 9/24 | Machine Learning Basics |  | DL Ch. 5 |
 | 5 | 10/1 | Multilayer Perceptron |  | D2L Ch. 5 & DL Ch. 6 |

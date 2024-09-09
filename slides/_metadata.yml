@@ -15,3 +15,4 @@ execute:
     warning: false
     cache: true
     freeze: true
+jupyter: python3

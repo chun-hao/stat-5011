@@ -1,10 +1,318 @@
 [
   {
+    "objectID": "slides/02-lm.html#outline",
+    "href": "slides/02-lm.html#outline",
+    "title": "Generalized Linear Models",
+    "section": "Outline",
+    "text": "Outline\n\n\\[\n\\newcommand{\\mc}[1]{\\mathcal{#1}}\n\\newcommand{\\R}{\\mathbb{R}}\n\\newcommand{\\E}{\\mathbb{E}}\n\\renewcommand{\\P}{\\mathbb{P}}\n\\newcommand{\\var}{{\\rm Var}} % Variance\n\\newcommand{\\mse}{{\\rm MSE}} % MSE\n\\newcommand{\\bias}{{\\rm Bias}} % MSE\n\\newcommand{\\cov}{{\\rm Cov}} % Covariance\n\\newcommand{\\iid}{\\stackrel{\\rm iid}{\\sim}}\n\\newcommand{\\ind}{\\stackrel{\\rm ind}{\\sim}}\n\\renewcommand{\\choose}[2]{\\binom{#1}{#2}}  % Choose\n\\newcommand{\\chooses}[2]{{}_{#1}C_{#2}}  % Small choose\n\\newcommand{\\cd}{\\stackrel{d}{\\rightarrow}}\n\\newcommand{\\cas}{\\stackrel{a.s.}{\\rightarrow}}\n\\newcommand{\\cp}{\\stackrel{p}{\\rightarrow}}\n\\newcommand{\\bin}{{\\rm Bin}}\n\\newcommand{\\ber}{{\\rm Ber}}\n\\newcommand{\\diag}{{\\rm diag}}\n\\DeclareMathOperator*{\\argmax}{argmax}\n\\DeclareMathOperator*{\\argmin}{argmin}\n\\]\n\n\nClassical Linear Model\n\nOrdinary Least Squares (OLS) Estimation\nMaximum Likelihood (ML) Estimation\nPenality and Regularization\n\nGeneralized Linear Models\n\nLogistic regression\nMultinomial Regression\n\nNon-linear Models\n\nGeneralized Additive Models (GAM)\nProjection Pursuit Regression (PPR)"
+  },
+  {
+    "objectID": "slides/02-lm.html#classical-linear-model",
+    "href": "slides/02-lm.html#classical-linear-model",
+    "title": "Generalized Linear Models",
+    "section": "Classical Linear Model",
+    "text": "Classical Linear Model\n\nGiven \\(p\\) covariate variables \\(x_1, \\ldots, x_p\\) and a response variable \\(y\\), the classical linear model assumes that the relationship between the \\(x\\)’s and \\(y\\) is linear: \\[\ny = \\beta_0 + \\beta_1 x_1 + \\cdots + \\beta_p x_p.\n\\]\nDenote \\(\\boldsymbol{x} = (1, x_{1}, \\ldots, x_{p})^T\\) and \\(\\boldsymbol{\\beta} = (\\beta_0, \\beta_1, \\ldots, \\beta_p)^T\\), the model can be written as \\[\ny = \\boldsymbol{x}^T\\boldsymbol{\\beta}.\n\\]\nSuppose now we have \\(n\\) samples \\((\\boldsymbol{x}_1, y_1), \\ldots (\\boldsymbol{x}_p, y_p)\\) and we believe that the linear model above is a reasonable approximation of the relationship between the \\(\\boldsymbol{x}_i\\)’s and \\(y_i\\).\nThe goal is to estimate the model parameter \\(\\boldsymbol{\\beta}\\)."
+  },
+  {
+    "objectID": "slides/02-lm.html#ordinary-least-squares-ols-estimation",
+    "href": "slides/02-lm.html#ordinary-least-squares-ols-estimation",
+    "title": "Generalized Linear Models",
+    "section": "Ordinary Least Squares (OLS) Estimation",
+    "text": "Ordinary Least Squares (OLS) Estimation\n\nThe most common method to estimate \\(\\boldsymbol{\\beta}\\) is the ordinary least squares (OLS) estimation, that is, we find \\(\\boldsymbol{\\beta}\\) that minimizes the sum of squared residuals: \\[\n\\hat{\\boldsymbol{\\beta}} = \\argmin_{\\boldsymbol{\\beta}} \\sum_{i=1}^n (y_i - \\boldsymbol{x}_i^T\\boldsymbol{\\beta})^2.\n\\]\nDenote \\[\n\\boldsymbol{y} = \\begin{bmatrix} y_1 \\\\ \\vdots \\\\ y_n \\end{bmatrix}, \\quad\n\\boldsymbol{X} = \\begin{bmatrix} \\boldsymbol{x}_1^T \\\\ \\vdots \\\\ \\boldsymbol{x}_n^T \\end{bmatrix},\n\\] the minimization problem can be written as \\[\n\\hat{\\boldsymbol{\\beta}} = \\argmin_{\\boldsymbol{\\beta}} \\|\\boldsymbol{y} - \\boldsymbol{X}\\boldsymbol{\\beta}\\|_2^2.\n\\]"
+  },
+  {
+    "objectID": "slides/02-lm.html#ordinary-least-squares-ols-estimation-1",
+    "href": "slides/02-lm.html#ordinary-least-squares-ols-estimation-1",
+    "title": "Generalized Linear Models",
+    "section": "Ordinary Least Squares (OLS) Estimation",
+    "text": "Ordinary Least Squares (OLS) Estimation\n\nLet \\(L(\\boldsymbol{\\beta}) = \\|\\boldsymbol{y} - \\boldsymbol{X}\\boldsymbol{\\beta}\\|_2^2\\). This is often called the loss function.\nTake the gradient of \\(L(\\boldsymbol{\\beta})\\) with respect to \\(\\boldsymbol{\\beta}\\) and set it to zero, we have \\[\n\\nabla_{\\boldsymbol{\\beta}} L(\\boldsymbol{\\beta}) = -2\\boldsymbol{X}^T(\\boldsymbol{y} - \\boldsymbol{X}\\boldsymbol{\\beta}) = 0.\n\\]\nThe OLS estimation has a closed-form solution: \\[\n\\hat{\\boldsymbol{\\beta}}^{\\text{OLS}} = (\\boldsymbol{X}^T\\boldsymbol{X})^{-1}\\boldsymbol{X}^T\\boldsymbol{y}.\n\\]\nTo ensure the existence of the inverse, we often assume that \\(\\boldsymbol{X}^T\\boldsymbol{X}\\) is invertible, that is, the columns of \\(\\boldsymbol{X}\\) are linearly independent.\nTo verify that \\(\\hat{\\boldsymbol{\\beta}}^{\\text{OLS}}\\) is the minimizer, we need to show that the Hessian of \\(L(\\boldsymbol{\\beta})\\) is positive definite: \\[\n\\nabla^2_{\\boldsymbol{\\beta}} L(\\boldsymbol{\\beta}) = 2\\boldsymbol{X}^T\\boldsymbol{X} \\succ 0.\n\\]"
+  },
+  {
+    "objectID": "slides/02-lm.html#maximum-likelihood-ml-estimation",
+    "href": "slides/02-lm.html#maximum-likelihood-ml-estimation",
+    "title": "Generalized Linear Models",
+    "section": "Maximum Likelihood (ML) Estimation",
+    "text": "Maximum Likelihood (ML) Estimation\n\nAnother way to estimate \\(\\boldsymbol{\\beta}\\) is the maximum likelihood (ML) estimation.\nSuppose that the response variable \\(y\\) is normally distributed with mean \\(\\boldsymbol{x}^T\\boldsymbol{\\beta}\\) and variance \\(\\sigma^2\\): \\[\ny \\mid \\boldsymbol{x} \\sim \\mathcal{N}(\\boldsymbol{x}^T\\boldsymbol{\\beta}, \\sigma^2).\n\\]\nAssuming the samples are i.i.d, the likelihood function is \\[\nL(\\boldsymbol{\\beta}, \\sigma^2) = \\prod_{i=1}^n \\frac{1}{\\sqrt{2\\pi\\sigma^2}}\\exp\\left(-\\frac{(y_i - \\boldsymbol{x}_i^T\\boldsymbol{\\beta})^2}{2\\sigma^2}\\right).\n\\]\nThe log-likelihood function is \\[\n\\ell(\\boldsymbol{\\beta}, \\sigma^2) = -\\frac{n}{2}\\log(2\\pi\\sigma^2) - \\frac{1}{2\\sigma^2}\\sum_{i=1}^n (y_i - \\boldsymbol{x}_i^T\\boldsymbol{\\beta})^2 = -\\frac{n}{2}\\log(2\\pi\\sigma^2) - \\frac{1}{2\\sigma^2}\\|\\boldsymbol{y} - \\boldsymbol{X}\\boldsymbol{\\beta}\\|_2^2.\n\\]\nThe ML estimation is \\(\\hat{\\boldsymbol{\\beta}}, \\hat{\\sigma}^2 = \\argmax_{\\boldsymbol{\\beta}, \\sigma^2} \\ell(\\boldsymbol{\\beta}, \\sigma^2)\\)."
+  },
+  {
+    "objectID": "slides/02-lm.html#maximum-likelihood-ml-estimation-1",
+    "href": "slides/02-lm.html#maximum-likelihood-ml-estimation-1",
+    "title": "Generalized Linear Models",
+    "section": "Maximum Likelihood (ML) Estimation",
+    "text": "Maximum Likelihood (ML) Estimation\n\nTaking the gradient of \\(\\ell(\\boldsymbol{\\beta}, \\sigma^2)\\) with respect to \\(\\boldsymbol{\\beta}\\) and \\(\\sigma^2\\) and set them to zero, we have \\[\n\\nabla_{\\boldsymbol{\\beta}} \\ell(\\boldsymbol{\\beta}, \\sigma^2) = \\frac{1}{\\sigma^2} \\boldsymbol{X}^T(\\boldsymbol{y} - \\boldsymbol{X}\\boldsymbol{\\beta}) = 0,\n\\] and \\[\n\\frac{\\partial}{\\partial \\sigma^2} \\ell(\\boldsymbol{\\beta}, \\sigma^2) = -\\frac{n}{2\\sigma^2} + \\frac{1}{2\\sigma^4} \\|\\boldsymbol{y} - \\boldsymbol{X}\\boldsymbol{\\beta}\\|_2^2 = 0.\n\\]\nThe ML estimation has a closed-form solution: \\[\n\\hat{\\boldsymbol{\\beta}}^{\\text{MLE}} = (\\boldsymbol{X}^T\\boldsymbol{X})^{-1}\\boldsymbol{X}^T\\boldsymbol{y}, \\quad\n\\hat{\\sigma}^2 = \\frac{1}{n}\\|\\boldsymbol{y} - \\boldsymbol{X}\\hat{\\boldsymbol{\\beta}}^{\\text{MLE}}\\|_2^2.\n\\]\nThe MLE of \\(\\boldsymbol{\\beta}\\) is the same as the OLS estimation."
+  },
+  {
+    "objectID": "slides/02-lm.html#ols-v.s.-ml-estimation",
+    "href": "slides/02-lm.html#ols-v.s.-ml-estimation",
+    "title": "Generalized Linear Models",
+    "section": "OLS v.s. ML Estimation",
+    "text": "OLS v.s. ML Estimation\n\nCompared to the OLS estimation, the ML estimation requires an additional assumption on the distribution of \\(y\\).\nIn ths case of linear regression, the normality assumption is the most common one.\nAn equivalent way to express the linear regression under the normality assumption is \\[\ny  = \\boldsymbol{x}^T\\boldsymbol{\\beta} + \\varepsilon, \\quad \\varepsilon \\sim \\mathcal{N}(0, \\sigma^2).\n\\]\nOne of the advantages of the ML estimation is that it provides a way to estimate the variance of the estimated parameter \\(\\hat{\\boldsymbol{\\beta}}\\): \\[\\begin{align*}\n\\var(\\hat{\\boldsymbol{\\beta}}^{\\text{MLE}}) & = \\var((\\boldsymbol{X}^T\\boldsymbol{X})^{-1}\\boldsymbol{X}^T\\boldsymbol{y}) \\\\\n& = (\\boldsymbol{X}^T\\boldsymbol{X})^{-1}\\boldsymbol{X}^T\\var(\\boldsymbol{y})\\boldsymbol{X}(\\boldsymbol{X}^T\\boldsymbol{X})^{-1} \\\\\n& = (\\boldsymbol{X}^T\\boldsymbol{X})^{-1}\\boldsymbol{X}^T(\\sigma^2 I)\\boldsymbol{X}(\\boldsymbol{X}^T\\boldsymbol{X})^{-1} \\\\\n& = \\sigma^2 (\\boldsymbol{X}^T\\boldsymbol{X})^{-1}.\n\\end{align*}\\]"
+  },
+  {
+    "objectID": "slides/02-lm.html#useful-properties-of-mle",
+    "href": "slides/02-lm.html#useful-properties-of-mle",
+    "title": "Generalized Linear Models",
+    "section": "Useful Properties of MLE",
+    "text": "Useful Properties of MLE\n\nUnder the normality assumption, the MLE has the following properties:\n\nUnbiasedness: \\(\\E(\\hat{\\boldsymbol{\\beta}}^{\\text{MLE}}) = \\boldsymbol{\\beta}\\).\nNormality: \\(\\hat{\\boldsymbol{\\beta}}^{\\text{MLE}} \\sim \\mathcal{N}(\\boldsymbol{\\beta}, \\sigma^2 (\\boldsymbol{X}^T\\boldsymbol{X})^{-1})\\).\nPrediction Intervals: for a given \\(\\boldsymbol{x}^{\\star}\\), the predicted value is \\(y^{\\star} = \\boldsymbol{x}^{\\star T}\\hat{\\boldsymbol{\\beta}}^{\\text{MLE}}\\) and the prediction interval is \\[\ny^{\\star} \\pm t_{n-p-1, 1-\\alpha/2} \\hat{\\sigma} \\sqrt{1 + \\boldsymbol{x}^{\\star T}(\\boldsymbol{X}^T\\boldsymbol{X})^{-1}\\boldsymbol{x}^{\\star}}.\n\\]\nWe can also derive the confidence intervals and hypothesis tests for \\(c^T\\boldsymbol{\\beta}\\) for any \\(c\\)."
+  },
+  {
+    "objectID": "slides/02-lm.html#what-if-the-samples-are-not-i.i.d",
+    "href": "slides/02-lm.html#what-if-the-samples-are-not-i.i.d",
+    "title": "Generalized Linear Models",
+    "section": "What if the samples are not i.i.d?",
+    "text": "What if the samples are not i.i.d?\n\nIf the samples are not i.i.d, we can model the joint distribution of the samples: \\[\n\\boldsymbol{y} \\mid \\boldsymbol{X} \\sim \\mathcal{N}(\\boldsymbol{X}\\boldsymbol{\\beta}, \\sigma^2 W^{-1})\n\\] where \\(W\\) is an \\(n\\times n\\) covariance matrix describing the dependence between the samples.\nConsider the transformation \\(\\widetilde{\\boldsymbol{y}} = W^{1/2}\\boldsymbol{y}\\) and \\(\\widetilde{\\boldsymbol{X}} = W^{1/2}\\boldsymbol{X}\\), the model becomes \\[\n\\widetilde{\\boldsymbol{y}} \\mid \\widetilde{\\boldsymbol{X}} \\sim \\mathcal{N}(\\widetilde{\\boldsymbol{X}}\\boldsymbol{\\beta}, \\sigma^2 I).\n\\]\nTherefore the MLE for \\(\\boldsymbol{\\beta}\\) is \\[\n\\hat{\\boldsymbol{\\beta}}^{\\text{MLE}} = (\\widetilde{\\boldsymbol{X}}^T\\widetilde{\\boldsymbol{X}})^{-1}\\widetilde{\\boldsymbol{X}}^T\\widetilde{\\boldsymbol{y}} = (\\boldsymbol{X}^TW\\boldsymbol{X})^{-1}\\boldsymbol{X}^TW\\boldsymbol{y}\n\\] which is called the weighted least squares estimation."
+  },
+  {
+    "objectID": "slides/02-lm.html#penalized-likelihood-estimation",
+    "href": "slides/02-lm.html#penalized-likelihood-estimation",
+    "title": "Generalized Linear Models",
+    "section": "Penalized Likelihood Estimation",
+    "text": "Penalized Likelihood Estimation\n\nHowever, in practice, the MLE not be the best choice.\nFor example, when \\(X\\) contains columns that are close to collinear or if the number of covariates \\(p\\) is large, computing \\((X^TX)^{-1}\\) will become numerically unstable.\nOne of the most common ways to address this issue is to add penalization or regularization.\nThe idea is to add a penalty term to the log-likelihood function, i.e., \\[\n-\\ell(\\boldsymbol{\\beta}, \\sigma^2) + \\lambda \\cdot \\text{pen}(\\boldsymbol{\\beta}).\n\\]\nThat is, we are looking for the \\(\\boldsymbol{\\beta}\\) that minimizes the negaive log-likelihood and the penalty.\nThe extra term \\(\\lambda\\) is a hyperparameter that controls the trade-off between the likelihood and the penalty."
+  },
+  {
+    "objectID": "slides/02-lm.html#ridge-regression",
+    "href": "slides/02-lm.html#ridge-regression",
+    "title": "Generalized Linear Models",
+    "section": "Ridge Regression",
+    "text": "Ridge Regression\n\nOne of the most common penalization methods is the ridge regression.\nThe penalty term is the \\(L_2\\) norm of \\(\\boldsymbol{\\beta}\\): \\[\n\\text{pen}(\\boldsymbol{\\beta}) = \\|\\boldsymbol{\\beta}\\|_2^2 = \\sum_{j=0}^p \\beta_j^2.\n\\]\nThe ridge estimator is \\[\n\\hat{\\boldsymbol{\\beta}}^{\\text{ridge}} = \\argmin_{\\boldsymbol{\\beta}} \\|\\boldsymbol{y} - \\boldsymbol{X}\\boldsymbol{\\beta}\\|_2^2 + \\lambda \\|\\boldsymbol{\\beta}\\|_2^2.\n\\]\nLet \\(L_{\\lambda}(\\boldsymbol{\\beta}) = \\|\\boldsymbol{y} - \\boldsymbol{X}\\boldsymbol{\\beta}\\|_2^2 + \\lambda \\|\\boldsymbol{\\beta}\\|_2^2\\) and set the gradient to zero \\[\n\\nabla_{\\boldsymbol{\\beta}} L_{\\lambda}(\\boldsymbol{\\beta}) = -2\\boldsymbol{X}^T(\\boldsymbol{y} - \\boldsymbol{X}\\boldsymbol{\\beta}) + 2\\lambda \\boldsymbol{\\beta} = 0.\n\\]\nHence the ridge estimator is \\[\n\\hat{\\boldsymbol{\\beta}}^{\\text{ridge}} = (\\boldsymbol{X}^T\\boldsymbol{X} + \\lambda I)^{-1}\\boldsymbol{X}^T\\boldsymbol{y}.\n\\]"
+  },
+  {
+    "objectID": "slides/02-lm.html#ridge-regression-1",
+    "href": "slides/02-lm.html#ridge-regression-1",
+    "title": "Generalized Linear Models",
+    "section": "Ridge Regression",
+    "text": "Ridge Regression\n\nTypically, penalization of the intercept is not desired in ridge regression so that \\(\\beta_0\\) should be excluded from the penalty term.\nA simple way to achieve this is to center all covariates and the responses so that \\(\\bar{y} = 0\\) and \\(\\bar{\\boldsymbol{x}} = 0\\) which automatically results in \\(\\hat{\\beta}_0 = 0\\).\nA second approach is to use the following penalty term: \\[\n\\text{pen}(\\boldsymbol{\\beta}) = \\sum_{j=1}^p \\beta_j^2 = \\boldsymbol{\\beta}^TK\\boldsymbol{\\beta},\n\\] where \\(K = \\text{diag}(0, 1, \\ldots, 1)\\).\nThe ridge estimator is \\[\n\\hat{\\boldsymbol{\\beta}}^{\\text{ridge}} = (\\boldsymbol{X}^T\\boldsymbol{X} + \\lambda K)^{-1}\\boldsymbol{X}^T\\boldsymbol{y}.\n\\]"
+  },
+  {
+    "objectID": "slides/02-lm.html#ridge-v.s.-ols",
+    "href": "slides/02-lm.html#ridge-v.s.-ols",
+    "title": "Generalized Linear Models",
+    "section": "Ridge v.s. OLS",
+    "text": "Ridge v.s. OLS\n\nThe ridge estimator is biased and the OLS is unbiased.\nHowever, one can show that the ridge estimator has a smaller variance than the OLS estimator.\nWhen choosing an appropriate smoothing parameter \\(\\lambda\\), the ridge estimator can have a smaller mean squared error (MSE) than the OLS estimator.\nThe ridge estimator is shrinkage estimator that shrinks the coefficients towards zero (large value of \\(\\lambda\\) yields a stronger shrinkage).\nThe ridge estimator is particularly useful when the covariates are collinear or when the number of covariates is large.\nThe choice of \\(\\lambda\\) is often done using cross-validation."
+  },
+  {
+    "objectID": "slides/02-lm.html#least-absolute-shrinkage-and-selection-operator-lasso",
+    "href": "slides/02-lm.html#least-absolute-shrinkage-and-selection-operator-lasso",
+    "title": "Generalized Linear Models",
+    "section": "Least Absolute Shrinkage and Selection Operator (LASSO)",
+    "text": "Least Absolute Shrinkage and Selection Operator (LASSO)\n\nAnother common penalization method is the least absolute shrinkage and selection operator (LASSO).\nThe penalty term is the \\(L_1\\) norm of \\(\\boldsymbol{\\beta}\\): \\[\n\\text{pen}(\\boldsymbol{\\beta}) = \\sum_{j=1}^p |\\beta_j|.\n\\]\nThe LASSO estimator is \\[\n\\hat{\\boldsymbol{\\beta}}^{\\text{LASSO}} = \\argmin_{\\boldsymbol{\\beta}} \\|\\boldsymbol{y} - \\boldsymbol{X}\\boldsymbol{\\beta}\\|_2^2 + \\lambda \\sum_{j=1}^p |\\beta_j|.\n\\]"
+  },
+  {
+    "objectID": "slides/02-lm.html#lasso-estimation",
+    "href": "slides/02-lm.html#lasso-estimation",
+    "title": "Generalized Linear Models",
+    "section": "LASSO Estimation",
+    "text": "LASSO Estimation\n\nNote that the objective function of the LASSO estimator is not differentiable, due to the absolute value term.\nNo closed-form solution for the LASSO estimator is available. However, it can be solved using the Least Angle Regression1 or the coordinate descent2 algorithm.\nOne of the key properties of the LASSO estimator is that it produces sparse solutions, i.e., some of the estimated coefficients are exactly zero.\nThis is particularly useful for variable selection, i.e., to identify the important covariates.\n\nEfron, B., Hastie, T., Johnstone, I., & Tibshirani, R. (2004). Least angle regression. The Annals of Statistics, 32(2), pages 407–499.Friedman, J. H., Hastie, T., & Tibshirani, R. (2010). Regularization Paths for Generalized Linear Models via Coordinate Descent. Journal of Statistical Software, 33(1), pages 1–22."
+  },
+  {
+    "objectID": "slides/02-lm.html#ridge-v.s.-lasso-l_2-penalty-v.s.-l_1-penalty",
+    "href": "slides/02-lm.html#ridge-v.s.-lasso-l_2-penalty-v.s.-l_1-penalty",
+    "title": "Generalized Linear Models",
+    "section": "Ridge v.s. LASSO (\\(L_2\\) penalty v.s. \\(L_1\\) penalty)",
+    "text": "Ridge v.s. LASSO (\\(L_2\\) penalty v.s. \\(L_1\\) penalty)\n\n\n\n\n\n\n\nFigure 3.11 of ESL"
+  },
+  {
+    "objectID": "slides/02-lm.html#elastic-net",
+    "href": "slides/02-lm.html#elastic-net",
+    "title": "Generalized Linear Models",
+    "section": "Elastic Net",
+    "text": "Elastic Net\n\nThe elastic net1 is a combination of the ridge and the LASSO.\nThe penalty term is a combination of the \\(L_1\\) and \\(L_2\\) norm of \\(\\boldsymbol{\\beta}\\): \\[\n\\text{pen}(\\boldsymbol{\\beta}) = \\lambda_1 \\sum_{j=1}^p |\\beta_j| + \\lambda_2 \\sum_{j=1}^p \\beta_j^2.\n\\]\nThe elastic net estimator is \\[\n\\hat{\\boldsymbol{\\beta}}^{\\text{EN}} = \\argmin_{\\boldsymbol{\\beta}} \\|\\boldsymbol{y} - \\boldsymbol{X}\\boldsymbol{\\beta}\\|_2^2 + \\lambda_1 \\sum_{j=1}^p |\\beta_j| + \\lambda_2 \\sum_{j=1}^p \\beta_j^2.\n\\]\nThrough the choice of \\(\\lambda_1\\) and \\(\\lambda_2\\), the elastic net can be used to achieve the benefits of both the ridge and the LASSO.\n\nZou, H., & Hastie, T. (2005). Regularization and variable selection via the elastic net. Journal of the Royal Statistical Society Series B: Statistical Methodology, 67(2), pages 301-320."
+  },
+  {
+    "objectID": "slides/02-lm.html#example---sparse-features",
+    "href": "slides/02-lm.html#example---sparse-features",
+    "title": "Generalized Linear Models",
+    "section": "Example - Sparse features",
+    "text": "Example - Sparse features\n\nWe generate a synthetic dataset with 50 samples and 10 features.\nOnly 5 out of the 10 features are informative.\nWe fit the linear regression, Ridge, Lasso, and Elastic Net models to the data.\n\n\nfrom sklearn.linear_model import LinearRegression, Ridge\nfrom sklearn.linear_model import Lasso, ElasticNet\nfrom sklearn.datasets import make_regression\n\nX, y, true_coef = make_regression(n_samples = 50, n_features = 10, \n                                  n_informative = 5, noise = 5,\n                                  coef = True, random_state = 42)\n\nlm = LinearRegression().fit(X, y)\nridge = Ridge(alpha=1.0).fit(X, y)\nlasso = Lasso(alpha=1.0).fit(X, y)\nenet = ElasticNet(alpha=1.0, l1_ratio=0.5).fit(X, y)"
+  },
+  {
+    "objectID": "slides/02-lm.html#example---sparse-features-1",
+    "href": "slides/02-lm.html#example---sparse-features-1",
+    "title": "Generalized Linear Models",
+    "section": "Example - Sparse features",
+    "text": "Example - Sparse features\n\n\n\n\n\nTrue Coef\nLinear\nRidge\nLASSO\nElasticNet\n\n\n\n\n57.078\n56.306\n55.626\n55.459\n40.091\n\n\n0.000\n0.173\n0.471\n0.000\n1.685\n\n\n0.000\n-0.185\n0.073\n-0.000\n1.556\n\n\n35.610\n33.877\n33.447\n33.189\n25.617\n\n\n0.000\n0.702\n1.655\n0.000\n8.187\n\n\n60.577\n60.568\n59.158\n59.634\n38.185\n\n\n0.000\n1.586\n1.838\n0.650\n4.251\n\n\n64.592\n64.964\n63.242\n63.704\n37.886\n\n\n0.000\n-0.440\n-0.428\n-0.000\n-1.682\n\n\n98.652\n99.563\n96.871\n98.682\n61.042"
+  },
+  {
+    "objectID": "slides/02-lm.html#beyond-normality",
+    "href": "slides/02-lm.html#beyond-normality",
+    "title": "Generalized Linear Models",
+    "section": "Beyond Normality",
+    "text": "Beyond Normality\n\nWhen the responce variable is not real-valued, the classical linear model is not appropriate.\nFor example:\n\nBinary responces: \\(y \\in \\{0, 1\\}\\).\nCount data: \\(y \\in \\{0, 1, 2, \\ldots\\}\\).\nMultinomial responces: \\(y \\in \\{1, 2, \\ldots, K\\}\\).\n\nIn these cases, neither the OLS estimation nor the normality assumption is appropriate.\nGeneralized Linear Model (GLM) is a generalization of the classical linear model that allows for non-normal responces.\nThe key is to find a reasonable distribution to model \\(y\\)."
+  },
+  {
+    "objectID": "slides/02-lm.html#binary-responces-logistic-regression",
+    "href": "slides/02-lm.html#binary-responces-logistic-regression",
+    "title": "Generalized Linear Models",
+    "section": "Binary Responces: Logistic regression",
+    "text": "Binary Responces: Logistic regression\n\nWhen \\(y\\) is binary, we can use the Bernoulli distribution \\[\nY \\mid \\boldsymbol{x} \\sim \\text{Ber}(p(\\boldsymbol{x})),\n\\]\nThat is, \\(\\P(Y = 1 \\mid \\boldsymbol{x}) = p(\\boldsymbol{x})\\) and \\(\\P(Y = 0 \\mid \\boldsymbol{x}) = 1 - p(\\boldsymbol{x})\\) and the expectation is \\(\\E(Y \\mid \\boldsymbol{x}) = p(\\boldsymbol{x})\\).\nThe logistic regression model assumes \\[\np(\\boldsymbol{x}) = \\frac{1}{1 + \\exp(-\\boldsymbol{x}^T\\boldsymbol{\\beta})}.\n\\]\nEquivalently, we can write \\[\n\\log\\left(\\frac{p(\\boldsymbol{x})}{1 - p(\\boldsymbol{x})}\\right) = \\boldsymbol{x}^T\\boldsymbol{\\beta}.\n\\]\nThat is, the log-odds of the event \\(\\{Y = 1\\}\\) is linear in \\(\\boldsymbol{x}\\)."
+  },
+  {
+    "objectID": "slides/02-lm.html#ml-estimation-for-logistic-regression",
+    "href": "slides/02-lm.html#ml-estimation-for-logistic-regression",
+    "title": "Generalized Linear Models",
+    "section": "ML Estimation for Logistic Regression",
+    "text": "ML Estimation for Logistic Regression\n\nGiven \\(n\\) samples \\((\\boldsymbol{x}_1, y_1), \\ldots (\\boldsymbol{x}_n, y_n)\\), the likelihood function is \\[\nL(\\boldsymbol{\\beta}) = \\prod_{i=1}^n p(\\boldsymbol{x}_i)^{y_i} (1 - p(\\boldsymbol{x}_i))^{1 - y_i}.\n\\]\nThe log-likelihood function is \\[\n\\ell(\\boldsymbol{\\beta}) = \\sum_{i=1}^n y_i \\log(p(\\boldsymbol{x}_i)) + (1 - y_i)\\log(1 - p(\\boldsymbol{x}_i)).\n\\]\nHence the MLE of \\(\\boldsymbol{\\beta}\\) is \\[\n\\hat{\\boldsymbol{\\beta}}^{\\text{MLE}} = \\argmax_{\\boldsymbol{\\beta}} \\ell(\\boldsymbol{\\beta}).\n\\]\nThe negative log-likelihood is also called the cross-entropy loss, i.e., maximizing the likelihood is equivalent to minimizing the cross-entropy loss."
+  },
+  {
+    "objectID": "slides/02-lm.html#cross-entropy-loss",
+    "href": "slides/02-lm.html#cross-entropy-loss",
+    "title": "Generalized Linear Models",
+    "section": "Cross-Entropy Loss",
+    "text": "Cross-Entropy Loss\n\nIn Information Theory, the cross-entropy is defined as \\[\nH(p, q) = -\\sum_{x} p(x) \\log(q(x)) = -\\E_p[\\log(q(X))],\n\\] where \\(p(x)\\) and \\(q(x)\\) are two discrete probability distributions.\nLarge value of cross-entropy indicates that the two distributions are different.\nIn the case of logistic regression, we want to measure the discrepancy between the data \\([y_i, 1-y_i]\\) and the model \\([p(\\boldsymbol{x}_i), 1 - p(\\boldsymbol{x}_i)]\\).\nHence the cross-entropy is \\[\n-\\sum_{i=1}^n y_i \\log(p(\\boldsymbol{x}_i)) + (1 - y_i)\\log(1 - p(\\boldsymbol{x}_i)).\n\\]"
+  },
+  {
+    "objectID": "slides/02-lm.html#exponential-family",
+    "href": "slides/02-lm.html#exponential-family",
+    "title": "Generalized Linear Models",
+    "section": "Exponential family",
+    "text": "Exponential family\n\nRecall that an exponential family is a family of distributions \\[\nf(x \\mid \\theta) = h(x)\\exp(\\theta^T T(x) - \\psi(\\theta))\n\\] where \\(\\theta \\in \\R^k\\) and \\(T(x) = [T_1(x), \\ldots, T_k(x)]^T\\).\nThe parameter \\(\\theta\\) is called the natural parameter or the canonical parameter and \\(T(x)\\) is the sufficient statistic.\nTwo useful properties (from Bartlett’s identities):\n\n\\(\\E(T(X)) = \\nabla_{\\theta}\\psi(\\theta)\\)\n\\(\\var(T(X)) = \\text{Hess}(\\psi(\\theta)) = \\nabla^2_{\\theta} \\psi(\\theta)\\).\n\nThat is, the relationship between the parameter \\(\\theta\\) and the expectation \\(\\E(T(X))\\) determined by \\(\\nabla \\psi\\)."
+  },
+  {
+    "objectID": "slides/02-lm.html#examples",
+    "href": "slides/02-lm.html#examples",
+    "title": "Generalized Linear Models",
+    "section": "Examples",
+    "text": "Examples\n\nNormal disribution: \\[\nf(x \\mid \\mu, \\sigma^2) = \\exp\\left(-\\frac{1}{2\\sigma^2} x^2 + \\frac{\\mu}{\\sigma^2}x - \\frac{\\mu^2}{2\\sigma^2}\\right), \\quad x \\in \\R\n\\]\n\n\\(\\theta = \\left(-\\frac{1}{2\\sigma^2}, \\frac{\\mu}{\\sigma^2}\\right)\\), \\(T(x) = (-x^2, x)\\), \\(\\psi(\\theta) = -\\frac{\\theta_2^2}{4\\theta_1} = \\frac{\\mu^2}{2\\sigma^2}\\)\n\nBernoulli distribution: \\[\nf(x \\mid p) = p^x(1-p)^{1-x} = \\exp\\left(x\\log\\frac{p}{1-p} + \\log(1-p)\\right), \\quad x \\in \\{0, 1\\}\n\\]\n\n\\(\\theta = \\log\\frac{p}{1-p}\\), \\(T(x) = x\\), \\(\\psi(\\theta) = -\\log(1-p) = \\log(1 + e^{\\theta})\\)\n\nPoisson distribution: \\[\nf(x \\mid \\lambda) = \\frac{\\lambda^x e^{\\lambda}}{x!}= \\frac{1}{x!}\\exp(x\\log\\lambda - \\lambda), \\quad x = 0, 1, 2, \\ldots\n\\]\n\n\\(\\theta = \\log\\lambda\\), \\(T(x) = x\\), \\(\\psi(\\theta) = \\exp(\\theta) = \\lambda\\)"
+  },
+  {
+    "objectID": "slides/02-lm.html#generalized-linear-model-glm",
+    "href": "slides/02-lm.html#generalized-linear-model-glm",
+    "title": "Generalized Linear Models",
+    "section": "Generalized Linear Model (GLM)",
+    "text": "Generalized Linear Model (GLM)\n\nLet \\(Y\\) be univariate, \\(\\boldsymbol{x} \\in \\R^p\\), and \\(\\boldsymbol{\\beta} \\in \\R^p\\).\nA GLM is assuming \\(Y \\mid \\boldsymbol{x} \\sim F_{\\theta}\\), where \\(\\theta = \\boldsymbol{x}^T\\boldsymbol{\\beta}\\) and \\(F_\\theta\\) has the density function \\[\nf(y \\mid \\theta) = h(y)\\exp(\\theta\\cdot y - \\psi(\\theta)).\n\\]\nTherefore \\[\\begin{align*}\n\\E(Y \\mid \\boldsymbol{x}) & = \\frac{d}{d\\theta}\\psi(\\theta) = \\psi^{\\prime}(\\boldsymbol{x}^T\\boldsymbol{\\beta})\n\\end{align*}\\]\nEquivalently, \\[\ng(\\E(Y \\mid \\boldsymbol{x})) = \\boldsymbol{x}^T\\boldsymbol{\\beta}\n\\] where \\(g\\) is the inverse of \\(\\psi^{\\prime}\\).\nThe function \\(g\\) is called the link function."
+  },
+  {
+    "objectID": "slides/02-lm.html#logistic-regression",
+    "href": "slides/02-lm.html#logistic-regression",
+    "title": "Generalized Linear Models",
+    "section": "Logistic Regression",
+    "text": "Logistic Regression\n\nFor Bernoulli distributions, we have \\[\n\\theta = \\log\\frac{p}{1-p}, \\quad \\psi(\\theta) = -\\log(1-p) = \\log(1 + e^{\\theta}).\n\\]\nThus, \\(\\psi^{\\prime}(\\theta) = \\frac{e^{\\theta}}{1 + e^{\\theta}}\\) and \\(g(p) = (\\psi^{\\prime})^{-1}(p) = \\log\\frac{p}{1-p}\\). \\(\\psi^{\\prime}\\) is called the logistic function and \\(g\\) is called the logit function.\nPutting altogether, we have \\[\ng(\\E(Y \\mid \\boldsymbol{x})) = \\log\\left(\\frac{p(\\boldsymbol{x})}{1 - p(\\boldsymbol{x})}\\right) = \\boldsymbol{x}^T\\boldsymbol{\\beta}\n\\] or equivalently \\[\n\\P(Y = 1 \\mid \\boldsymbol{x}) = \\psi^{\\prime}(\\boldsymbol{x}^T\\boldsymbol{\\beta}) = \\frac{\\exp(\\boldsymbol{x}^T\\boldsymbol{\\beta})}{1 + \\exp(\\boldsymbol{x}^T\\boldsymbol{\\beta})}.\n\\]"
+  },
+  {
+    "objectID": "slides/02-lm.html#remarks",
+    "href": "slides/02-lm.html#remarks",
+    "title": "Generalized Linear Models",
+    "section": "Remarks",
+    "text": "Remarks\n\nThe link function \\(g = (\\psi^{\\prime})^{-1}\\) is sometimes called the canonical link function, since it is derived from the canonical representation of an exponential family.\nAll we need for a link function is that it is invertible and matches the range of \\(\\E(Y \\mid \\boldsymbol{x})\\) and \\(\\boldsymbol{x}^T\\boldsymbol{\\beta}\\).\nFor example, in the Bernoulli linear model, we could have used the probit link function \\[\ng(u) = \\Phi^{-1}(u): [0, 1] \\to \\R\n\\] where \\(\\Phi\\) is the CDF of the standard normal distribution.\nThis is called the probit regression."
+  },
+  {
+    "objectID": "slides/02-lm.html#multinomial-regression",
+    "href": "slides/02-lm.html#multinomial-regression",
+    "title": "Generalized Linear Models",
+    "section": "Multinomial Regression",
+    "text": "Multinomial Regression\n\nMultinomial regression is a generalization of Logistic regression to categorical variables with more than two categories.\nSuppose \\(Y\\) is a categorical variable with \\(K\\) categories, \\(Y \\in \\{1, 2, \\ldots, K\\}\\).\nA more useful representation is to use the one-hot encoding: \\[\nY = [0, 0, \\ldots, 1, \\ldots, 0]^T\n\\] where the \\(k\\)-th element is 1 and the rest are 0.\nThe multinomial regression model assumes \\[\nY \\mid \\boldsymbol{x} \\sim \\text{Multi}(1, [p_1(\\boldsymbol{x}), p_2(\\boldsymbol{x}), \\ldots, p_K(\\boldsymbol{x})]^T)\n\\] where \\(p_k(\\boldsymbol{x}) = \\P(Y = 1_k \\mid \\boldsymbol{x})\\) and \\(1_k\\) is the one-hot encoding of the \\(k\\)-th category."
+  },
+  {
+    "objectID": "slides/02-lm.html#multinomial-distribution",
+    "href": "slides/02-lm.html#multinomial-distribution",
+    "title": "Generalized Linear Models",
+    "section": "Multinomial Distribution",
+    "text": "Multinomial Distribution\n\nThe probability mass function of the \\(\\text{Multi}(m,p)\\) is \\[\nf(x \\mid p) = \\frac{n!}{x_1!\\cdots x_K!}\\prod_{k=1}^K p_k^{x_k} = \\frac{n!}{x_1!\\cdots x_K!}\\exp\\left(\\sum_{k=1}^K x_k\\log p_k\\right)\n\\] where \\(x = [x_1, x_2, \\ldots, x_K]^T\\), \\(\\sum_{k=1}^K x_k = m\\), and \\(\\sum_{k=1}^K p_k = 1\\).\nNote that \\(p_K = 1 - p_1 - \\ldots - p_{K-1}\\) and therefore \\[\\begin{align*}\nf(x \\mid p) & = \\frac{n!}{x_1!\\cdots x_K!}\\exp\\left(\\sum_{k=1}^{K-1} x_k\\log p_k + \\left(m - \\sum_{k=1}^{K-1} x_k\\right)\\log(1 - p_1 - \\ldots - p_{K-1})\\right)\\\\\n& = \\frac{n!}{x_1!\\cdots x_K!}\\exp\\left(\\sum_{k=1}^{K-1} x_k\\log\\frac{p_k}{p_K} + m\\log(1 - p_1 - \\ldots - p_{K-1})\\right).\n\\end{align*}\\]"
+  },
+  {
+    "objectID": "slides/02-lm.html#softmax-function",
+    "href": "slides/02-lm.html#softmax-function",
+    "title": "Generalized Linear Models",
+    "section": "Softmax Function",
+    "text": "Softmax Function\n\nThe canonical parameter is \\(\\theta = [\\log\\frac{p_1}{p_K}, \\ldots, \\log\\frac{p_{K-1}}{p_K}]^T\\) and therefore \\(p_i = p_K\\exp(\\theta_i)\\).\nUsing the relationship \\(p_K = 1 - \\sum_{k=1}^{K-1} p_k\\), we have \\[\np_K = 1 - p_K\\sum_{k=1}^{K-1} \\exp(\\theta_k) \\quad \\Rightarrow \\quad p_K = \\frac{1}{1 + \\sum_{k=1}^{K-1} \\exp(\\theta_k)}.\n\\]\nHence (assume \\(m = 1\\) for simplicity) \\[\\begin{align*}\n\\psi(\\theta) & = - \\log(1 - p_1 - \\ldots - p_{K-1})\n= - \\log(1 - p_Ke^{\\theta_1} - \\ldots - p_Ke^{\\theta_{K-1}})\\\\\n& = - \\log\\left(1 - \\frac{\\sum_{k=1}^{K-1} \\exp(\\theta_k)}{1 + \\sum_{k=1}^{K-1} \\exp(\\theta_k)}\\right)\n= \\log\\left(1 + \\sum_{k=1}^{K-1} \\exp(\\theta_k)\\right).\n\\end{align*}\\]\nTaking the derivative, we have the softmax function: \\[\n\\nabla_{\\theta}\\psi(\\theta) = \\left[\\frac{\\exp(\\theta_1)}{1 + \\sum_{k=1}^{K-1} \\exp(\\theta_k)}, \\ldots, \\frac{\\exp(\\theta_{K-1})}{1 + \\sum_{k=1}^{K-1} \\exp(\\theta_k)}\\right].\n\\]"
+  },
+  {
+    "objectID": "slides/02-lm.html#multinomial-regression-1",
+    "href": "slides/02-lm.html#multinomial-regression-1",
+    "title": "Generalized Linear Models",
+    "section": "Multinomial Regression",
+    "text": "Multinomial Regression\n\nThe multinomial regression model is given by \\[\\begin{align*}\n   \\theta_i & = \\boldsymbol{x}^T\\boldsymbol{\\beta}_i, \\\\\n   p_i(\\boldsymbol{x}) & = \\frac{\\exp(\\theta_i)}{1 + \\sum_{k=1}^{K-1} \\exp(\\theta_i)}, \\quad i = 1, 2, \\ldots, K-1,\n\\end{align*}\\] where \\(\\boldsymbol{\\beta}_i \\in \\R^p\\).\nIn fact, a more common representation is \\[\\begin{align*}\n   \\tilde{\\theta}_i & = \\boldsymbol{x}^T\\tilde{\\boldsymbol{\\beta}}_i, \\\\\n   p_i(\\boldsymbol{x}) & = \\frac{\\exp(\\tilde{\\theta}_i)}{\\sum_{k=1}^{K} \\exp(\\tilde{\\theta}_i)}, \\quad i = 1, 2, \\ldots, K.\n\\end{align*}\\]\nThe equivalence is due to the transformation \\(\\theta_i = \\tilde{\\theta}_i - \\tilde{\\theta}_K\\) and \\(\\boldsymbol{\\beta}_i = \\tilde{\\boldsymbol{\\beta}}_i - \\tilde{\\boldsymbol{\\beta}}_K\\).\nWe can also write \\[\n[p_1(\\boldsymbol{x}), \\ldots, p_K(\\boldsymbol{x})] = \\texttt{softmax}(\\boldsymbol{x}^T\\boldsymbol{\\beta}_1, \\ldots, \\boldsymbol{x}^T\\boldsymbol{\\beta}_K).\n\\]"
+  },
+  {
+    "objectID": "slides/02-lm.html#quick-summary",
+    "href": "slides/02-lm.html#quick-summary",
+    "title": "Generalized Linear Models",
+    "section": "Quick Summary",
+    "text": "Quick Summary\n\nA GLM is \\[\n   g(\\E(Y \\mid X = x)) = x^T\\beta \\Leftrightarrow \\E(Y \\mid X = x) = g^{-1}(x^T\\beta).\n\\]\nThe link function \\(g\\) connects the conditional expectation and the linear predictor and is chosen based on the distribution of \\(Y\\).\nExamples:\n\nLogistic regression: \\(g(p) = \\log\\left(\\frac{p}{1-p}\\right)\\), $g^{-1}(x) = $\nLinear regression: \\(g(\\mu) = \\mu\\).\nMultinomial regression: softmax function.\nThere are other choices and the above are called the canonical link functions."
+  },
+  {
+    "objectID": "slides/02-lm.html#beyond-linearity",
+    "href": "slides/02-lm.html#beyond-linearity",
+    "title": "Generalized Linear Models",
+    "section": "Beyond Linearity",
+    "text": "Beyond Linearity\n\nUp to now, we have assumed that a linear relationship between the features and the (transformed) conditional expectation: \\[\n   g(\\E(Y \\mid \\boldsymbol{x})) = \\boldsymbol{x}^T\\boldsymbol{\\beta}\n\\]\nHowever, this is a strong assumption and may not be appropriate in many cases.\nTo remove this assumption, we can consider \\[\n   g(\\E(Y \\mid \\boldsymbol{x})) = f(\\boldsymbol{x})\n\\] where \\(f: \\R^p \\to \\R\\) is an unknown function.\nThe problem is now to estimate the function \\(f\\).\nDepending on the restrictions on \\(f\\), we can use different methods to estimate \\(f\\)."
+  },
+  {
+    "objectID": "slides/02-lm.html#generalized-additive-models-gam",
+    "href": "slides/02-lm.html#generalized-additive-models-gam",
+    "title": "Generalized Linear Models",
+    "section": "Generalized Additive Models (GAM)",
+    "text": "Generalized Additive Models (GAM)\n\nAn additive model assumes that the unknown function \\(f\\) is a sum of univariate functions: \\[\nf(\\boldsymbol{x}) = \\beta_0 + f_1(x_1) + f_2(x_2) + \\cdots + f_p(x_p).\n\\]\nTherefore, the model is \\[\ng(\\E(Y \\mid \\boldsymbol{x})) = \\beta_0 + f_1(x_1) + f_2(x_2) + \\cdots + f_p(x_p).\n\\]\nThe functions \\(f_j: \\R \\to \\R\\) are unknown and need to be estimated.\nNonparametric methods can be used to estimate the functions \\(f_j\\), for example, kernel smoothing, splines, etc.\nThe GAM is a generalization of the linear model that allows for non-linear relationships between the features and the conditional expectation."
+  },
+  {
+    "objectID": "slides/02-lm.html#projection-pursuit-regression-ppr",
+    "href": "slides/02-lm.html#projection-pursuit-regression-ppr",
+    "title": "Generalized Linear Models",
+    "section": "Projection Pursuit Regression (PPR)",
+    "text": "Projection Pursuit Regression (PPR)\n\nThe projection pursuit regression (PPR)1 model assumes: \\[\nf(\\boldsymbol{x}) = \\sum_{m=1}^M f_m(\\boldsymbol{x}^T\\boldsymbol{\\omega}_m),\n\\] where \\(\\boldsymbol{\\omega}_m \\in \\R^p\\) are unknown unit vectors and \\(f_m: \\R \\to \\R\\) are unknown functions.\nThe scalar variable \\(V_m = \\boldsymbol{x}^T\\boldsymbol{\\omega}_m\\) is the projection of \\(\\boldsymbol{x}\\) onto the unit vector \\(\\boldsymbol{\\omega}_m\\), and we seek \\(\\boldsymbol{\\omega}_m\\) so that the model fits well, hence the name “projection pursuit.”\nIf \\(M\\) is taken arbitrarily large, for appropriate choice of \\(f_m\\) the PPR model can approximate any continuous function in \\(\\R^p\\) arbitrarily well, i.e., the PPR is a universal approximator.\nHowever, this model is not widely used due to the difficulty in estimating the functions \\(f_m\\).\n\nFriedman, J. H., & Tukey, J. W. (1974). A projection pursuit algorithm for exploratory data analysis. IEEE Transactions on computers, 100(9), 881-890."
+  },
+  {
+    "objectID": "slides/02-lm.html#the-log-likelihood-function",
+    "href": "slides/02-lm.html#the-log-likelihood-function",
+    "title": "Generalized Linear Models",
+    "section": "The log-likelihood function",
+    "text": "The log-likelihood function\nIn order to find the MLE, we need to simplify the log-likelihood function: \\[\\begin{align*}\n\\ell(\\boldsymbol{\\beta}) & = \\log \\left(\\prod_{i=1}^n p(\\boldsymbol{x}_i)^{y_i}(1-p(\\boldsymbol{x}_i))^{1-y_i}\\right) \\\\\n& = \\sum_{i=1}^n y_i \\log p(\\boldsymbol{x}_i) + (1-y_i)\\log(1-p(\\boldsymbol{x}_i))\\\\\n& = \\sum_{i=1}^n \\left[y_i \\log \\left(\\frac{p(\\boldsymbol{x}_i)}{1-p(\\boldsymbol{x}_i)}\\right) + \\log(1-p(\\boldsymbol{x}_i))\\right]\\\\\n& = \\sum_{i=1}^n \\left[y_i\\boldsymbol{x}_i^T\\boldsymbol{\\beta} - \\log(1+\\exp(\\boldsymbol{x}_i^T\\boldsymbol{\\beta}))\\right]\n\\end{align*}\\]"
+  },
+  {
+    "objectID": "slides/02-lm.html#gradient-and-hessian",
+    "href": "slides/02-lm.html#gradient-and-hessian",
+    "title": "Generalized Linear Models",
+    "section": "Gradient and Hessian",
+    "text": "Gradient and Hessian\nNow we compute the gradient and the Hessian of the log-likelihood function:\n\\[\\begin{align*}\n    \\nabla \\ell(\\boldsymbol{\\beta}) & = \\sum_{i=1}^n \\left[y_i \\boldsymbol{x}_i - \\frac{\\exp(\\boldsymbol{x}_i^T\\boldsymbol{\\beta})}{1+\\exp(\\boldsymbol{x}_i^T\\boldsymbol{\\beta})}\\boldsymbol{x}_i\\right] = \\sum_{i=1}^n (y_i - p(\\boldsymbol{x}_i))\\boldsymbol{x}_i\\\\\n    & = X^T(\\boldsymbol{y}-\\mathbf{p})\\\\\n    \\nabla^2 \\ell(\\boldsymbol{\\beta}) & = -\\sum_{i=1}^n p(\\boldsymbol{x}_i)(1-p(\\boldsymbol{x}_i))\\boldsymbol{x}_i\\boldsymbol{x}_i^T = -X^TWX\n\\end{align*}\\] where \\[\n\\mathbf{p} = [p(\\boldsymbol{x}_1), \\ldots, p(\\boldsymbol{x}_n)]^T, \\quad W= \\diag(\\mathbf{p})\\diag(1-\\mathbf{p}), \\quad X = \\begin{bmatrix} \\boldsymbol{x}_1^T \\\\ \\vdots \\\\ \\boldsymbol{x}_n^T \\end{bmatrix}\n\\]"
+  },
+  {
+    "objectID": "slides/02-lm.html#iteratively-reweighted-least-squares-irwls",
+    "href": "slides/02-lm.html#iteratively-reweighted-least-squares-irwls",
+    "title": "Generalized Linear Models",
+    "section": "Iteratively Reweighted Least Squares (IRWLS)",
+    "text": "Iteratively Reweighted Least Squares (IRWLS)\nThere is no analytic solution for the MLE of the logistic regression. However, the Newton-Raphson method can be used to find the MLE. The Newton-Raphson method is an iterative method that updates the parameter \\(\\boldsymbol{\\beta}\\) as follows:\n\\[\\begin{align*}\n\\boldsymbol{\\beta}^{(t+1)} & = \\boldsymbol{\\beta}^{(t)} - \\left[\\nabla^2 \\ell(\\boldsymbol{\\beta}^{(t)})\\right]^{-1} \\nabla \\ell\\left(\\boldsymbol{\\beta}^{(t)}\\right) \\\\\n& = \\boldsymbol{\\beta}^{(t)}+\\left(X^T W^{(t)}X\\right)^{-1} X^T\\left(\\boldsymbol{y}-\\mathbf{p}^{(t)}\\right) \\\\\n& = \\left(X^T W^{(t)} X\\right)^{-1} X^T W^{(t)}\\left[X \\boldsymbol{\\beta}^{(t)}+\\left(W^{(t)}\\right)^{-1}\\left(\\boldsymbol{y}-\\mathbf{p}^{(t)}\\right)\\right] \\\\\n& = \\left(X^T W^{(t)} X\\right)^{-1} X^T W^{(t)} \\mathbf{z}^{(t)}\n\\end{align*}\\] where \\[\\begin{align*}\n\\mathbf{z}^{(t)} & =X \\boldsymbol{\\beta}^{(t)}+\\left(W^{(t)}\\right)^{-1}\\left(\\boldsymbol{y}-\\mathbf{p}^{(t)}\\right), \\quad \\mathbf{p}^{(t)} = [p^{(t)}(\\boldsymbol{x}_1), \\ldots, p^{(t)}(\\boldsymbol{x}_n)]^T\\\\\np^{(t)}(\\boldsymbol{x}_i) & = \\frac{\\exp(\\boldsymbol{x}_i^T\\boldsymbol{\\beta}^{(t)})}{1+\\exp(\\boldsymbol{x}_i^T\\boldsymbol{\\beta}^{(t)})}, \\quad\nW^{(t)} = \\diag(\\mathbf{p}^{(t)})\\diag(1-\\mathbf{p}^{(t)})\n\\end{align*}\\]\n\n\n\nHome"
+  },
+  {
+    "objectID": "resources.html",
+    "href": "resources.html",
+    "title": "Resources",
+    "section": "",
+    "text": "Goodfellow et al. (2016) Deep Learning\nZhang et al. (2023) Dive into Deep Learning\nT. Hastie, R. Tibshirani, and J. Friedman (2009). The Elements of Statistical Learning.\nC. M. Bishop (2006). Pattern Recognition and Machine Learning.\nS. Shalev-Shwartz and S. Ben-David (2014). Understanding Machine Learning: From Theory to Algorithms.\nV. Vapnik (2000). The Nature of Statistical Learning Theory\nC. C. Aggarwal (2023). Neural Networks and Deep Learning"
+  },
+  {
+    "objectID": "resources.html#references",
+    "href": "resources.html#references",
+    "title": "Resources",
+    "section": "",
+    "text": "Goodfellow et al. (2016) Deep Learning\nZhang et al. (2023) Dive into Deep Learning\nT. Hastie, R. Tibshirani, and J. Friedman (2009). The Elements of Statistical Learning.\nC. M. Bishop (2006). Pattern Recognition and Machine Learning.\nS. Shalev-Shwartz and S. Ben-David (2014). Understanding Machine Learning: From Theory to Algorithms.\nV. Vapnik (2000). The Nature of Statistical Learning Theory\nC. C. Aggarwal (2023). Neural Networks and Deep Learning"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Statistical Deep Learning (Fall 2024)",
+    "section": "",
+    "text": "加簽表單：https://forms.gle/2JH4nuPr6ueTv2JP7 (9/11前截止)"
+  },
+  {
+    "objectID": "index.html#course-schedule",
+    "href": "index.html#course-schedule",
+    "title": "Statistical Deep Learning (Fall 2024)",
+    "section": "Course Schedule",
+    "text": "Course Schedule\n\n\n\n\n\n\n\n\n\n\nWeek\nDate\nTopics\nSlides\nReading\n\n\n\n\n1\n9/3\nCourse Introduction\nSlide\n\n\n\n2\n9/10\nReview of Linear Models\nSlide\n\n\n\n3\n9/17\nNo class (Mid-Autumn Festival)\n\n\n\n\n4\n9/24\nMachine Learning Basics\n\nDL Ch. 5\n\n\n5\n10/1\nMultilayer Perceptron\n\nD2L Ch. 5 & DL Ch. 6\n\n\n6\n10/8\nRegularization for Deep Learning\n\nDL Ch. 7\n\n\n7\n10/15\nOptimization for DL Models\n\nD2L Ch. 12 & DL Ch. 8\n\n\n8\n10/22\nProject Proposal\n\n\n\n\n9\n10/29\nImplementation of DL Models\n\nD2L Ch. 6\n\n\n10\n11/5\nConvolutional Networks\n\nD2L Ch. 7, 8 & DL Ch. 9\n\n\n11\n11/12\nRecurrent Networks\n\nD2L Ch. 9, 10 & DL Ch. 10\n\n\n12\n11/19\nHyperparameter Optimization and Tuning\n\nD2L Ch. 19 & DL Ch. 11\n\n\n13\n11/26\nGenerative Models: Autoencoders, GAN, Diffusion models\n\nD2L Ch. 20 & DL Ch. 14\n\n\n14\n12/3\nAdditional Topics: Attention Mechanisms and Gaussian Process\n\nD2L Ch. 11, 18\n\n\n15-16\n12/10-17\nFinal Project Presentation"
+  },
+  {
+    "objectID": "index.html#important-dates",
+    "href": "index.html#important-dates",
+    "title": "Statistical Deep Learning (Fall 2024)",
+    "section": "Important Dates:",
+    "text": "Important Dates:\n\n9/17: No Class (Mid-Autumn Festival)\n10/22: Proposal Presentation\n12/10-17: Final Project Presentation"
+  },
+  {
     "objectID": "slides/01-intro.html#course-description",
     "href": "slides/01-intro.html#course-description",
     "title": "STAT 5011: Course Introduction",
     "section": "Course Description",
-    "text": "Course Description\n\n\\[\n\\newcommand{\\mc}[1]{\\mathcal{#1}}\n\\newcommand{\\R}{\\mathbb{R}}\n\\newcommand{\\E}{\\mathbb{E}}\n\\renewcommand{\\P}{\\mathbb{P}}\n\\newcommand{\\var}{{\\rm Var}} % Variance\n\\newcommand{\\mse}{{\\rm MSE}} % MSE\n\\newcommand{\\bias}{{\\rm Bias}} % MSE\n\\newcommand{\\cov}{{\\rm Cov}} % Covariance\n\\newcommand{\\iid}{\\stackrel{\\rm iid}{\\sim}}\n\\newcommand{\\ind}{\\stackrel{\\rm ind}{\\sim}}\n\\renewcommand{\\choose}[2]{\\binom{#1}{#2}}  % Choose\n\\newcommand{\\chooses}[2]{{}_{#1}C_{#2}}  % Small choose\n\\newcommand{\\cd}{\\stackrel{d}{\\rightarrow}}\n\\newcommand{\\cas}{\\stackrel{a.s.}{\\rightarrow}}\n\\newcommand{\\cp}{\\stackrel{p}{\\rightarrow}}\n\\newcommand{\\bin}{{\\rm Bin}}\n\\newcommand{\\ber}{{\\rm Ber}}\n\\DeclareMathOperator*{\\argmax}{argmax}\n\\DeclareMathOperator*{\\argmin}{argmin}\n\\]\n\n\nThis course provides an introduction to some commonly used models in deep learning:\n\nMultilayer Perceptron (MLP) or Fully-connected neural network (FCN)\nConvolutional Neural Network (CNN)\nRecurrent Neural Network (RNN)\nGenerative models\n\nThe course will cover the basic theory, practical implementation, and some applications of these models."
+    "text": "Course Description\n\n\\[\n\\newcommand{\\mc}[1]{\\mathcal{#1}}\n\\newcommand{\\R}{\\mathbb{R}}\n\\newcommand{\\E}{\\mathbb{E}}\n\\renewcommand{\\P}{\\mathbb{P}}\n\\newcommand{\\var}{{\\rm Var}} % Variance\n\\newcommand{\\mse}{{\\rm MSE}} % MSE\n\\newcommand{\\bias}{{\\rm Bias}} % MSE\n\\newcommand{\\cov}{{\\rm Cov}} % Covariance\n\\newcommand{\\iid}{\\stackrel{\\rm iid}{\\sim}}\n\\newcommand{\\ind}{\\stackrel{\\rm ind}{\\sim}}\n\\renewcommand{\\choose}[2]{\\binom{#1}{#2}}  % Choose\n\\newcommand{\\chooses}[2]{{}_{#1}C_{#2}}  % Small choose\n\\newcommand{\\cd}{\\stackrel{d}{\\rightarrow}}\n\\newcommand{\\cas}{\\stackrel{a.s.}{\\rightarrow}}\n\\newcommand{\\cp}{\\stackrel{p}{\\rightarrow}}\n\\newcommand{\\bin}{{\\rm Bin}}\n\\newcommand{\\ber}{{\\rm Ber}}\n\\newcommand{\\diag}{{\\rm diag}}\n\\DeclareMathOperator*{\\argmax}{argmax}\n\\DeclareMathOperator*{\\argmin}{argmin}\n\\]\n\n\nThis course provides an introduction to some commonly used models in deep learning:\n\nMultilayer Perceptron (MLP) or Fully-connected neural network (FCN)\nConvolutional Neural Network (CNN)\nRecurrent Neural Network (RNN)\nGenerative models\n\nThe course will cover the basic theory, practical implementation, and some applications of these models."
   },
   {
     "objectID": "slides/01-intro.html#prerequisites",
@@ -215,40 +523,5 @@
     "title": "STAT 5011: Course Introduction",
     "section": "Other readings",
     "text": "Other readings\n\nThe story of Frank Rosenblatt: Professor’s perceptron paved the way for AI – 60 years too soon\n\nWhat is ‘model collapse’? An expert explains the rumours about an impending AI doom.\n\n\n\n\nHome"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Statistical Deep Learning (Fall 2024)",
-    "section": "",
-    "text": "加簽表單：https://forms.gle/2JH4nuPr6ueTv2JP7 (9/11前截止)"
-  },
-  {
-    "objectID": "index.html#course-schedule",
-    "href": "index.html#course-schedule",
-    "title": "Statistical Deep Learning (Fall 2024)",
-    "section": "Course Schedule",
-    "text": "Course Schedule\n\n\n\n\n\n\n\n\n\n\nWeek\nDate\nTopics\nSlides\nReading\n\n\n\n\n1\n9/3\nCourse Introduction\nSlide\n\n\n\n2\n9/10\nReview of Linear Models\n\n\n\n\n3\n9/17\nNo class (Mid-Autumn Festival)\n\n\n\n\n4\n9/24\nMachine Learning Basics\n\nDL Ch. 5\n\n\n5\n10/1\nMultilayer Perceptron\n\nD2L Ch. 5 & DL Ch. 6\n\n\n6\n10/8\nRegularization for Deep Learning\n\nDL Ch. 7\n\n\n7\n10/15\nOptimization for DL Models\n\nD2L Ch. 12 & DL Ch. 8\n\n\n8\n10/22\nProject Proposal\n\n\n\n\n9\n10/29\nImplementation of DL Models\n\nD2L Ch. 6\n\n\n10\n11/5\nConvolutional Networks\n\nD2L Ch. 7, 8 & DL Ch. 9\n\n\n11\n11/12\nRecurrent Networks\n\nD2L Ch. 9, 10 & DL Ch. 10\n\n\n12\n11/19\nHyperparameter Optimization and Tuning\n\nD2L Ch. 19 & DL Ch. 11\n\n\n13\n11/26\nGenerative Models: Autoencoders, GAN, Diffusion models\n\nD2L Ch. 20 & DL Ch. 14\n\n\n14\n12/3\nAdditional Topics: Attention Mechanisms and Gaussian Process\n\nD2L Ch. 11, 18\n\n\n15-16\n12/10-17\nFinal Project Presentation"
-  },
-  {
-    "objectID": "index.html#important-dates",
-    "href": "index.html#important-dates",
-    "title": "Statistical Deep Learning (Fall 2024)",
-    "section": "Important Dates:",
-    "text": "Important Dates:\n\n9/17: No Class (Mid-Autumn Festival)\n10/22: Proposal Presentation\n12/10-17: Final Project Presentation"
-  },
-  {
-    "objectID": "resources.html",
-    "href": "resources.html",
-    "title": "Resources",
-    "section": "",
-    "text": "Goodfellow et al. (2016) Deep Learning\nZhang et al. (2023) Dive into Deep Learning\nT. Hastie, R. Tibshirani, and J. Friedman (2009). The Elements of Statistical Learning.\nC. M. Bishop (2006). Pattern Recognition and Machine Learning.\nS. Shalev-Shwartz and S. Ben-David (2014). Understanding Machine Learning: From Theory to Algorithms.\nV. Vapnik (2000). The Nature of Statistical Learning Theory\nC. C. Aggarwal (2023). Neural Networks and Deep Learning"
-  },
-  {
-    "objectID": "resources.html#references",
-    "href": "resources.html#references",
-    "title": "Resources",
-    "section": "",
-    "text": "Goodfellow et al. (2016) Deep Learning\nZhang et al. (2023) Dive into Deep Learning\nT. Hastie, R. Tibshirani, and J. Friedman (2009). The Elements of Statistical Learning.\nC. M. Bishop (2006). Pattern Recognition and Machine Learning.\nS. Shalev-Shwartz and S. Ben-David (2014). Understanding Machine Learning: From Theory to Algorithms.\nV. Vapnik (2000). The Nature of Statistical Learning Theory\nC. C. Aggarwal (2023). Neural Networks and Deep Learning"
   }
 ]

@@ -17,6 +17,7 @@ $$
 \newcommand{\cp}{\stackrel{p}{\rightarrow}}
 \newcommand{\bin}{{\rm Bin}}
 \newcommand{\ber}{{\rm Ber}}
+\newcommand{\diag}{{\rm diag}}
 \DeclareMathOperator*{\argmax}{argmax}
 \DeclareMathOperator*{\argmin}{argmin}
 $$
