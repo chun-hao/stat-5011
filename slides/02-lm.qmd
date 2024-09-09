@@ -28,7 +28,7 @@ title: "Generalized Linear Models"
    $$
    y = \boldsymbol{x}^T\boldsymbol{\beta}.
    $$
--  Suppose now we have $n$ samples $(\boldsymbol{x}_1, y_1), \ldots (\boldsymbol{x}_p, y_p)$ and we believe that the linear model above is a reasonable approximation of the relationship between the $\boldsymbol{x}_i$'s and $y_i$.
+-  Suppose now we have $n$ samples $(\boldsymbol{x}_1, y_1), \ldots (\boldsymbol{x}_n, y_n)$ and we believe that the linear model above is a reasonable approximation of the relationship between the $\boldsymbol{x}_i$'s and $y_i$.
 -  The goal is to estimate the **model parameter** $\boldsymbol{\beta}$. 
 
 ## Ordinary Least Squares (OLS) Estimation
