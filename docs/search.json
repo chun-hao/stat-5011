@@ -137,7 +137,7 @@
     "href": "slides/02-lm.html#beyond-normality",
     "title": "Generalized Linear Models",
     "section": "Beyond Normality",
-    "text": "Beyond Normality\n\nWhen the responce variable is not real-valued, the classical linear model is not appropriate.\nFor example:\n\nBinary responces: \\(y \\in \\{0, 1\\}\\).\nCount data: \\(y \\in \\{0, 1, 2, \\ldots\\}\\).\nMultinomial responces: \\(y \\in \\{1, 2, \\ldots, K\\}\\).\n\nIn these cases, neither the OLS estimation nor the normality assumption is appropriate.\nGeneralized Linear Model (GLM) is a generalization of the classical linear model that allows for non-normal responces.\nThe key is to find a reasonable distribution to model \\(y\\)."
+    "text": "Beyond Normality\n\nWhen the response variable is not real-valued, the classical linear model is not appropriate.\nFor example:\n\nBinary responces: \\(y \\in \\{0, 1\\}\\).\nCount data: \\(y \\in \\{0, 1, 2, \\ldots\\}\\).\nMultinomial responces: \\(y \\in \\{1, 2, \\ldots, K\\}\\).\n\nIn these cases, neither the OLS estimation nor the normality assumption is appropriate.\nGeneralized Linear Model (GLM) is a generalization of the classical linear model that allows for non-normal responces.\nThe key is to find a reasonable distribution to model \\(y\\)."
   },
   {
     "objectID": "slides/02-lm.html#binary-responces-logistic-regression",

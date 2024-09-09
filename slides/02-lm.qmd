@@ -289,7 +289,7 @@ Markdown(res.to_markdown(floatfmt=".3f", index=False))
 
 ## Beyond Normality 
 
--  When the responce variable is not real-valued, the classical linear model is not appropriate.
+-  When the response variable is not real-valued, the classical linear model is not appropriate.
 -  For example:
    -  Binary responces: $y \in \{0, 1\}$.
    -  Count data: $y \in \{0, 1, 2, \ldots\}$.
