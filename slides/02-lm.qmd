@@ -11,7 +11,7 @@ title: "Generalized Linear Models"
    -  Maximum Likelihood (ML) Estimation
    -  Penality and Regularization
 -  Generalized Linear Models
-   -  Logistic regression
+   -  Logistic Regression
    -  Multinomial Regression
 -  Non-linear Models
    -  Generalized Additive Models (GAM)
@@ -19,7 +19,7 @@ title: "Generalized Linear Models"
 
 ## Classical Linear Model
 
--  Given $p$ covariate variables $x_1, \ldots, x_p$ and a response variable $y$, the classical linear model assumes that the relationship between the $x$'s and $y$ is linear:
+-  Given $p$ covariates $x_1, \ldots, x_p$ and a response variable $y$, the classical linear model assumes that the relationship between the $x_i$'s and $y$ is linear:
    $$
    y = \beta_0 + \beta_1 x_1 + \cdots + \beta_p x_p.
    $$
@@ -37,7 +37,7 @@ title: "Generalized Linear Models"
    $$
    \hat{\boldsymbol{\beta}} = \argmin_{\boldsymbol{\beta}} \sum_{i=1}^n (y_i - \boldsymbol{x}_i^T\boldsymbol{\beta})^2.
    $$
--  Denote
+-  Denoting
    $$
    \boldsymbol{y} = \begin{bmatrix} y_1 \\ \vdots \\ y_n \end{bmatrix}, \quad
    \boldsymbol{X} = \begin{bmatrix} \boldsymbol{x}_1^T \\ \vdots \\ \boldsymbol{x}_n^T \end{bmatrix},
@@ -50,7 +50,7 @@ title: "Generalized Linear Models"
 ## Ordinary Least Squares (OLS) Estimation
 
 -  Let $L(\boldsymbol{\beta}) = \|\boldsymbol{y} - \boldsymbol{X}\boldsymbol{\beta}\|_2^2$. This is often called the **loss function**.
--  Take the gradient of $L(\boldsymbol{\beta})$ with respect to $\boldsymbol{\beta}$ and set it to zero, we have
+-  Taking the gradient of $L(\boldsymbol{\beta})$ with respect to $\boldsymbol{\beta}$ and setting it to zero, we have
    $$
    \nabla_{\boldsymbol{\beta}} L(\boldsymbol{\beta}) = -2\boldsymbol{X}^T(\boldsymbol{y} - \boldsymbol{X}\boldsymbol{\beta}) = 0.
    $$
@@ -58,8 +58,8 @@ title: "Generalized Linear Models"
    $$
    \hat{\boldsymbol{\beta}}^{\text{OLS}} = (\boldsymbol{X}^T\boldsymbol{X})^{-1}\boldsymbol{X}^T\boldsymbol{y}.
    $$
--  To ensure the existence of the inverse, we often assume that $\boldsymbol{X}^T\boldsymbol{X}$ is invertible, that is, the columns of $\boldsymbol{X}$ are linearly independent.
--  To verify that $\hat{\boldsymbol{\beta}}^{\text{OLS}}$ is the minimizer, we need to show that the Hessian of $L(\boldsymbol{\beta})$ is positive definite:
+-  To ensure the existence of the inverse, we need to assume that $\boldsymbol{X}^T\boldsymbol{X}$ is invertible, that is, the columns of $\boldsymbol{X}$ are linearly independent.
+-  To verify that $\hat{\boldsymbol{\beta}}^{\text{OLS}}$ is indeed the minimizer, we need to show that the Hessian of $L(\boldsymbol{\beta})$ is positive definite:
    $$
    \nabla^2_{\boldsymbol{\beta}} L(\boldsymbol{\beta}) = 2\boldsymbol{X}^T\boldsymbol{X} \succ 0.
    $$
@@ -68,7 +68,7 @@ title: "Generalized Linear Models"
 ## Maximum Likelihood (ML) Estimation
 
 -  Another way to estimate $\boldsymbol{\beta}$ is the **maximum likelihood (ML)** estimation.
--  Suppose that the response variable $y$ is normally distributed with mean $\boldsymbol{x}^T\boldsymbol{\beta}$ and variance $\sigma^2$:
+-  Suppose that the response variable $y$ is normally distributed with mean $\mu(\boldsymbol{x}) = \boldsymbol{x}^T\boldsymbol{\beta}$ and variance $\sigma^2$:
    $$
    y \mid \boldsymbol{x} \sim \mathcal{N}(\boldsymbol{x}^T\boldsymbol{\beta}, \sigma^2).
    $$
@@ -84,7 +84,7 @@ title: "Generalized Linear Models"
 
 ## Maximum Likelihood (ML) Estimation
 
--  Taking the gradient of $\ell(\boldsymbol{\beta}, \sigma^2)$ with respect to $\boldsymbol{\beta}$ and $\sigma^2$ and set them to zero, we have
+-  Taking the gradient of $\ell(\boldsymbol{\beta}, \sigma^2)$ with respect to $\boldsymbol{\beta}$ and $\sigma^2$ and setting them to zero, we have
    $$
    \nabla_{\boldsymbol{\beta}} \ell(\boldsymbol{\beta}, \sigma^2) = \frac{1}{\sigma^2} \boldsymbol{X}^T(\boldsymbol{y} - \boldsymbol{X}\boldsymbol{\beta}) = 0,
    $$ 
@@ -133,22 +133,22 @@ title: "Generalized Linear Models"
    \boldsymbol{y} \mid \boldsymbol{X} \sim \mathcal{N}(\boldsymbol{X}\boldsymbol{\beta}, \sigma^2 W^{-1})
    $$
    where $W$ is an $n\times n$ covariance matrix describing the dependence between the samples.
--  Consider the transformation $\widetilde{\boldsymbol{y}} = W^{1/2}\boldsymbol{y}$ and $\widetilde{\boldsymbol{X}} = W^{1/2}\boldsymbol{X}$, the model becomes
+-  Consider the transformation $\widetilde{\boldsymbol{y}} = W^{1/2}\boldsymbol{y}$ and $\widetilde{\boldsymbol{X}} = W^{1/2}\boldsymbol{X}$. The model becomes
    $$
    \widetilde{\boldsymbol{y}} \mid \widetilde{\boldsymbol{X}} \sim \mathcal{N}(\widetilde{\boldsymbol{X}}\boldsymbol{\beta}, \sigma^2 I).
    $$
 -  Therefore the MLE for $\boldsymbol{\beta}$ is
    $$
-   \hat{\boldsymbol{\beta}}^{\text{MLE}} = (\widetilde{\boldsymbol{X}}^T\widetilde{\boldsymbol{X}})^{-1}\widetilde{\boldsymbol{X}}^T\widetilde{\boldsymbol{y}} = (\boldsymbol{X}^TW\boldsymbol{X})^{-1}\boldsymbol{X}^TW\boldsymbol{y}
+   \hat{\boldsymbol{\beta}}^{\text{MLE}} = (\widetilde{\boldsymbol{X}}^T\widetilde{\boldsymbol{X}})^{-1}\widetilde{\boldsymbol{X}}^T\widetilde{\boldsymbol{y}} = (\boldsymbol{X}^TW\boldsymbol{X})^{-1}\boldsymbol{X}^TW\boldsymbol{y},
    $$
    which is called the **weighted least squares** estimation.
 
 ## Penalized Likelihood Estimation
 
--  However, in practice, the MLE not be the best choice.
+-  However, in practice, the MLE might not be the best choice.
 -  For example, when $X$ contains columns that are close to **collinear** or if the number of covariates $p$ is large, computing $(X^TX)^{-1}$ will become numerically unstable.
 -  One of the most common ways to address this issue is to add **penalization** or **regularization**.
--  The idea is to add a penalty term to the log-likelihood function, i.e.,
+-  The idea is to add a penalty term to the negative log-likelihood function, i.e.,
    $$
    -\ell(\boldsymbol{\beta}, \sigma^2) + \lambda \cdot \text{pen}(\boldsymbol{\beta}).
    $$
@@ -157,12 +157,12 @@ title: "Generalized Linear Models"
 
 ## Ridge Regression
 
--  One of the most common penalization methods is the **ridge regression**.
+-  One of the most common penalization methods is the **Ridge regression**.
 -  The penalty term is the $L_2$ norm of $\boldsymbol{\beta}$:
    $$
    \text{pen}(\boldsymbol{\beta}) = \|\boldsymbol{\beta}\|_2^2 = \sum_{j=0}^p \beta_j^2.
    $$
--  The ridge estimator is
+-  The Ridge estimator is
    $$
    \hat{\boldsymbol{\beta}}^{\text{ridge}} = \argmin_{\boldsymbol{\beta}} \|\boldsymbol{y} - \boldsymbol{X}\boldsymbol{\beta}\|_2^2 + \lambda \|\boldsymbol{\beta}\|_2^2.
    $$
@@ -170,32 +170,32 @@ title: "Generalized Linear Models"
    $$
    \nabla_{\boldsymbol{\beta}} L_{\lambda}(\boldsymbol{\beta}) = -2\boldsymbol{X}^T(\boldsymbol{y} - \boldsymbol{X}\boldsymbol{\beta}) + 2\lambda \boldsymbol{\beta} = 0.
    $$
--  Hence the ridge estimator is
+-  Hence the Ridge estimator is
    $$
    \hat{\boldsymbol{\beta}}^{\text{ridge}} = (\boldsymbol{X}^T\boldsymbol{X} + \lambda I)^{-1}\boldsymbol{X}^T\boldsymbol{y}.
    $$
 
 ## Ridge Regression
 
--  Typically, penalization of the intercept is not desired in ridge regression so that $\beta_0$ should be excluded from the penalty term. 
+-  Typically, penalization of the intercept is not desired in Ridge regression so that $\beta_0$ should be excluded from the penalty term. 
 -  A simple way to achieve this is to center all covariates and the responses so that $\bar{y} = 0$ and $\bar{\boldsymbol{x}} = 0$ which automatically results in $\hat{\beta}_0 = 0$.
 -  A second approach is to use the following penalty term: 
    $$
    \text{pen}(\boldsymbol{\beta}) = \sum_{j=1}^p \beta_j^2 = \boldsymbol{\beta}^TK\boldsymbol{\beta},
    $$
    where $K = \text{diag}(0, 1, \ldots, 1)$.
--  The ridge estimator is
+-  The Ridge estimator is
    $$
    \hat{\boldsymbol{\beta}}^{\text{ridge}} = (\boldsymbol{X}^T\boldsymbol{X} + \lambda K)^{-1}\boldsymbol{X}^T\boldsymbol{y}.
    $$
 
 ## Ridge v.s. OLS 
 
--  The ridge estimator is **biased** and the OLS is **unbiased**.
--  However, one can show that the ridge estimator has a smaller variance than the OLS estimator.
--  When choosing an appropriate smoothing parameter $\lambda$, the ridge estimator can have a smaller **mean squared error (MSE)** than the OLS estimator.
--  The ridge estimator is **shrinkage** estimator that shrinks the coefficients towards zero (large value of $\lambda$ yields a stronger shrinkage).
--  The ridge estimator is particularly useful when the covariates are collinear or when the number of covariates is large.
+-  The Ridge estimator is **biased** and the OLS is **unbiased**.
+-  However, one can show that the Ridge estimator has a smaller variance than the OLS estimator.
+-  When choosing an appropriate hyperparameter $\lambda$, the Ridge estimator can have a smaller **mean squared error (MSE)** than the OLS estimator.
+-  The Ridge estimator is **shrinkage** estimator that shrinks the coefficients towards zero (large value of $\lambda$ yields a stronger shrinkage).
+-  The Ridge estimator is particularly useful when the covariates are collinear or when the number of covariates is large.
 -  The choice of $\lambda$ is often done using cross-validation.
 
 
@@ -230,18 +230,18 @@ title: "Generalized Linear Models"
 Figure 3.11 of ESL
 :::
 
-## Elastic Net
+## Elastic-Net
 
--  The **elastic net**[^zou] is a combination of the ridge and the LASSO.
+-  The **Elastic-Net**[^zou] is a combination of the Ridge and the LASSO.
 -  The penalty term is a combination of the $L_1$ and $L_2$ norm of $\boldsymbol{\beta}$:
    $$
    \text{pen}(\boldsymbol{\beta}) = \lambda_1 \sum_{j=1}^p |\beta_j| + \lambda_2 \sum_{j=1}^p \beta_j^2.
    $$
--  The elastic net estimator is
+-  The Elastic-Net estimator is
    $$
    \hat{\boldsymbol{\beta}}^{\text{EN}} = \argmin_{\boldsymbol{\beta}} \|\boldsymbol{y} - \boldsymbol{X}\boldsymbol{\beta}\|_2^2 + \lambda_1 \sum_{j=1}^p |\beta_j| + \lambda_2 \sum_{j=1}^p \beta_j^2.
    $$
--  Through the choice of $\lambda_1$ and $\lambda_2$, the elastic net can be used to achieve the benefits of both the ridge and the LASSO.
+-  Through the choice of $\lambda_1$ and $\lambda_2$, the Elastic-Net can be used to achieve the benefits of both the ridge and the LASSO.
 
 [^zou]: Zou, H., & Hastie, T. (2005). Regularization and variable selection via the elastic net. *Journal of the Royal Statistical Society Series B: Statistical Methodology*, 67(2), pages 301-320.
 
@@ -249,7 +249,7 @@ Figure 3.11 of ESL
 
 -  We generate a synthetic dataset with 50 samples and 10 features.
 -  Only 5 out of the 10 features are informative.
--  We fit the linear regression, Ridge, Lasso, and Elastic Net models to the data.
+-  We fit the linear regression, Ridge, LASSO, and Elastic-Net models to the data.
 
 ```{python}
 #| echo: true
@@ -279,7 +279,7 @@ res = pd.DataFrame({"True Coef": true_coef,
               "Linear": lm.coef_,
               "Ridge": ridge.coef_,
               "LASSO": lasso.coef_,
-              "ElasticNet": enet.coef_
+              "Elastic-Net": enet.coef_
               })
 Markdown(res.to_markdown(floatfmt=".3f", index=False))
 ```
@@ -388,7 +388,7 @@ Markdown(res.to_markdown(floatfmt=".3f", index=False))
     $$
 -   Therefore
     \begin{align*}
-    \E(Y \mid \boldsymbol{x}) & = \frac{d}{d\theta}\psi(\theta) = \psi^{\prime}(\boldsymbol{x}^T\boldsymbol{\beta})
+    \E(Y \mid \boldsymbol{x}) & = \frac{d}{d\theta}\psi(\theta) = \psi^{\prime}(\boldsymbol{x}^T\boldsymbol{\beta}).
     \end{align*}
 -   Equivalently,
     $$
@@ -501,7 +501,7 @@ Markdown(res.to_markdown(floatfmt=".3f", index=False))
    $$
 -  The link function $g$ connects the conditional expectation and the linear predictor and is chosen based on the distribution of $Y$.
 -  Examples:
-   -  Logistic regression: $g(p) = \log\left(\frac{p}{1-p}\right)$, $g^{-1}(x) = $
+   -  Logistic regression: $g(p) = \log\left(\frac{p}{1-p}\right)$, $g^{-1}(x) = \frac{1}{1+e^{-x}}$.
    -  Linear regression: $g(\mu) = \mu$.
    -  Multinomial regression: softmax function.
    -  There are other choices and the above are called the **canonical link functions**.
@@ -557,7 +557,7 @@ In order to find the MLE, we need to simplify the log-likelihood function:
 \ell(\boldsymbol{\beta}) & = \log \left(\prod_{i=1}^n p(\boldsymbol{x}_i)^{y_i}(1-p(\boldsymbol{x}_i))^{1-y_i}\right) \\
 & = \sum_{i=1}^n y_i \log p(\boldsymbol{x}_i) + (1-y_i)\log(1-p(\boldsymbol{x}_i))\\
 & = \sum_{i=1}^n \left[y_i \log \left(\frac{p(\boldsymbol{x}_i)}{1-p(\boldsymbol{x}_i)}\right) + \log(1-p(\boldsymbol{x}_i))\right]\\
-& = \sum_{i=1}^n \left[y_i\boldsymbol{x}_i^T\boldsymbol{\beta} - \log(1+\exp(\boldsymbol{x}_i^T\boldsymbol{\beta}))\right]
+& = \sum_{i=1}^n \left[y_i\boldsymbol{x}_i^T\boldsymbol{\beta} - \log(1+\exp(\boldsymbol{x}_i^T\boldsymbol{\beta}))\right].
 \end{align*}
 
 ## Gradient and Hessian
@@ -571,10 +571,10 @@ Now we compute the gradient and the Hessian of the log-likelihood function:
 \end{align*}
 where
 $$
-\mathbf{p} = [p(\boldsymbol{x}_1), \ldots, p(\boldsymbol{x}_n)]^T, \quad W= \diag(\mathbf{p})\diag(1-\mathbf{p}), \quad X = \begin{bmatrix} \boldsymbol{x}_1^T \\ \vdots \\ \boldsymbol{x}_n^T \end{bmatrix}
+\mathbf{p} = [p(\boldsymbol{x}_1), \ldots, p(\boldsymbol{x}_n)]^T, \quad W= \diag(\mathbf{p})\diag(1-\mathbf{p}), \quad X = \begin{bmatrix} \boldsymbol{x}_1^T \\ \vdots \\ \boldsymbol{x}_n^T \end{bmatrix}.
 $$
 
-## Iteratively Reweighted Least Squares (IRWLS)
+## Iteratively Re-Weighted Least Squares (IRWLS)
 
 There is no analytic solution for the MLE of the logistic regression. However, the Newton-Raphson method can be used to find the MLE. The Newton-Raphson method is an iterative method that updates the parameter $\boldsymbol{\beta}$ as follows:
 
@@ -588,5 +588,5 @@ where
 \begin{align*}
 \mathbf{z}^{(t)} & =X \boldsymbol{\beta}^{(t)}+\left(W^{(t)}\right)^{-1}\left(\boldsymbol{y}-\mathbf{p}^{(t)}\right), \quad \mathbf{p}^{(t)} = [p^{(t)}(\boldsymbol{x}_1), \ldots, p^{(t)}(\boldsymbol{x}_n)]^T\\
 p^{(t)}(\boldsymbol{x}_i) & = \frac{\exp(\boldsymbol{x}_i^T\boldsymbol{\beta}^{(t)})}{1+\exp(\boldsymbol{x}_i^T\boldsymbol{\beta}^{(t)})}, \quad
-W^{(t)} = \diag(\mathbf{p}^{(t)})\diag(1-\mathbf{p}^{(t)})
+W^{(t)} = \diag(\mathbf{p}^{(t)})\diag(1-\mathbf{p}^{(t)}).
 \end{align*}
