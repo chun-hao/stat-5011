@@ -295,7 +295,7 @@ Markdown(res.to_markdown(floatfmt=".3f", index=False))
    -  Count data: $y \in \{0, 1, 2, \ldots\}$.
    -  Multinomial responces: $y \in \{1, 2, \ldots, K\}$.
 -  In these cases, neither the OLS estimation nor the normality assumption is appropriate.
--  Generalized Linear Model (GLM) is a generalization of the classical linear model that allows for non-normal responces.
+-  Generalized Linear Model (GLM) is a generalization of the classical linear model that allows for non-normal responses.
 -  The key is to find a reasonable distribution to model $y$.
   
 
