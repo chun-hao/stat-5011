@@ -291,9 +291,9 @@ Markdown(res.to_markdown(floatfmt=".3f", index=False))
 
 -  When the response variable is not real-valued, the classical linear model is not appropriate.
 -  For example:
-   -  Binary responces: $y \in \{0, 1\}$.
+   -  Binary responses: $y \in \{0, 1\}$.
    -  Count data: $y \in \{0, 1, 2, \ldots\}$.
-   -  Multinomial responces: $y \in \{1, 2, \ldots, K\}$.
+   -  Multinomial responses: $y \in \{1, 2, \ldots, K\}$.
 -  In these cases, neither the OLS estimation nor the normality assumption is appropriate.
 -  Generalized Linear Model (GLM) is a generalization of the classical linear model that allows for non-normal responses.
 -  The key is to find a reasonable distribution to model $y$.
