@@ -365,9 +365,9 @@ Markdown(res.to_markdown(floatfmt=".3f", index=False))
 
 -  Normal disribution: 
    $$
-   f(x \mid \mu, \sigma^2) = \exp\left(-\frac{1}{2\sigma^2} x^2 + \frac{\mu}{\sigma^2}x - \frac{\mu^2}{2\sigma^2}\right), \quad x \in \R
+   f(x \mid \mu, \sigma^2) = \exp\left(-\frac{1}{2\sigma^2} x^2 + \frac{\mu}{\sigma^2}x - \frac{\mu^2}{2\sigma^2} - \frac{1}{2}\log(2\pi\sigma^2)\right), \quad x \in \R
    $$
-    +   $\theta = \left(-\frac{1}{2\sigma^2}, \frac{\mu}{\sigma^2}\right)$, $T(x) = (-x^2, x)$, $\psi(\theta) = -\frac{\theta_2^2}{4\theta_1} = \frac{\mu^2}{2\sigma^2}$
+    +   $\theta = \left(-\frac{1}{2\sigma^2}, \frac{\mu}{\sigma^2}\right)$, $T(x) = (-x^2, x)$, $\psi(\theta) = -\frac{\theta_2^2}{4\theta_1} - \frac{1}{2}\log\left(-\frac{\theta_1}{\pi}\right)= \frac{\mu^2}{2\sigma^2} + \frac{1}{2}\log(2\pi\sigma^2)$ 
 -  Bernoulli distribution:
    $$
    f(x \mid p) = p^x(1-p)^{1-x} = \exp\left(x\log\frac{p}{1-p} + \log(1-p)\right), \quad x \in \{0, 1\}
