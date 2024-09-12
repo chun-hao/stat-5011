@@ -2,11 +2,6 @@
 title: "Statistical Deep Learning (Fall 2024)"
 ---
 
-### Sign-up form
-
-加簽表單：<https://forms.gle/2JH4nuPr6ueTv2JP7> (9/11前截止)
-
-
 ## Course Schedule {.smaller}
 
 | Week | Date | Topics | Slides | Reading |

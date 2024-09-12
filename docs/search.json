@@ -291,14 +291,14 @@
     "href": "index.html",
     "title": "Statistical Deep Learning (Fall 2024)",
     "section": "",
-    "text": "加簽表單：https://forms.gle/2JH4nuPr6ueTv2JP7 (9/11前截止)"
+    "text": "Week\nDate\nTopics\nSlides\nReading\n\n\n\n\n1\n9/3\nCourse Introduction\nSlide\n\n\n\n2\n9/10\nReview of Linear Models\nSlide\n\n\n\n3\n9/17\nNo class (Mid-Autumn Festival)\n\n\n\n\n4\n9/24\nMachine Learning Basics\n\nDL Ch. 5\n\n\n5\n10/1\nMultilayer Perceptron\n\nD2L Ch. 5 & DL Ch. 6\n\n\n6\n10/8\nRegularization for Deep Learning\n\nDL Ch. 7\n\n\n7\n10/15\nOptimization for DL Models\n\nD2L Ch. 12 & DL Ch. 8\n\n\n8\n10/22\nProject Proposal\n\n\n\n\n9\n10/29\nImplementation of DL Models\n\nD2L Ch. 6\n\n\n10\n11/5\nConvolutional Networks\n\nD2L Ch. 7, 8 & DL Ch. 9\n\n\n11\n11/12\nRecurrent Networks\n\nD2L Ch. 9, 10 & DL Ch. 10\n\n\n12\n11/19\nHyperparameter Optimization and Tuning\n\nD2L Ch. 19 & DL Ch. 11\n\n\n13\n11/26\nGenerative Models: Autoencoders, GAN, Diffusion models\n\nD2L Ch. 20 & DL Ch. 14\n\n\n14\n12/3\nAdditional Topics: Attention Mechanisms and Gaussian Process\n\nD2L Ch. 11, 18\n\n\n15-16\n12/10-17\nFinal Project Presentation"
   },
   {
     "objectID": "index.html#course-schedule",
     "href": "index.html#course-schedule",
     "title": "Statistical Deep Learning (Fall 2024)",
-    "section": "Course Schedule",
-    "text": "Course Schedule\n\n\n\n\n\n\n\n\n\n\nWeek\nDate\nTopics\nSlides\nReading\n\n\n\n\n1\n9/3\nCourse Introduction\nSlide\n\n\n\n2\n9/10\nReview of Linear Models\nSlide\n\n\n\n3\n9/17\nNo class (Mid-Autumn Festival)\n\n\n\n\n4\n9/24\nMachine Learning Basics\n\nDL Ch. 5\n\n\n5\n10/1\nMultilayer Perceptron\n\nD2L Ch. 5 & DL Ch. 6\n\n\n6\n10/8\nRegularization for Deep Learning\n\nDL Ch. 7\n\n\n7\n10/15\nOptimization for DL Models\n\nD2L Ch. 12 & DL Ch. 8\n\n\n8\n10/22\nProject Proposal\n\n\n\n\n9\n10/29\nImplementation of DL Models\n\nD2L Ch. 6\n\n\n10\n11/5\nConvolutional Networks\n\nD2L Ch. 7, 8 & DL Ch. 9\n\n\n11\n11/12\nRecurrent Networks\n\nD2L Ch. 9, 10 & DL Ch. 10\n\n\n12\n11/19\nHyperparameter Optimization and Tuning\n\nD2L Ch. 19 & DL Ch. 11\n\n\n13\n11/26\nGenerative Models: Autoencoders, GAN, Diffusion models\n\nD2L Ch. 20 & DL Ch. 14\n\n\n14\n12/3\nAdditional Topics: Attention Mechanisms and Gaussian Process\n\nD2L Ch. 11, 18\n\n\n15-16\n12/10-17\nFinal Project Presentation"
+    "section": "",
+    "text": "Week\nDate\nTopics\nSlides\nReading\n\n\n\n\n1\n9/3\nCourse Introduction\nSlide\n\n\n\n2\n9/10\nReview of Linear Models\nSlide\n\n\n\n3\n9/17\nNo class (Mid-Autumn Festival)\n\n\n\n\n4\n9/24\nMachine Learning Basics\n\nDL Ch. 5\n\n\n5\n10/1\nMultilayer Perceptron\n\nD2L Ch. 5 & DL Ch. 6\n\n\n6\n10/8\nRegularization for Deep Learning\n\nDL Ch. 7\n\n\n7\n10/15\nOptimization for DL Models\n\nD2L Ch. 12 & DL Ch. 8\n\n\n8\n10/22\nProject Proposal\n\n\n\n\n9\n10/29\nImplementation of DL Models\n\nD2L Ch. 6\n\n\n10\n11/5\nConvolutional Networks\n\nD2L Ch. 7, 8 & DL Ch. 9\n\n\n11\n11/12\nRecurrent Networks\n\nD2L Ch. 9, 10 & DL Ch. 10\n\n\n12\n11/19\nHyperparameter Optimization and Tuning\n\nD2L Ch. 19 & DL Ch. 11\n\n\n13\n11/26\nGenerative Models: Autoencoders, GAN, Diffusion models\n\nD2L Ch. 20 & DL Ch. 14\n\n\n14\n12/3\nAdditional Topics: Attention Mechanisms and Gaussian Process\n\nD2L Ch. 11, 18\n\n\n15-16\n12/10-17\nFinal Project Presentation"
   },
   {
     "objectID": "index.html#important-dates",
