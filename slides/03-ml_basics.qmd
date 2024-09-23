@@ -1,0 +1,503 @@
+---
+title: "Machine Learning Basics"
+---
+
+## Recap of the Last Lecture
+
+{{< include macro.qmd >}}
+
+-  Relationship between likelihood and loss function
+   -  Normal likelihood $\leftrightarrow$ squared error loss
+   -  Multinomial/Binomial likelihood $\leftrightarrow$ cross-entropy loss
+-  Penalization/Regularization: $L_1$ and $L_2$ regularization
+-  Link function: a function that connects the conditional mean $\E(Y \mid \boldsymbol{x})$ and the linear predictor $\boldsymbol{x}^T \boldsymbol{\beta}$:
+   -  Real-valued response: identity link $\E(Y \mid \boldsymbol{x}) = \boldsymbol{x}^T \boldsymbol{\beta}$
+   -  Binary response: logit link $\E(Y \mid \boldsymbol{x}) = \frac{1}{1 + \exp(-\boldsymbol{x}^T \boldsymbol{\beta})}$
+   -  Multinomial response: softmax link 
+      $$
+      \E(Y \mid \boldsymbol{x}) = \left[\frac{\exp(\boldsymbol{x}^T \boldsymbol{\beta_1})}{\sum_{k=1}^K \exp(\boldsymbol{x}^T \boldsymbol{\beta}_k)}, \ldots, \frac{\exp(\boldsymbol{x}^T \boldsymbol{\beta_K})}{\sum_{k=1}^K \exp(\boldsymbol{x}^T \boldsymbol{\beta}_k)}\right]^T
+      $$
+
+## Outline
+
+-  Empirical Risk Minimization (ERM)
+   -  A general framework for machine learning
+   -  Decomposition of the generalization error of a model
+-  Vapnik-Chervonenkis (VC) Theory
+   -  Measuring the complexity of a set of models
+   -  Providing an upper bound for the generalization error
+-  Validation of a trained model
+   -  Estimating the generalization error
+   -  $k$-fold cross-validation
+   -  Cross-validation for hyperparameter tuning 
+
+## Different Types of Learning
+
+
+There are many types of learning:
+
+-  Supervised Learning
+-  Unsupervised Learning
+-  Reinforcement Learning
+-  Semi-supervised Learning
+-  Active Learning
+-  Online Learning
+-  Transfer Learning
+-  Multi-task Learning
+-  Federated Learning, etc.
+
+## Supervised Learning
+
+-  The dataset consists of pairs $(x_i, y_i)$, $x_i \in \mathcal{X}$, $y_i \in \mathcal{Y}$, where $x_i$ is called the **feature** and $y_i$ is the associated **label**.
+   -  $\mathcal{X} \subseteq \R^p$ is called the feature space (usually $\mathcal{X} = \R^p$)
+   -  $\mathcal{Y} \subseteq \R^K$ is called the label space
+-  The goal is to learn a function $f: \mathcal{X} \to \mathcal{Y}$ that maps the feature to the label.
+-  Examples:
+   -  image/text classification
+   -  prediction
+-  Commonly used models:
+   -  Linear regression/Logistic regression
+   -  Support vector machine (SVM)
+   -  Neural network, and many others
+
+## General Framework of Supervised Learning
+
+-  In this course, we will mainly focus on supervised learning.
+-  Supervised learning can also be viewed as a **function estimation** problem, i.e., estimating the function $f$ that maps the feature $x$ to the label $y$.
+-  Depending the types of labels, many different models have been developed.
+-  Instead of focusing on individual models, we will discuss a general framework for supervised learning, called **Empirical Risk Minimization (ERM)**.
+
+
+# Empirical Risk Minimization
+
+## Empirical Risk Minimization (ERM)
+
+-  The ERM principle for supervised learning requires:
+   -  A **loss function** $L(y, g(x))$ that measures the discrepancy between the true label $y$ and the predicted label $g(x)$.
+   -  A **hypothesis class** $\mathcal{G}$ which is a class of functions $g: \mathcal{X} \to \mathcal{Y}$.
+   -  A **training dataset**  $(x_1, y_1), \ldots, (x_n, y_n)$.
+
+
+## Loss function
+
+-  A loss function $L: \mathcal{Y} \times \R^K \to \R$ quantifies how well $\hat{y}$ approximates $y$:
+   -  smaller values of $L(y, \hat{y}$) indicate that $\hat{y}$ is a good approximation of $y$
+   -  typically (but not always) $L(y, y) = 0$ and $L(y, \hat{y}) \geq 0$ for all $\hat{y}$, and $y$
+-  Examples:
+   -  Quadratic loss: $L(y, \hat{y}) = (y - \hat{y})^2$ or $L(y, \hat{y}) = \|y - \hat{y}\|^2$
+   -  Absolute loss: $L(y, \hat{y}) = |y - \hat{y}|$
+   -  Cross-Entropy loss: $L(y, \hat{y}) = -y \log(\hat{y}) - (1 - y) \log(1 - \hat{y})$ or $L(y, \hat{y}) = -\sum_{i=1}^K y_i\log\hat{y}_i$
+
+## Risk Function
+
+-  Assume that $(X, Y) \sim F$ and $F$ is an unknown distribution. 
+-  Given a loss function ,the **risk function** of a model $h$ is 
+   $$
+   R(h) = \E_{(X, Y) \sim F}[L(Y, h(X))].
+   $$
+-  The optimal $h$ is the one that minimizes the risk function: 
+   $$
+   h^{\star} = \argmin_{h: \mathcal{X} \to \mathcal{Y}} R(h).
+   $$
+-  Denote the **optimal risk** as $R^{\star} = R(h^{\star})$.
+-  However, it is impossible to obtain either $h^{\star}$ or $R^{\star}$ because:
+   1.  the space of all possible functions $\{h: \mathcal{X} \to \mathcal{Y}\}$ is too large, and 
+   2.  the data distribution $F$ is unknown.
+
+## Hypothesis Class
+
+-  To make the problem tractable, we restrict the space of functions to a **hypothesis class** $\mathcal{H}$.
+-  We denote the **best model** in $\mathcal{H}$ as $h_{\mathcal{H}}^{\star} = \argmin_{h \in \mathcal{H}} R(h)$.
+-  Its associated risk is $R_{\mathcal{H}}^{\star} = R(h_{\mathcal{H}}^{\star})$.
+-  By definition, it is obvious that $R_{\mathcal{H}}^{\star} \geq R^{\star}$.
+-  Examples:
+   -  Linear regression: $\mathcal{H} = \{h: h(\boldsymbol{x}) = \boldsymbol{x}^T \boldsymbol{\beta}, \boldsymbol{\beta} \in \R^p\} = \R^p$
+   -  Logistic regression: $\mathcal{H} = \left\{h: h(\boldsymbol{x}) = \frac{1}{1 + \exp(-\boldsymbol{x}^T \boldsymbol{\beta})}, \boldsymbol{\beta} \in \R^p\right\} = \R^p$
+-  The difference between $R_{\mathcal{H}}^{\star}$ and $R^{\star}$ is called the **approximation error**.
+-  Intuitively, the larger the hypothesis class, the smaller the approximation error.
+
+## Empirical Risk
+
+
+-  Assuming that $(x_1, y_1), \ldots, (x_n, y_n) \iid F$, the **empirical risk** is
+   $$
+    R_{\text{emp}}(h) = \E_{(X, Y) \sim \widehat{F}_n}[L(Y, h(X))]
+           = \frac{1}{n} \sum_{i=1}^n L(y_i, h(x_i))
+   $$
+   where $\widehat{F}_n = \frac{1}{n}\sum_{i=1}^n \delta_{(x_i, y_i)}$ is the empirical distribution of the data.
+-  We choose the $h$ that minimizes the empirical risk function, i.e., the **empirical risk minimizer**:
+   $$
+    \hat{h}_{n, \mathcal{H}} = \argmin_{h \in \mathcal{H}} R_{\text{emp}}(h)
+   $$
+   where $\mathcal{H}$ is the hypothesis class.
+-  Denote the empirical risk associated with $\hat{h}_{n, \mathcal{H}}$ as $\hat{R}_n = R_{\text{emp}}(\hat{h}_{n, \mathcal{H}})$ and this is what we obtain in practice.
+
+## Quick Summary
+
+-  Goal: find the best model $h^{\star} = \argmin_h R(h)$, which is impossible since
+   -  the space of all possible functions is too large $\textcolor{red}{\rightarrow}$ [restrict to hypothesis class]{style="color:red;"}
+   -  the data distribution is unknown $\textcolor{red}{\rightarrow}$ [use empirical data]{style="color:red;"}
+-  We have three models:
+   -  $h^{\star}$: the best model [(associated risk $R^{\star} = R(h^{\star})$)]{style="color:blue;"}
+   -  $h_{\mathcal{H}}^{\star}$: the best model in the hypothesis class $\mathcal{H}$ [(associated risk $R_{\mathcal{H}}^{\star} = R(h^{\star}_{\mathcal{H}})$)]{style="color:blue;"}
+   -  $\hat{h}_{n, \mathcal{H}}$: the empirical risk minimizer, i.e., the **trained model** [(empirical risk, or the **training error**,  $\hat{R}_n = R_{\text{emp}}(\hat{h}_{n, \mathcal{H}})$)]{style="color:blue;"}
+-  We want $\hat{h}_{n, \mathcal{H}}$ to be as close as possible to $h^{\star}$ in terms of the risk function $R(h)$.
+
+## Error Decomposition
+
+-  Goal: $R(\hat{h}_{n,\mathcal{H}}) - R^{\star} = R(\hat{h}_{n,\mathcal{H}}) - R(h^{\star}) = 0$.
+-  Decomposition:
+   \begin{align*}
+   R(\hat{h}_{n,\mathcal{H}}) - R^{\star} & = \underbrace{R(\hat{h}_{n,\mathcal{H}}) - R_{\mathcal{H}}^{\star}}_{\textcolor{blue}{\text{estimation error}}} \quad + \underbrace{R_{\mathcal{H}}^{\star} - R^{\star}}_{\textcolor{blue}{\text{approximation error}}}\\
+   & = \underbrace{R(\hat{h}_{n,\mathcal{H}}) - R(h_{\mathcal{H}}^{\star})}_{\textcolor{blue}{\text{estimation error}}} \quad + \quad \underbrace{R(h_{\mathcal{H}}^{\star}) - R(h^{\star})}_{\textcolor{blue}{\text{approximation error}}}\\
+   \end{align*}
+-  The approximation error comes from the [use of a hypothesis class $\mathcal{H}$]{style="color:red;"}.
+   -  Larger $\mathcal{H}$ $\rightarrow$ smaller approximation error
+-  The estimation error comes from the [use of empirical data]{style="color:red;"}.
+   -  More data $\rightarrow$ smaller estimation error
+
+## Error Decomposition {.auto-stretch}
+
+![](./images/lec03/diagram.png){fig-align="center" width=100%}
+
+## Example
+
+-  Linear Regression:
+   -   $\mathcal{H} = \{h: h(\boldsymbol{x}) = \boldsymbol{x}^T \boldsymbol{\beta}, \boldsymbol{\beta} \in \R^p\}$
+   -   $L(y, h(\boldsymbol{x})) = (y - h(\boldsymbol{x}))^2$
+-  Logistic Regression:
+   -   $\mathcal{H} = \left\{h: h(\boldsymbol{x}) = \frac{1}{1 + \exp(-\boldsymbol{x}^T \boldsymbol{\beta})}, \boldsymbol{\beta} \in \R^p\right\}$
+   -   $L(y, h(\boldsymbol{x})) = -y \log(h(\boldsymbol{x})) - (1 - y) \log(1 - h(\boldsymbol{x}))$
+-  (Linear) Support Vector Machine:
+   -   $\mathcal{H} = \{h: h(\boldsymbol{x}) = \boldsymbol{w}^T \boldsymbol{x} + b, \boldsymbol{w} \in \R^p, b \in \R\}$
+   -   $L(y, h(\boldsymbol{x})) = \max(0, 1 - y \cdot h(\boldsymbol{x}))$
+
+## Maximum Likelihood (ML) v.s. ERM
+
+-  In fact, the ML principle is a special case of the ERM principle.
+-  That is, specifying a likelihood function gives a loss function, i.e., use the negative log-likelihood as the loss function.
+-  ML:
+   -  Stronger assumptions
+   -  Stronger guarantees (consistency, asymptotic normality, etc.)
+   -  Allow us to do more things (e.g., hypothesis testing and confidence intervals)
+   -  Linear regression and logistic regression are ML and hence ERM
+-  ERM:
+   -  More flexible and practical, but weaker guarantees
+   -  Usually provide only a point estimate
+   -  SVM is ERM but not ML
+
+
+
+
+## Constructing Learning Algorithms
+
+-  Following the ERM principle, we need to specify a **loss function** and a **hypothesis class** in order to construct a learning algorithm.
+-  The choice of the loss function is based on the types of labels and the problem.
+-  The choice of the hypothesis class is more challenging:
+   -  Smaller $\mathcal{H}$ $\rightarrow$ larger approximation error, smaller estimation error, and less overfitting
+   -  Larger $\mathcal{H}$ $\rightarrow$ smaller approximation error, larger estimation error, more overfitting, and requires more data
+-  Next, we will discuss:
+   -  how to measure the "size" (capacity/complexity) of a hypothesis class
+   -  how to choose an appropriate hypothesis class
+
+
+# Vapnik-Chervonenkis (VC) Theory
+
+## Complexity v.s. Dimension
+
+-  Let $\mathcal{H}$ be a parametric hypothesis class ,e.g., $\mathcal{H} = \{h: h(\boldsymbol{x}) = \boldsymbol{x}^T \boldsymbol{\beta}, \boldsymbol{\beta} \in \R^p\}$.
+-  An intuitive way to measure the complexity of $\mathcal{H}$ is to count the number of unknown parameters, i.e., the dimension of $\mathcal{H}$.
+-  In this case, the dimension of $\dim(\mathcal{H}) = p$.
+
+```{python}
+#| echo: false
+#| fig-align: center 
+#| output: asis
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.linspace(-3, 3, 100)
+
+fig = plt.figure()
+plt.subplot(121)
+plt.plot(x, 0.7*x)
+plt.ylim(-4, 4) 
+plt.title("h(x) = a + bx, dim(H) = 2")
+plt.subplot(122)
+plt.plot(x, np.sin(2*x))
+plt.ylim(-4, 4) 
+plt.title("h(x) = sin(ax), dim(H) = 1")
+plt.show()
+```
+
+## Shattering
+
+A hypothesis class $\mathcal{H}$ is said to **shatter** a set of points $S = \{x_1, \ldots, x_n\}$ if for all possible binary labelings (0/1) of these points, there exists a function $h \in \mathcal{H}$ that can perfectly separate the points.
+
+![](./images/lec03/shatter.png){width=100%}
+
+::: aside
+Image Source: Figure 7.6 of ESL
+:::
+
+
+## Shattering
+
+**Definition** (Restriction of $\mathcal{H}$ to $S$) Let $\mathcal{H}$ be a class of functions from $\mathcal{X}$ to $\{0,1\}$ and let $S = \{x_1, \ldots, x_n\} \subset \mathcal{X}$. The restriction of $\mathcal{H}$ to $S$ is the set of functions from $S$ to $\{0, 1\}$ that can be derived from $\mathcal{H}$. That is,
+$$
+   \mathcal{H}_S = \{(h(x_1), \ldots, h(x_n)): h \in \mathcal{H}\}
+$$
+
+**Definition** (Shattering) A hypothesis class $\mathcal{H}$ shatters a finite set $S \subset \mathcal{X}$ if the restriction of $\mathcal{H}$ to $S$ is the set of all functions from $S$ to $\{0, 1\}$. That is, $|\mathcal{H}_S| = 2^{|S|}$.
+
+## Vapnik-Chervonenkis (VC) Dimension
+
+**Definition** (VC-dimension) The VC-dimension of a hypothesis class $\mathcal{H}$, denoted $\text{VC-dim}(\mathcal{H})$, is the maximal size of a set $S \subset \mathcal{X}$ that can be shattered by $\mathcal{H}$. If $\mathcal{H}$ can shatter sets of arbitrarily large size we say that $\mathcal{H}$ has **infinite VC-dimension**.
+
+-  One can show that for linear models, e.g., $\mathcal{H} = \{h: h(\boldsymbol{x}) = \beta_0 + \boldsymbol{x}^T \boldsymbol{\beta}, \boldsymbol{\beta} \in \R^p\}$, the VC-dimension is $p+1$ (the same as the number of parameters).
+-  However, for nonlinear models, the calculation of the VC-dimension is often challenging.
+
+## Example (Infinite VC-dimension)
+
+-  Let $\mathcal{H} = \{h: h(x) = \mathbb{I}(\sin(\alpha x) > 0), \alpha > 0\}$. Then $\text{VC-dim}(\mathcal{H}) = \infty$.
+-  Proof: 
+   -  For any $n$, let $x_1 = 2\pi 10^{-1}, \ldots, x_n = 2\pi 10^{-n}$.
+   -  Then the parameter $\alpha = \frac{1}{2}\left(1 + \sum_{i=1}^n (1-y_i)10^i\right)$ can perfectly separate the points, where $y_i \in \{0, 1\}$ is any labeling of the points.
+
+![](./images/lec03/sin_shatter.png){fig-align="center" width=80%}
+
+::: aside
+Image Source: Figure 7.5 of ESL
+:::
+
+
+## Goodness-of-fit v.s. Generalization ability
+
+-  Goodness-of-fit: how well the model fits the data.
+-  Generalization ability: how well the model generalizes to unseen data.
+-  Recall that for an ERM $\hat{h}_{n, \mathcal{H}}$, we have 
+   -  training error (error on training data) $\hat{R}_n = R_{\text{emp}}(\hat{h}_{n, \mathcal{H}})$
+   -  generalization error (error on unseen data) $R(\hat{h}_{n, \mathcal{H}}) = \E_{(X, Y) \sim F} \left[L(Y, \hat{h}_{n,\mathcal{H}}(X)) \mid \mathcal{T}\right]$, where $\mathcal{T}$ denotes the training dataset.
+-  We can write
+   \begin{align*}
+      R(\hat{h}_{n, \mathcal{H}}) & = \hat{R}_n + \left(R(\hat{h}_{n, \mathcal{H}}) - \hat{R}_n\right)\\ 
+      \textcolor{blue}{\text{generalization error}} & = \textcolor{blue}{\text{training error}} + \textcolor{blue}{\text{generalization gap}}
+   \end{align*}
+
+
+## Overfitting and Underfitting
+
+-  To have low generalization error, we need to have both **low training error** and **small generalization gap**.
+   -  Large training error $\rightarrow$ underfitting
+   -  Low training error but large generalization gap $\rightarrow$ overfitting
+
+![](./images/lec03/overfitting.png){fig-align="center" width=70%}
+
+::: aside
+Image Source: Figure 5.3 in DL
+:::
+
+## VC Inequality
+
+-  The VC theory provides an upper bound for the generalization gap, known as the **VC inequality**: with probability at least $1 - \delta$
+   $$
+   R(h) \leq R_{\text{emp}}(h)+\varepsilon \sqrt{1+\frac{4 R_{\text{emp}}(h)}{\varepsilon}}, \quad \varepsilon = O\left(\frac{d - \log \delta}{n}\right)
+   $$
+   simultaneously for all $h \in \mathcal{H}$, where $\text{VC-dim}(\mathcal{H}) = d < \infty$.
+-  The generalization gap increases as 
+   -  the VC-dimension increases
+   -  the samples size $n$ decreases
+-  This upper bound is only a loose bound and does not work for models with infinite VC-dimension.
+
+## Regularized ERM
+
+-  To prevent overfitting, we can add a **regularization term** to the empirical risk:
+   $$
+   R_{\text{reg}}(h) = R_{\text{emp}}(h) + \lambda \Omega(h)
+   $$
+   where $\Omega(h)$ is a regularization term and $\lambda$ is the regularization parameter.
+-  Typically, $\Omega(h)$ measures the smoothness or complexity of the model $h$.
+
+![](./images/lec03/Regularization.svg){fig-align="center" width=30%}
+
+::: aside
+Image Source: <https://en.wikipedia.org/wiki/Regularization_(mathematics)>
+:::
+
+
+## Regularized ERM
+
+-  For example, $\Omega(h) = \|h^{\prime}(x)\|_2^2 = \int \left(h^{\prime}(x)\right)^2dx$. ($L_2$ Regularization)
+-  If $h(x) = \beta_0 + \beta_1 x$, then $h^{\prime}(x) = \beta_1$ and $\Omega(h) = \beta_1^2$.
+-  The $L_1$ regularization is $\Omega(h) = \|h^{\prime}(x)\|_1 = \int |h^{\prime}(x)|dx$.
+-  If $h(x) = \beta_0 + \beta_1 x$, then $h^{\prime}(x) = \beta_1$ and $\Omega(h) = |\beta_1|$.
+-  Using $L_1$ gives you [sparsity]{style="color:red;"}; using $L_2$ gives you [smoothness/insensitivity]{style="color:red;"}:
+   -  Consider a linear model $h(\boldsymbol{x}) = \boldsymbol{x}^T \boldsymbol{\beta}$.
+   -  A good model should not be too sensitive to the input, i.e., small changes in the input should not lead to large changes in the output.
+   -  That is, if $\boldsymbol{x} \approx \tilde{\boldsymbol{x}}$ , then $|\boldsymbol{x}^T \boldsymbol{\beta} - \tilde{\boldsymbol{x}}^T \boldsymbol{\beta}|$ should be small.
+   -  Note that
+      $$
+      |\boldsymbol{x}^T \boldsymbol{\beta} - \tilde{\boldsymbol{x}}^T \boldsymbol{\beta}| = |(\boldsymbol{x} - \tilde{\boldsymbol{x}})^T \boldsymbol{\beta}| \leq \|\boldsymbol{x} - \tilde{\boldsymbol{x}}\|_2 \|\boldsymbol{\beta}\|_2
+      $$
+
+## Bias-Variance Tradeoff
+
+-  Adding a reguralization term often increases the bias but reduces the variance of the model.
+-  This tradeoff is known as the **bias-variance tradeoff**.
+
+![](./images/lec03/bias_variance.png){fig-align="center" width=70%}
+
+::: aside
+Image Source: Figure 5.6 in DL
+:::
+
+## Quick Summary
+
+-  The VC dimension measures the complexity of a hypothesis class.
+-  The VC inequality provides an upper bound for the generalization gap, provided that the VC dimension is finite.
+-  The bound is often criticized for being too loose and does not work for models with infinite VC dimension.
+-  Example of infinite VC dimension: 
+   -  Neural Networks
+   -  Kernel methods (e.g., kernel SVM, kernel regression)
+   -  $K$-nearest neighbors (with small $K$, say $K = 1$)
+
+## Double Descent Curve
+
+![](images/lec03/double_descent.png){width=100%}
+
+::: aside
+Belkin, M., Hsu, D., Ma, S., & Mandal, S. (2019). Reconciling modern machine-learning practice and the classical bias–variance trade-off. *Proceedings of the National Academy of Sciences*, 116(32), 15849-15854.
+:::
+
+# Validation 
+
+## Estimating the Generalization Error
+
+-  Although the VC inequality provides an upper bound for the generalization gap, it is often too loose.
+-  In order to have a more accurate insight into the model's generalization ability, we need to estimate the generalization error.
+-  To achieve this, we need to have an extra dataset, called the **validation dataset** $\mathcal{V} = \{(\tilde{x}_i, \tilde{y}_i)\}_{i=1}^m$.
+-  The generalization error is then estimated as
+   $$
+   \hat{R}_{\text{gen}} = \frac{1}{m} \sum_{i=1}^m L(\tilde{y}_i, \hat{h}_{n, \mathcal{H}}(\tilde{x}_i)).
+   $$
+-  Assuming the $\mathcal{V}$ and $\mathcal{T}$ (training dataset) are i.i.d, $\hat{R}_{\text{gen}}$ is an unbiased estimate of the generalization error, i.e., $\E[\hat{R}_{\text{gen}} \mid \mathcal{T}] = R(\hat{h}_{n, \mathcal{H}})$.
+
+## $k$-fold Cross-Validation (CV)
+
+-  In practice, we often do not have an extra validation dataset and hence we need to use the training dataset to estimate the generalization error.
+-  One common method is the $k$-fold cross-validation:
+   1.  Split the training dataset $\mathcal{T}$ into $k$ equal-sized folds.
+   2.  For each fold $i = 1, \ldots, k$, train the model on the remaining $k-1$ folds and evaluate the model on the $i$th fold.
+   3.  Average the $k$ validation errors to obtain the estimated generalization error.
+
+![](images/lec03/k_fold_CV.png){fig-align="center" width=80%}
+
+## $k$-fold Cross-Validation
+
+-  When $k = n$, it is called the **leave-one-out cross-validation (LOOCV)**, i.e., train the model on $n-1$ samples and evaluate on the remaining one.
+-  Choice of $k$?
+   -  Larger $k$ $\rightarrow$ [low bias, high variance]{style="color:blue;"} (the model is trained on a larger dataset and validated on a smaller dataset)
+   -  Smaller $k$ $\rightarrow$ [high bias, low variance]{style="color:blue;"} (the model is trained on a smaller dataset and validated on a larger dataset)
+   -  $k = 5$ or $k = 10$ are common choices.
+
+## CV for Hyperparameter Tuning
+
+-  In practice, the models often have hyperparameters that need to be tuned, e.g., the regularization parameter $\lambda$.
+-  We can use CV to choose the best hyperparameters:
+   1.  For each hyperparameter value, perform $k$-fold CV to estimate the generalization error.
+   2.  Choose the hyperparameter value that minimizes the CV error.
+-  However, the CV error after the **selection** will overestimate the generalization error.
+-  Such bias is known as the **selection bias**.
+  
+## CV for Hyperparameter Tuning
+
+-  To avoid the selection bias, we first split the dataset into two parts: the **training dataset** and the **test dataset**.
+-  The test dataset should not be used in the neither the traing process nor hyperparameter tuning process.
+-  The training dataset is further split into $k$-folds for CV.
+-  After all the processes, including training, hyperparameter tuning, model selection, etc., we evaluate the final model on the test dataset to estimate the generalization error.
+
+## Example: Using CV to Choose the Regularization Parameter
+
+```{python}
+#| echo: true
+from sklearn.linear_model import LassoCV
+from sklearn import datasets
+
+X, y = datasets.load_diabetes(return_X_y=True)
+
+X /= X.std(axis=0)
+
+alpha_seq = np.logspace(-2, 2, 100)
+reg = LassoCV(alphas = alpha_seq, cv = 5, random_state = 42)
+reg.fit(X, y)
+
+print("best alpha:", np.round(reg.alpha_, 4))
+```
+
+## Example: Using CV to Choose the Regularization Parameter
+
+```{python}
+#| echo: false
+#| fig-align: center
+import matplotlib.pyplot as plt
+from itertools import cycle
+from sklearn.linear_model import lasso_path
+
+alphas_lasso, coefs_lasso, _ = lasso_path(X, y)
+
+for coef_l in coefs_lasso:
+    l1 = plt.semilogx(alphas_lasso, coef_l, c=np.random.rand(3,))
+
+plt.xlabel("alpha")
+plt.ylabel("coefficients")
+plt.title("Lasso Path")
+plt.axis("tight")
+plt.show()
+```
+
+# Appendix
+
+## Proof of Example (Infinite VC-dimension)
+
+-  We need to show that the model $h(x) = \mathbb{I}(\sin(\alpha x) > 0)$ with $\alpha = \frac{1}{2}\left(1 + \sum_{i=1}^n (1-y_i)10^i\right)$ can perfectly separate the $n$ points.
+-  Consider the $j$th sample $x_j = 2\pi 10^{-j}$.
+-  If $y_j = 0$, then 
+   \begin{align*}
+      \alpha x_j & = \pi 10^{-j} \left(1 + \sum_{i=1}^n (1-y_i)10^i\right) = \pi 10^{-j} \left(1 + \sum_{\{i: y_i = 0\}} 10^i\right)\\
+      & = \pi 10^{-j}\left(1 + 10^j + \sum_{\{i: y_i = 0, i \neq j\}} 10^i\right)\\
+      & = \pi \left(10^{-j} + 1 + \sum_{\{i: y_i = 0, i > j\}} 10^{i-j} + \sum_{\{i: y_i = 0, i < j\}} 10^{i-j}\right)
+   \end{align*}
+
+::: aside
+Reference: <https://mlweb.loria.fr/book/en/VCdiminfinite.html>
+:::
+
+## Proof of Example (Infinite VC-dimension)
+
+-  For $i>j$, $10^{i-j}$ is even and so is $\sum_{\{i: y_i = 0, i > j\}} 10^{i-j}$, say 
+   $$
+   \sum_{\{i: y_i = 0, i > j\}} 10^{i-j} = 2m, \quad m \in \mathbb{N}. 
+   $$
+-  Note that 
+   $$
+   \sum_{\{i: y_i = 0, i < j\}} 10^{i-j} < \sum_{i=1}^{\infty} 10^{-i} = \sum_{i=0}^{\infty} 10^{-i} - 1 = \frac{1}{1-0.1} - 1 = \frac{1}{9}.  
+   $$
+-  Therefore, $\alpha x_j = \pi(1 + 2m +\epsilon)$, where 
+   $$
+   0 < \epsilon = 10^{-j} + \sum_{\{i: y_i = 0, i < j\}} 10^{i-j} < \frac{1}{10} + \frac{1}{9} < 1.
+   $$
+-  Hence $\sin(\alpha x_j) < 0$ and $h(x_j) = 0$.
+
+## Proof of Example (Infinite VC-dimension)
+
+-  If $y_j = 1$, then 
+   \begin{align*}
+      \alpha x_j & = \pi 10^{-j} \left(1 + \sum_{i=1}^n (1-y_i)10^i\right) = \pi 10^{-j} \left(1 + \sum_{\{i: y_i = 0\}} 10^i\right)\\
+      & = \pi \left(10^{-j} + \sum_{\{i: y_i = 0, i > j\}} 10^{i-j} + \sum_{\{i: y_i = 0, i < j\}} 10^{i-j}\right)
+   \end{align*}
+-  Similarly, we have $\alpha x_j = \pi(2m +\epsilon)$, where 
+   $$
+   0 < \epsilon = 10^{-j} + \sum_{\{i: y_i = 0, i < j\}} 10^{i-j} < \frac{1}{10} + \frac{1}{9} < 1.
+   $$
+-  Hence $\sin(\alpha x_j) > 0$ and $h(x_j) = 1$. 
