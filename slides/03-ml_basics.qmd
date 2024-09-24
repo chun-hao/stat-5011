@@ -305,7 +305,7 @@ Image Source: Figure 5.3 in DL
    R(h) \leq R_{\text{emp}}(h)+\varepsilon \sqrt{1+\frac{4 R_{\text{emp}}(h)}{\varepsilon}}, \quad \varepsilon = O\left(\frac{d - \log \delta}{n}\right)
    $$
    simultaneously for all $h \in \mathcal{H}$, where $\text{VC-dim}(\mathcal{H}) = d < \infty$.
--  The generalization gap increases as 
+-  The **upper bound** of generalization gap increases as 
    -  the VC-dimension increases
    -  the samples size $n$ decreases
 -  This upper bound is only a loose bound and does not work for models with infinite VC-dimension.
