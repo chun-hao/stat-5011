@@ -1,528 +1,206 @@
 [
   {
-    "objectID": "slides/03-ml_basics.html#recap-of-the-last-lecture",
-    "href": "slides/03-ml_basics.html#recap-of-the-last-lecture",
-    "title": "Machine Learning Basics",
+    "objectID": "slides/04-mlp.html#midterm-proposal-presentation",
+    "href": "slides/04-mlp.html#midterm-proposal-presentation",
+    "title": "Multilayer Perceptron",
+    "section": "Midterm Proposal presentation",
+    "text": "Midterm Proposal presentation\n\nA group of 3-4 students.\nLet me know your group members next Tuesday.\nThe presentation will be on 10/22.\n\nProblem statement\nData description\n1-2 references\n\nEach group has 15 minutes to present.\nHomework 1 is due on 10/15."
+  },
+  {
+    "objectID": "slides/04-mlp.html#recap-of-the-last-lecture",
+    "href": "slides/04-mlp.html#recap-of-the-last-lecture",
+    "title": "Multilayer Perceptron",
     "section": "Recap of the Last Lecture",
-    "text": "Recap of the Last Lecture\n\n\\[\n\\newcommand{\\mc}[1]{\\mathcal{#1}}\n\\newcommand{\\R}{\\mathbb{R}}\n\\newcommand{\\E}{\\mathbb{E}}\n\\renewcommand{\\P}{\\mathbb{P}}\n\\newcommand{\\var}{{\\rm Var}} % Variance\n\\newcommand{\\mse}{{\\rm MSE}} % MSE\n\\newcommand{\\bias}{{\\rm Bias}} % MSE\n\\newcommand{\\cov}{{\\rm Cov}} % Covariance\n\\newcommand{\\iid}{\\stackrel{\\rm iid}{\\sim}}\n\\newcommand{\\ind}{\\stackrel{\\rm ind}{\\sim}}\n\\renewcommand{\\choose}[2]{\\binom{#1}{#2}}  % Choose\n\\newcommand{\\chooses}[2]{{}_{#1}C_{#2}}  % Small choose\n\\newcommand{\\cd}{\\stackrel{d}{\\rightarrow}}\n\\newcommand{\\cas}{\\stackrel{a.s.}{\\rightarrow}}\n\\newcommand{\\cp}{\\stackrel{p}{\\rightarrow}}\n\\newcommand{\\bin}{{\\rm Bin}}\n\\newcommand{\\ber}{{\\rm Ber}}\n\\newcommand{\\diag}{{\\rm diag}}\n\\DeclareMathOperator*{\\argmax}{argmax}\n\\DeclareMathOperator*{\\argmin}{argmin}\n\\]\n\n\nRelationship between likelihood and loss function\n\nNormal likelihood \\(\\leftrightarrow\\) squared error loss\nMultinomial/Binomial likelihood \\(\\leftrightarrow\\) cross-entropy loss\n\nPenalization/Regularization: \\(L_1\\) and \\(L_2\\) regularization\nLink function: a function that connects the conditional mean \\(\\E(Y \\mid \\boldsymbol{x})\\) and the linear predictor \\(\\boldsymbol{x}^T \\boldsymbol{\\beta}\\):\n\nReal-valued response: identity link \\(\\E(Y \\mid \\boldsymbol{x}) = \\boldsymbol{x}^T \\boldsymbol{\\beta}\\)\nBinary response: logit link \\(\\E(Y \\mid \\boldsymbol{x}) = \\frac{1}{1 + \\exp(-\\boldsymbol{x}^T \\boldsymbol{\\beta})}\\)\nMultinomial response: softmax link \\[\n\\E(Y \\mid \\boldsymbol{x}) = \\left[\\frac{\\exp(\\boldsymbol{x}^T \\boldsymbol{\\beta_1})}{\\sum_{k=1}^K \\exp(\\boldsymbol{x}^T \\boldsymbol{\\beta}_k)}, \\ldots, \\frac{\\exp(\\boldsymbol{x}^T \\boldsymbol{\\beta_K})}{\\sum_{k=1}^K \\exp(\\boldsymbol{x}^T \\boldsymbol{\\beta}_k)}\\right]^T\n\\]"
+    "text": "Recap of the Last Lecture\n\n\\[\n\\newcommand{\\mc}[1]{\\mathcal{#1}}\n\\newcommand{\\R}{\\mathbb{R}}\n\\newcommand{\\E}{\\mathbb{E}}\n\\renewcommand{\\P}{\\mathbb{P}}\n\\newcommand{\\var}{{\\rm Var}} % Variance\n\\newcommand{\\mse}{{\\rm MSE}} % MSE\n\\newcommand{\\bias}{{\\rm Bias}} % MSE\n\\newcommand{\\cov}{{\\rm Cov}} % Covariance\n\\newcommand{\\iid}{\\stackrel{\\rm iid}{\\sim}}\n\\newcommand{\\ind}{\\stackrel{\\rm ind}{\\sim}}\n\\renewcommand{\\choose}[2]{\\binom{#1}{#2}}  % Choose\n\\newcommand{\\chooses}[2]{{}_{#1}C_{#2}}  % Small choose\n\\newcommand{\\cd}{\\stackrel{d}{\\rightarrow}}\n\\newcommand{\\cas}{\\stackrel{a.s.}{\\rightarrow}}\n\\newcommand{\\cp}{\\stackrel{p}{\\rightarrow}}\n\\newcommand{\\bin}{{\\rm Bin}}\n\\newcommand{\\ber}{{\\rm Ber}}\n\\newcommand{\\diag}{{\\rm diag}}\n\\DeclareMathOperator*{\\argmax}{argmax}\n\\DeclareMathOperator*{\\argmin}{argmin}\n\\]\n\nA general procedure for supervised learning:\n\nGather a dataset \\(\\mathcal{D} = \\{(\\boldsymbol{x}_1, y_1), \\ldots, (\\boldsymbol{x}_n, y_n)\\}\\).\nChoose an appropriate loss function \\(L\\) for your dataset and problem.\nChoose a hypothesis class \\(\\mathcal{H}\\).\n\nNot too simple (underfitting), nor too complicated (overfitting).\n\nAdd a regularization term to the loss function to better control the complexity of the model.\nFind the model that minimizes the (regularized) empirical risk function.\nUse cross-validation to select the hyperparameters (if any).\nEstimate the generalization error of the final model using the test dataset."
   },
   {
-    "objectID": "slides/03-ml_basics.html#outline",
-    "href": "slides/03-ml_basics.html#outline",
-    "title": "Machine Learning Basics",
+    "objectID": "slides/04-mlp.html#nonlinear-hypothesis-class",
+    "href": "slides/04-mlp.html#nonlinear-hypothesis-class",
+    "title": "Multilayer Perceptron",
+    "section": "Nonlinear Hypothesis Class",
+    "text": "Nonlinear Hypothesis Class\n\nA simple and useful hypothesis class is the linear hypothesis class, for example:\n\nLinear regression: \\(\\mathcal{H} = \\{h(\\boldsymbol{x}) = \\boldsymbol{x}^T\\boldsymbol{\\beta}, \\boldsymbol{\\beta} \\in \\R^p\\}\\)\nLogistic regression: \\(\\mathcal{H} = \\left\\{h: h(\\boldsymbol{x}) = \\frac{1}{1 + \\exp(-\\boldsymbol{x}^T \\boldsymbol{\\beta})}, \\boldsymbol{\\beta} \\in \\R^p\\right\\} = \\R^p\\)\n\nTo extend linear models to represent nonlinear functions of \\(\\boldsymbol{x}\\), we can apply the linear model not to \\(\\boldsymbol{x}\\) itself but to a transformed input \\(\\phi(\\boldsymbol{x})\\), where \\(\\phi\\) is a nonlinear transformation.\nThat is, \\[\n\\mathcal{H} = \\{ h(\\boldsymbol{x}) = \\phi(\\boldsymbol{x})^T \\boldsymbol{\\beta}, \\phi: \\R^p \\to \\R^d, \\boldsymbol{\\beta}\\in \\R^d\\}.\n\\]\nThe function \\(\\phi\\) is usually called a feature map and usually we choose \\(d \\gg p\\)."
+  },
+  {
+    "objectID": "slides/04-mlp.html#choice-of-feature-map",
+    "href": "slides/04-mlp.html#choice-of-feature-map",
+    "title": "Multilayer Perceptron",
+    "section": "Choice of Feature Map",
+    "text": "Choice of Feature Map\nThere are three common ways to choose the feature map \\(\\phi\\):\n\nKernel method\n\nInstead of explicitly specifying \\(\\phi\\), we can define a symmetric function \\(k(\\boldsymbol{x}, \\boldsymbol{x}')\\) called a kernel, which corresponds to the dot product of some feature map \\(k(\\boldsymbol{x}, \\boldsymbol{x}^{\\prime}) = \\phi(\\boldsymbol{x})^T \\phi(\\boldsymbol{x}^{\\prime})\\).\n\nManual engineering (hand-crafted features)\n\nChoose a feature map \\(\\phi\\) manually, e.g., \\(\\phi(x) = [x, x^2, \\exp(x), \\sin(x)]\\).\nA good feature map requires human effort for each separate task, with practitioners specializing in different domains.\n\nDeep Learning\n\nParametrize the feature map \\(\\phi\\) with a deep neural network, \\(\\phi(\\boldsymbol{x}) = \\phi(\\boldsymbol{x}; \\boldsymbol{\\theta})\\).\nThe parameter \\(\\boldsymbol{\\theta}\\) is learned from the data, i.e., we learn the feature map from the data."
+  },
+  {
+    "objectID": "slides/04-mlp.html#outline",
+    "href": "slides/04-mlp.html#outline",
+    "title": "Multilayer Perceptron",
     "section": "Outline",
-    "text": "Outline\n\nEmpirical Risk Minimization (ERM)\n\nA general framework for machine learning\nDecomposition of the generalization error of a model\n\nVapnik-Chervonenkis (VC) Theory\n\nMeasuring the complexity of a set of models\nProviding an upper bound for the generalization error\n\nValidation of a trained model\n\nEstimating the generalization error\n\\(k\\)-fold cross-validation\nCross-validation for hyperparameter tuning"
+    "text": "Outline\n\nKernel Methods\n\nKernel Ridge Regression\n\nMultilayer Perceptron (MLP)\n\nBasic Structure\nActivation Function\n\nTraining an MLP\n\nGradient-based Learning\nBack-propagation\nComputational Graph\n\nExample"
   },
   {
-    "objectID": "slides/03-ml_basics.html#different-types-of-learning",
-    "href": "slides/03-ml_basics.html#different-types-of-learning",
-    "title": "Machine Learning Basics",
-    "section": "Different Types of Learning",
-    "text": "Different Types of Learning\nThere are many types of learning:\n\nSupervised Learning\nUnsupervised Learning\nReinforcement Learning\nSemi-supervised Learning\nActive Learning\nOnline Learning\nTransfer Learning\nMulti-task Learning\nFederated Learning, etc."
+    "objectID": "slides/04-mlp.html#regression-with-a-feature-map",
+    "href": "slides/04-mlp.html#regression-with-a-feature-map",
+    "title": "Multilayer Perceptron",
+    "section": "Regression with a Feature Map",
+    "text": "Regression with a Feature Map\n\nConsider the regression model with a given feature map \\(\\phi: \\R^p \\to \\R^d\\), i.e., \\[\ny = f(\\boldsymbol{x}) = \\phi(\\boldsymbol{x})^T \\boldsymbol{\\beta}.\n\\]\nGiven a training dataset \\(\\{(\\boldsymbol{x}_i, y_i)\\}_{i=1}^n\\), let \\(\\boldsymbol{z_i} = \\phi(\\boldsymbol{x}_i)\\) and \\(\\boldsymbol{Z} = [\\boldsymbol{z}_1, \\boldsymbol{z}_2, \\ldots, \\boldsymbol{z}_n]^T \\in \\R^{n \\times d}\\).\nThen the model parameter \\(\\boldsymbol{\\beta}\\) can be estimated by minimizing the regularized empirical risk function: \\[\\begin{align*}\n\\hat{\\boldsymbol{\\beta}} & = \\argmin_{\\boldsymbol{\\beta} \\in \\R^d} \\|\\boldsymbol{y} - \\boldsymbol{Z}\\boldsymbol{\\beta}\\|^2 + \\alpha \\|\\boldsymbol{\\beta}\\|^2_2 = (\\boldsymbol{Z}^T \\boldsymbol{Z} + \\alpha I_d)^{-1} \\boldsymbol{Z}^T \\boldsymbol{y}\\\\\n& \\stackrel{\\textcolor{red}{\\text{(*)}}}{=} \\boldsymbol{Z}^T (\\boldsymbol{Z} \\boldsymbol{Z}^T + \\alpha I_n)^{-1} \\boldsymbol{y}.\n\\end{align*}\\]\nThe prediction for a new input \\(\\boldsymbol{x}^{\\star}\\) is \\[\n\\widehat{y^{\\star}} = \\phi(\\boldsymbol{x}^{\\star})^T \\hat{\\boldsymbol{\\beta}} = \\phi(\\boldsymbol{x}^{\\star})^T\\boldsymbol{Z}^T (\\boldsymbol{Z} \\boldsymbol{Z}^T + \\alpha I_n)^{-1} \\boldsymbol{y}.\n\\]\n\n\n\nSee appendix for the proof of equality (*)."
   },
   {
-    "objectID": "slides/03-ml_basics.html#supervised-learning",
-    "href": "slides/03-ml_basics.html#supervised-learning",
-    "title": "Machine Learning Basics",
-    "section": "Supervised Learning",
-    "text": "Supervised Learning\n\nThe dataset consists of pairs \\((x_i, y_i)\\), \\(x_i \\in \\mathcal{X}\\), \\(y_i \\in \\mathcal{Y}\\), where \\(x_i\\) is called the feature and \\(y_i\\) is the associated label.\n\n\\(\\mathcal{X} \\subseteq \\R^p\\) is called the feature space (usually \\(\\mathcal{X} = \\R^p\\))\n\\(\\mathcal{Y} \\subseteq \\R^K\\) is called the label space\n\nThe goal is to learn a function \\(f: \\mathcal{X} \\to \\mathcal{Y}\\) that maps the feature to the label.\nExamples:\n\nimage/text classification\nprediction\n\nCommonly used models:\n\nLinear regression/Logistic regression\nSupport vector machine (SVM)\nNeural network, and many others"
+    "objectID": "slides/04-mlp.html#regression-with-a-feature-map-1",
+    "href": "slides/04-mlp.html#regression-with-a-feature-map-1",
+    "title": "Multilayer Perceptron",
+    "section": "Regression with a Feature Map",
+    "text": "Regression with a Feature Map\n\nNote that \\[\n\\boldsymbol{Z} \\boldsymbol{Z}^T = \\begin{bmatrix} \\boldsymbol{z}_1^T \\\\ \\boldsymbol{z}_2^T \\\\ \\vdots \\\\ \\boldsymbol{z}_n^T \\end{bmatrix} \\begin{bmatrix} \\boldsymbol{z}_1 & \\boldsymbol{z}_2 & \\cdots & \\boldsymbol{z}_n \\end{bmatrix} = \\begin{bmatrix}\n\\boldsymbol{z}_1^T \\boldsymbol{z}_1 & \\boldsymbol{z}_1^T \\boldsymbol{z}_2 & \\cdots & \\boldsymbol{z}_1^T \\boldsymbol{z}_n \\\\\n\\boldsymbol{z}_2^T \\boldsymbol{z}_1 & \\boldsymbol{z}_2^T \\boldsymbol{z}_2 & \\cdots & \\boldsymbol{z}_2^T \\boldsymbol{z}_n \\\\\n\\vdots & \\vdots & \\ddots & \\vdots \\\\\n\\boldsymbol{z}_n^T \\boldsymbol{z}_1 & \\boldsymbol{z}_n^T \\boldsymbol{z}_2 & \\cdots & \\boldsymbol{z}_n^T \\boldsymbol{z}_n\n\\end{bmatrix} = \\left[\\phi(\\boldsymbol{x}_i)^T\\phi(\\boldsymbol{x}_j)\\right]_{i,j=1}^n\n\\] and \\[\n\\phi(\\boldsymbol{x}^{\\star})^T\\boldsymbol{Z}^T = \\begin{bmatrix} \\phi(\\boldsymbol{x}^{\\star})^T \\boldsymbol{z}_1 & \\phi(\\boldsymbol{x}^{\\star})^T \\boldsymbol{z}_2 & \\cdots & \\phi(\\boldsymbol{x}^{\\star})^T \\boldsymbol{z}_n \\end{bmatrix} = \\left[\\phi(\\boldsymbol{x}^{\\star})^T\\phi(\\boldsymbol{x}_i)\\right]_{i=1}^n.  \n\\]\nBIG NEWS: we don’t need to know the feature map \\(\\phi\\) explicitly, but only its inner product \\(\\phi(\\boldsymbol{x}_i)^T\\phi(\\boldsymbol{x}_j)\\).\nThat is, if we can find a function \\(k(\\boldsymbol{x}, \\boldsymbol{x}^{\\prime})\\) such that \\(k(\\boldsymbol{x}, \\boldsymbol{x}^{\\prime}) = \\phi(\\boldsymbol{x})^T\\phi(\\boldsymbol{x}^{\\prime})\\) for some \\(\\phi\\), then we don’t need to know \\(\\phi\\) explicitly.\nThe function \\(k\\) is called a kernel function and the model is called a kernel ridge regression.\nMercer Condition: If the function \\(k(\\cdot, \\cdot)\\) is symmetric and positive definite, then there exist a \\(\\phi\\) such that \\(k(\\boldsymbol{x}, \\boldsymbol{x}^{\\prime}) = \\phi(\\boldsymbol{x})^T\\phi(\\boldsymbol{x}^{\\prime})\\)."
   },
   {
-    "objectID": "slides/03-ml_basics.html#general-framework-of-supervised-learning",
-    "href": "slides/03-ml_basics.html#general-framework-of-supervised-learning",
-    "title": "Machine Learning Basics",
-    "section": "General Framework of Supervised Learning",
-    "text": "General Framework of Supervised Learning\n\nIn this course, we will mainly focus on supervised learning.\nSupervised learning can also be viewed as a function estimation problem, i.e., estimating the function \\(f\\) that maps the feature \\(x\\) to the label \\(y\\).\nDepending the types of labels, many different models have been developed.\nInstead of focusing on individual models, we will discuss a general framework for supervised learning, called Empirical Risk Minimization (ERM)."
+    "objectID": "slides/04-mlp.html#kernel-method-vs-deep-learning",
+    "href": "slides/04-mlp.html#kernel-method-vs-deep-learning",
+    "title": "Multilayer Perceptron",
+    "section": "Kernel Method vs Deep Learning",
+    "text": "Kernel Method vs Deep Learning\n\nBoth kernel method and deep learning utilize nonlinear feature map to obtain a nonlinear hypothesis class.\nKernel method use a kernel function (the inner product of the feature map) to implicitly define the feature map. Some common kernel functions include:\n\nLinear kernel: \\(k(\\boldsymbol{x}, \\boldsymbol{x}^{\\prime}) = \\boldsymbol{x}^T\\boldsymbol{x}^{\\prime} \\Rightarrow \\phi(\\boldsymbol{x}) = \\boldsymbol{x}\\).\nPolynomial kernel: \\(k(\\boldsymbol{x}, \\boldsymbol{x}^{\\prime}) = (\\boldsymbol{x}^T\\boldsymbol{x}^{\\prime} + c)^d\\).\nRadial basis function (RBF) kernel: \\(k(\\boldsymbol{x}, \\boldsymbol{x}^{\\prime}) = \\exp\\left(-\\gamma\\|\\boldsymbol{x} - \\boldsymbol{x}^{\\prime}\\|^2\\right)\\).1\n\nDeep learning uses a deep neural network to parametrize the feature map.\n\nSee the appendix for the feature map of the RBF kernel."
   },
   {
-    "objectID": "slides/03-ml_basics.html#empirical-risk-minimization-erm",
-    "href": "slides/03-ml_basics.html#empirical-risk-minimization-erm",
-    "title": "Machine Learning Basics",
-    "section": "Empirical Risk Minimization (ERM)",
-    "text": "Empirical Risk Minimization (ERM)\n\nThe ERM principle for supervised learning requires:\n\nA loss function \\(L(y, g(x))\\) that measures the discrepancy between the true label \\(y\\) and the predicted label \\(g(x)\\).\nA hypothesis class \\(\\mathcal{G}\\) which is a class of functions \\(g: \\mathcal{X} \\to \\mathcal{Y}\\).\nA training dataset \\((x_1, y_1), \\ldots, (x_n, y_n)\\)."
+    "objectID": "slides/04-mlp.html#example-kernel-regression",
+    "href": "slides/04-mlp.html#example-kernel-regression",
+    "title": "Multilayer Perceptron",
+    "section": "Example: Kernel Regression",
+    "text": "Example: Kernel Regression\nGenerate a dataset from the model \\(y = \\sin(2\\pi x) + x + \\epsilon\\), where \\(\\epsilon \\sim N(0, 0.5^2)\\).\n\nimport numpy as np\nimport matplotlib.pyplot as plt\n\nrng = np.random.default_rng(100)\nn = 100\nX = rng.uniform(low=0, high=3, size=n)\ny = np.sin(2 * np.pi * X) + X + rng.normal(loc=0, scale=0.5, size=n)\nplt.scatter(X, y, c=\"black\", s=20)\nplt.show()"
   },
   {
-    "objectID": "slides/03-ml_basics.html#loss-function",
-    "href": "slides/03-ml_basics.html#loss-function",
-    "title": "Machine Learning Basics",
-    "section": "Loss function",
-    "text": "Loss function\n\nA loss function \\(L: \\mathcal{Y} \\times \\R^K \\to \\R\\) quantifies how well \\(\\hat{y}\\) approximates \\(y\\):\n\nsmaller values of \\(L(y, \\hat{y}\\)) indicate that \\(\\hat{y}\\) is a good approximation of \\(y\\)\ntypically (but not always) \\(L(y, y) = 0\\) and \\(L(y, \\hat{y}) \\geq 0\\) for all \\(\\hat{y}\\), and \\(y\\)\n\nExamples:\n\nQuadratic loss: \\(L(y, \\hat{y}) = (y - \\hat{y})^2\\) or \\(L(y, \\hat{y}) = \\|y - \\hat{y}\\|^2\\)\nAbsolute loss: \\(L(y, \\hat{y}) = |y - \\hat{y}|\\)\nCross-Entropy loss: \\(L(y, \\hat{y}) = -y \\log(\\hat{y}) - (1 - y) \\log(1 - \\hat{y})\\) or \\(L(y, \\hat{y}) = -\\sum_{i=1}^K y_i\\log\\hat{y}_i\\)"
+    "objectID": "slides/04-mlp.html#multilayer-perceptron-mlp",
+    "href": "slides/04-mlp.html#multilayer-perceptron-mlp",
+    "title": "Multilayer Perceptron",
+    "section": "Multilayer Perceptron (MLP)",
+    "text": "Multilayer Perceptron (MLP)\n\nIt is also called a feedforward neural network because information flows through the function being evaluated from \\(\\boldsymbol{x}\\), through the intermediate computations used to define \\(f\\) , and finally to the output \\(y\\).\nWhen feedback connections are included, they are called recurrent neural networks."
   },
   {
-    "objectID": "slides/03-ml_basics.html#risk-function",
-    "href": "slides/03-ml_basics.html#risk-function",
-    "title": "Machine Learning Basics",
-    "section": "Risk Function",
-    "text": "Risk Function\n\nAssume that \\((X, Y) \\sim F\\) and \\(F\\) is an unknown distribution.\nGiven a loss function ,the risk function of a model \\(h\\) is \\[\nR(h) = \\E_{(X, Y) \\sim F}[L(Y, h(X))].\n\\]\nThe optimal \\(h\\) is the one that minimizes the risk function: \\[\nh^{\\star} = \\argmin_{h: \\mathcal{X} \\to \\mathcal{Y}} R(h).\n\\]\nDenote the optimal risk as \\(R^{\\star} = R(h^{\\star})\\).\nHowever, it is impossible to obtain either \\(h^{\\star}\\) or \\(R^{\\star}\\) because:\n\nthe space of all possible functions \\(\\{h: \\mathcal{X} \\to \\mathcal{Y}\\}\\) is too large, and\nthe data distribution \\(F\\) is unknown."
+    "objectID": "slides/04-mlp.html#multilayer-perceptron-mlp-1",
+    "href": "slides/04-mlp.html#multilayer-perceptron-mlp-1",
+    "title": "Multilayer Perceptron",
+    "section": "Multilayer Perceptron (MLP)",
+    "text": "Multilayer Perceptron (MLP)\n\n\n\n\n\n\n\n\n\nInput: \\(\\boldsymbol{x} = [x_1, x_2, \\ldots, x_p]^T \\in \\R^p\\).\nHidden Units: \\[\\begin{align*}\nh_i & = \\sigma\\left(\\sum_{j=1}^p w_{ij} x_j + b_i\\right), \\quad i = 1, \\ldots, m, \\\\\n    & = \\sigma\\left(\\boldsymbol{w}_i^T \\boldsymbol{x} + b_i\\right), \\quad i = 1, \\ldots, m, \\\\\n\\boldsymbol{w}_i & = [w_{i1}, w_{i2}, \\ldots, w_{ip}]^T \\in \\R^p, \\quad b_i \\in \\R.\n\\end{align*}\\]\nOutput: \\[\\begin{align*}\ny & = \\beta_0 + \\sum_{j=1}^m \\beta_{j} h_j = \\beta_0 + \\boldsymbol{\\beta}^T \\boldsymbol{h},\\\\\n\\boldsymbol{h} & = [h_{1}, h_{2}, \\ldots, h_{m}]^T \\in \\R^m, \\\\\n\\boldsymbol{\\beta} & = [\\beta_{1}, \\beta_{2}, \\ldots, \\beta_{m}]^T \\in \\R^m, \\quad \\beta_0 \\in \\R.\n\\end{align*}\\]"
   },
   {
-    "objectID": "slides/03-ml_basics.html#hypothesis-class",
-    "href": "slides/03-ml_basics.html#hypothesis-class",
-    "title": "Machine Learning Basics",
-    "section": "Hypothesis Class",
-    "text": "Hypothesis Class\n\nTo make the problem tractable, we restrict the space of functions to a hypothesis class \\(\\mathcal{H}\\).\nWe denote the best model in \\(\\mathcal{H}\\) as \\(h_{\\mathcal{H}}^{\\star} = \\argmin_{h \\in \\mathcal{H}} R(h)\\).\nIts associated risk is \\(R_{\\mathcal{H}}^{\\star} = R(h_{\\mathcal{H}}^{\\star})\\).\nBy definition, it is obvious that \\(R_{\\mathcal{H}}^{\\star} \\geq R^{\\star}\\).\nExamples:\n\nLinear regression: \\(\\mathcal{H} = \\{h: h(\\boldsymbol{x}) = \\boldsymbol{x}^T \\boldsymbol{\\beta}, \\boldsymbol{\\beta} \\in \\R^p\\} = \\R^p\\)\nLogistic regression: \\(\\mathcal{H} = \\left\\{h: h(\\boldsymbol{x}) = \\frac{1}{1 + \\exp(-\\boldsymbol{x}^T \\boldsymbol{\\beta})}, \\boldsymbol{\\beta} \\in \\R^p\\right\\} = \\R^p\\)\n\nThe difference between \\(R_{\\mathcal{H}}^{\\star}\\) and \\(R^{\\star}\\) is called the approximation error.\nIntuitively, the larger the hypothesis class, the smaller the approximation error."
+    "objectID": "slides/04-mlp.html#feature-map-in-mlp",
+    "href": "slides/04-mlp.html#feature-map-in-mlp",
+    "title": "Multilayer Perceptron",
+    "section": "Feature Map in MLP",
+    "text": "Feature Map in MLP\n\nThe relationship between the input \\(\\boldsymbol{x}\\) and the hidden unit \\(\\boldsymbol{h}\\) is \\[\n\\boldsymbol{h} = \\sigma\\left(\\boldsymbol{W} \\boldsymbol{x} + \\boldsymbol{b}\\right),\n\\] where \\[\n\\boldsymbol{W} = \\begin{bmatrix} \\boldsymbol{w}_1^T \\\\ \\boldsymbol{w}_2^T \\\\ \\vdots \\\\ \\boldsymbol{w}_m^T \\end{bmatrix} \\in \\R^{m \\times p}, \\quad \\boldsymbol{b} = \\begin{bmatrix} b_1 \\\\ b_2 \\\\ \\vdots \\\\ b_m \\end{bmatrix} \\in \\R^m.\n\\]\nThe function \\(\\sigma: \\R \\to \\R\\) is called an activation function and is applied element-wise to the vector \\(\\boldsymbol{W} \\boldsymbol{x} + \\boldsymbol{b}\\).\nTha map \\(\\boldsymbol{x} \\mapsto \\sigma\\left(\\boldsymbol{W} \\boldsymbol{x} + \\boldsymbol{b}\\right)\\) can be viewed as a feature map parametrized by \\(\\boldsymbol{W}\\) and \\(\\boldsymbol{b}\\).\nThat is, we replace the linear predictor \\(\\beta_0 + \\boldsymbol{x}^T \\boldsymbol{\\beta}\\) with \\(\\beta_0 + \\boldsymbol{\\beta}^T \\boldsymbol{h} = \\beta_0 + \\boldsymbol{\\beta}^T \\sigma\\left(\\boldsymbol{W} \\boldsymbol{x} + \\boldsymbol{b}\\right)\\).\nFinally, we can link the predictor \\(\\beta_0 + \\boldsymbol{\\beta}^T \\sigma\\left(\\boldsymbol{W} \\boldsymbol{x} + \\boldsymbol{b}\\right)\\) to the output \\(y\\) (or more specifically \\(\\E(Y \\mid \\boldsymbol{x})\\)) using a link function, e.g., identity, logit, or softmax."
   },
   {
-    "objectID": "slides/03-ml_basics.html#empirical-risk",
-    "href": "slides/03-ml_basics.html#empirical-risk",
-    "title": "Machine Learning Basics",
-    "section": "Empirical Risk",
-    "text": "Empirical Risk\n\nAssuming that \\((x_1, y_1), \\ldots, (x_n, y_n) \\iid F\\), the empirical risk is \\[\nR_{\\text{emp}}(h) = \\E_{(X, Y) \\sim \\widehat{F}_n}[L(Y, h(X))]\n        = \\frac{1}{n} \\sum_{i=1}^n L(y_i, h(x_i))\n\\] where \\(\\widehat{F}_n = \\frac{1}{n}\\sum_{i=1}^n \\delta_{(x_i, y_i)}\\) is the empirical distribution of the data.\nWe choose the \\(h\\) that minimizes the empirical risk function, i.e., the empirical risk minimizer: \\[\n\\hat{h}_{n, \\mathcal{H}} = \\argmin_{h \\in \\mathcal{H}} R_{\\text{emp}}(h)\n\\] where \\(\\mathcal{H}\\) is the hypothesis class.\nDenote the empirical risk associated with \\(\\hat{h}_{n, \\mathcal{H}}\\) as \\(\\hat{R}_n = R_{\\text{emp}}(\\hat{h}_{n, \\mathcal{H}})\\) and this is what we obtain in practice."
+    "objectID": "slides/04-mlp.html#activation-function",
+    "href": "slides/04-mlp.html#activation-function",
+    "title": "Multilayer Perceptron",
+    "section": "Activation function",
+    "text": "Activation function\n\nThe main role of the activation function is to introduce nonlinearity into the model.\nIf \\(\\sigma(x) = x\\), then the MLP is equivalent to a linear model since \\[\\begin{align*}\n\\beta_0 + \\boldsymbol{\\beta}^T \\boldsymbol{h} & = \\beta_0 + \\boldsymbol{\\beta}^T \\sigma(\\boldsymbol{W} \\boldsymbol{x} + \\boldsymbol{b}) = \\beta_0 + \\boldsymbol{\\beta}^T \\boldsymbol{W} \\boldsymbol{x} + \\boldsymbol{\\beta}^T \\boldsymbol{b}\\\\\n& = \\left(\\beta_0 + \\boldsymbol{\\beta}^T \\boldsymbol{b}\\right) + \\left(\\boldsymbol{\\beta}^T \\boldsymbol{W}\\right) \\boldsymbol{x} = \\tilde{\\beta}_0 + \\tilde{\\boldsymbol{\\beta}}^T \\boldsymbol{x}.\n\\end{align*}\\]\nFrom this perspective, \\(\\sigma\\) can be any nonlinear function.\nHowever, the choice of activation function has a crucial impact on training, especially when the neural network is deep, i.e., it has many hidden layers.\nCommon choices of activation functions include:\n\nRectified Linear Unit (ReLU): \\(\\sigma(x) = \\max(0, x)\\)\nLogistic: \\(\\sigma(x) = \\frac{1}{1 + \\exp(-x)}\\)\nHyperbolic Tangent (tanh): \\(\\sigma(x) = \\tanh(x)\\)"
   },
   {
-    "objectID": "slides/03-ml_basics.html#quick-summary",
-    "href": "slides/03-ml_basics.html#quick-summary",
-    "title": "Machine Learning Basics",
-    "section": "Quick Summary",
-    "text": "Quick Summary\n\nGoal: find the best model \\(h^{\\star} = \\argmin_h R(h)\\), which is impossible since\n\nthe space of all possible functions is too large \\(\\textcolor{red}{\\rightarrow}\\) restrict to hypothesis class\nthe data distribution is unknown \\(\\textcolor{red}{\\rightarrow}\\) use empirical data\n\nWe have three models:\n\n\\(h^{\\star}\\): the best model (associated risk \\(R^{\\star} = R(h^{\\star})\\))\n\\(h_{\\mathcal{H}}^{\\star}\\): the best model in the hypothesis class \\(\\mathcal{H}\\) (associated risk \\(R_{\\mathcal{H}}^{\\star} = R(h^{\\star}_{\\mathcal{H}})\\))\n\\(\\hat{h}_{n, \\mathcal{H}}\\): the empirical risk minimizer, i.e., the trained model (empirical risk, or the training error, \\(\\hat{R}_n = R_{\\text{emp}}(\\hat{h}_{n, \\mathcal{H}})\\))\n\nWe want \\(\\hat{h}_{n, \\mathcal{H}}\\) to be as close as possible to \\(h^{\\star}\\) in terms of the risk function \\(R(h)\\)."
+    "objectID": "slides/04-mlp.html#activation-functions",
+    "href": "slides/04-mlp.html#activation-functions",
+    "title": "Multilayer Perceptron",
+    "section": "Activation Functions",
+    "text": "Activation Functions"
   },
   {
-    "objectID": "slides/03-ml_basics.html#error-decomposition",
-    "href": "slides/03-ml_basics.html#error-decomposition",
-    "title": "Machine Learning Basics",
-    "section": "Error Decomposition",
-    "text": "Error Decomposition\n\nGoal: \\(R(\\hat{h}_{n,\\mathcal{H}}) - R^{\\star} = R(\\hat{h}_{n,\\mathcal{H}}) - R(h^{\\star}) = 0\\).\nDecomposition: \\[\\begin{align*}\nR(\\hat{h}_{n,\\mathcal{H}}) - R^{\\star} & = \\underbrace{R(\\hat{h}_{n,\\mathcal{H}}) - R_{\\mathcal{H}}^{\\star}}_{\\textcolor{blue}{\\text{estimation error}}} \\quad + \\underbrace{R_{\\mathcal{H}}^{\\star} - R^{\\star}}_{\\textcolor{blue}{\\text{approximation error}}}\\\\\n& = \\underbrace{R(\\hat{h}_{n,\\mathcal{H}}) - R(h_{\\mathcal{H}}^{\\star})}_{\\textcolor{blue}{\\text{estimation error}}} \\quad + \\quad \\underbrace{R(h_{\\mathcal{H}}^{\\star}) - R(h^{\\star})}_{\\textcolor{blue}{\\text{approximation error}}}\\\\\n\\end{align*}\\]\nThe approximation error comes from the use of a hypothesis class \\(\\mathcal{H}\\).\n\nLarger \\(\\mathcal{H}\\) \\(\\rightarrow\\) smaller approximation error\n\nThe estimation error comes from the use of empirical data.\n\nMore data \\(\\rightarrow\\) smaller estimation error"
+    "objectID": "slides/04-mlp.html#more-hidden-layers",
+    "href": "slides/04-mlp.html#more-hidden-layers",
+    "title": "Multilayer Perceptron",
+    "section": "More Hidden Layers",
+    "text": "More Hidden Layers\n\nIncreasing the number of hidden layers is straightforward and it allows the model to learn more complex functions.\nThe MLP is also called a fully connected neural network (FCNN) because we have connections between all the units in adjacent layers."
   },
   {
-    "objectID": "slides/03-ml_basics.html#error-decomposition-1",
-    "href": "slides/03-ml_basics.html#error-decomposition-1",
-    "title": "Machine Learning Basics",
-    "section": "Error Decomposition",
-    "text": "Error Decomposition"
+    "objectID": "slides/04-mlp.html#the-general-form-of-an-fcnn",
+    "href": "slides/04-mlp.html#the-general-form-of-an-fcnn",
+    "title": "Multilayer Perceptron",
+    "section": "The general form of an FCNN",
+    "text": "The general form of an FCNN\n\nAn \\(L\\)-layer FCNN (the \\(L\\)th layer is the output layer) can be written recursively as \\[\nf^{(L)}(\\boldsymbol{x}) = \\boldsymbol{W}^{(L)}\\boldsymbol{h}^{(L-1)} +  \\boldsymbol{b}^{(L)} \\in \\R^k,\n\\] where \\[\n\\boldsymbol{h}^{(l)} = \\sigma^{(l)}\\left(\\boldsymbol{W}^{(l)} \\boldsymbol{h}^{(l-1)} + \\boldsymbol{b}^{(l)}\\right), \\quad l = 1, \\ldots, L-1,\n\\] and \\(\\boldsymbol{h}^{(0)} = \\boldsymbol{x} \\in \\R^p\\).\nThe function \\(\\sigma^{(l)}\\) is the activation function for the \\(l\\)-th layer. Typically, we use the same activation function for all layers.\nThe parameter of the model is \\(\\theta = \\{\\boldsymbol{W}^{(1)}, \\ldots, \\boldsymbol{W}^{(L)}, \\boldsymbol{b}^{(1)}, \\ldots, \\boldsymbol{b}^{(L)}\\}\\).\nDenote the number of nodes in the \\(l\\)th layer by \\(m_l\\) (\\(m_0 = p\\) and \\(m_{L} = k\\)), i.e., \\(\\boldsymbol{h}^{(l)} \\in \\R^{m_l}\\).\nThen \\(\\boldsymbol{W}^{(l)} \\in \\R^{m_l \\times m_{l-1}}\\) and \\(\\boldsymbol{b}^{(l)} \\in \\R^{m_l}\\) and the total number of parameters is \\[\n    \\sum_{i=1}^{L} m_l\\cdot m_{l-1} + m_l = \\sum_{i=1}^{L} m_l(m_{l-1} + 1).\n\\]"
   },
   {
-    "objectID": "slides/03-ml_basics.html#example",
-    "href": "slides/03-ml_basics.html#example",
-    "title": "Machine Learning Basics",
+    "objectID": "slides/04-mlp.html#training-a-neural-network",
+    "href": "slides/04-mlp.html#training-a-neural-network",
+    "title": "Multilayer Perceptron",
+    "section": "Training a Neural Network",
+    "text": "Training a Neural Network\n\nSuppose now we have a dataset \\(\\mathcal{D} = \\{(\\boldsymbol{x}_1, y_1), \\ldots, (\\boldsymbol{x}_n, y_n)\\}\\) and we have chosen a hypothesis class \\(\\mathcal{H}^{(L)}\\) consisting of \\(L\\)-layer FCNNs.\nBased on the dataset, we can also specify an appropriate loss function \\(\\ell\\).\nFollowing the ERM principle, we want to find the model \\(\\hat{f} \\in \\mathcal{H}^{(L)}\\) that minimizes the empirical risk function \\[\n\\hat{f} = \\argmin_{f \\in \\mathcal{H}^{(L)}} \\frac{1}{n} \\sum_{i=1}^n \\ell(y_i, f(\\boldsymbol{x}_i)).\n\\]\nSince \\(\\mathcal{H}^{(L)}\\) is parametrized by the weights and biases, we need to find the optimal weights and biases that minimize the empirical risk function.\nLet \\(J(\\theta) = \\frac{1}{n} \\sum_{i=1}^n \\ell(y_i, f_{\\theta}(\\boldsymbol{x}_i))\\). The goal is to find \\(\\theta\\) that minimizes \\(J(\\theta)\\)."
+  },
+  {
+    "objectID": "slides/04-mlp.html#gradient-descent",
+    "href": "slides/04-mlp.html#gradient-descent",
+    "title": "Multilayer Perceptron",
+    "section": "Gradient Descent",
+    "text": "Gradient Descent\n\nThe gardient descent algorithm is a simple and widely used optimization algorithm for finding the minimum of a function.\nLet \\(g: \\R^d \\to \\R\\) be a differentiable function. The gradient of \\(g\\) at \\(\\boldsymbol{x} \\in \\R^d\\) is the vector of partial derivatives of \\(g\\) at \\(\\boldsymbol{x}\\): \\[\n\\nabla g(\\boldsymbol{x}) = \\left[\\frac{\\partial}{\\partial x_1} g(\\boldsymbol{x}), \\ldots, \\frac{\\partial}{\\partial x_d} g(\\boldsymbol{x})\\right]^T.\n\\]\nConsider the first-order Taylor expansion of \\(g\\) at \\(\\boldsymbol{x}\\): \\[\ng(\\boldsymbol{x} + \\boldsymbol{\\epsilon}) = g(\\boldsymbol{x}) + \\boldsymbol{\\epsilon} ^T\\nabla g(\\boldsymbol{x})  + O(\\|\\boldsymbol{\\epsilon}\\|^2).\n\\]\nWhen \\(\\|\\boldsymbol{\\epsilon}\\|\\) is small, we can approximate \\(g(\\boldsymbol{x} + \\boldsymbol{\\epsilon})\\) by \\(g(\\boldsymbol{x}) + \\boldsymbol{\\epsilon} ^T\\nabla g(\\boldsymbol{x})\\).\nTaking \\(\\boldsymbol{\\epsilon} = -\\eta \\nabla g(\\boldsymbol{x})\\) for some small \\(\\eta &gt; 0\\), we have \\[\ng(\\boldsymbol{x} - \\eta \\nabla g(\\boldsymbol{x})) \\approx g(\\boldsymbol{x}) - \\eta \\|\\nabla g(\\boldsymbol{x})\\|^2 \\leq g(\\boldsymbol{x}).\n\\]\nThat is, if we move in the opposite direction of the gradient by an appropriate distance, we can decrease the value of \\(g\\). This is called the gradient descent algorithm."
+  },
+  {
+    "objectID": "slides/04-mlp.html#example-gradient-descent",
+    "href": "slides/04-mlp.html#example-gradient-descent",
+    "title": "Multilayer Perceptron",
+    "section": "Example: Gradient Descent",
+    "text": "Example: Gradient Descent"
+  },
+  {
+    "objectID": "slides/04-mlp.html#gradient-descent-1",
+    "href": "slides/04-mlp.html#gradient-descent-1",
+    "title": "Multilayer Perceptron",
+    "section": "Gradient Descent",
+    "text": "Gradient Descent\n\nThe gradient descent/ascent algorithm is the most simple optimization algorithm for finding the minimum/maximum of a function.\nIt is a first-order optimization algorithm that uses only the first-order derivative information.\nThe extra parameter \\(\\eta\\) is called the learning rate, which controls the step size of the algorithm.\nLearning rate is a crucial hyperparameter in the gradient descent algorithm as it determines the convergence rate and the stability of the algorithm.\nIf the learning rate is too small, the algorithm may converge very slowly. If it is too large, the algorithm may diverge.\nThere are also second-order optimization algorithms that use the second-order derivative information (the Hessian matrix), e.g., Newton’s method, IRWLS.\nModern deep learning frameworks use variants of gradient descent algorithms, e.g., Adam, RMSprop, Adagrad, etc."
+  },
+  {
+    "objectID": "slides/04-mlp.html#train-a-neural-network-using-gd",
+    "href": "slides/04-mlp.html#train-a-neural-network-using-gd",
+    "title": "Multilayer Perceptron",
+    "section": "Train a Neural Network using GD",
+    "text": "Train a Neural Network using GD\n\nRecall that the goal is to find the optimal weights and biases that minimize the empirical risk function \\(J(\\theta) = \\frac{1}{n} \\sum_{i=1}^n \\ell(y_i, f_{\\theta}(\\boldsymbol{x}_i))\\).\nTo apply the gradient descent algorithm, we need to compute the gradient of \\(J(\\theta)\\) with respect to the weights and biases.\nFor simplicity, we assume that \\(L = 2\\) (one hidden layer, \\(m_0 = p\\), \\(m_1 = m\\), \\(m_2 = 1\\)), i.e., \\[\nf_{\\theta}(\\boldsymbol{x}) = \\boldsymbol{W}^{(2)}\\sigma\\left(\\boldsymbol{W}^{(1)}\\boldsymbol{x} + \\boldsymbol{b}^{(1)}\\right) + \\boldsymbol{b}^{(2)}.\n\\]\nThe parameters are \\(\\theta = \\{\\boldsymbol{W}^{(1)}, \\boldsymbol{W}^{(2)}, \\boldsymbol{b}^{(1)}, \\boldsymbol{b}^{(2)}\\}\\) where \\(\\boldsymbol{W}^{(1)} \\in \\R^{m \\times p}\\), \\(\\boldsymbol{W}^{(2)} \\in \\R^{1 \\times m}\\), \\(\\boldsymbol{b}^{(1)} \\in \\R^m\\), and \\(\\boldsymbol{b}^{(2)} \\in \\R\\)."
+  },
+  {
+    "objectID": "slides/04-mlp.html#chain-rule",
+    "href": "slides/04-mlp.html#chain-rule",
+    "title": "Multilayer Perceptron",
+    "section": "Chain Rule",
+    "text": "Chain Rule\nWrite \\[\\begin{align*}\nf_{\\theta}(\\boldsymbol{x}) & = \\boldsymbol{W}^{(2)}\\sigma\\left(\\boldsymbol{W}^{(1)}\\boldsymbol{x} + \\boldsymbol{b}^{(1)}\\right) + \\boldsymbol{b}^{(2)} = \\boldsymbol{W}^{(2)}\\boldsymbol{h}^{(1)} + \\boldsymbol{b}^{(2)}\\\\\n\\boldsymbol{h}^{(1)} & = \\sigma\\left(\\boldsymbol{W}^{(1)}\\boldsymbol{x} + \\boldsymbol{b}^{(1)}\\right),\n\\end{align*}\\] and we have \\[\\begin{align*}\n\\nabla_{\\boldsymbol{b}^{(2)}} f_{\\theta}(\\boldsymbol{x}) & = 1\\\\\n\\nabla_{\\boldsymbol{W}^{(2)}} f_{\\theta}(\\boldsymbol{x}) & = \\boldsymbol{h}^{(1)} = \\sigma\\left(\\boldsymbol{W}^{(1)}\\boldsymbol{x} + \\boldsymbol{b}^{(1)}\\right) \\in \\R^m\\\\\n\\nabla_{\\boldsymbol{b}^{(1)}} f_{\\theta}(\\boldsymbol{x}) & = \\left[\\nabla_{\\boldsymbol{b}^{(1)}} \\boldsymbol{h}^{(1)}\\right] \\left(\\boldsymbol{W}^{(2)}\\right)^T \\in \\R^m\\\\\n\\nabla_{\\boldsymbol{W}^{(1)}} f_{\\theta}(\\boldsymbol{x}) & = \\boldsymbol{W}^{(2)}\\nabla_{\\boldsymbol{W}^{(1)}} \\boldsymbol{h}^{(1)} = \\sum_{k=1}^m W_k^{(2)} \\nabla_{\\boldsymbol{W}^{(1)}} h_k^{(1)}\\in \\R^{m \\times p}\\\\\n\\nabla_{\\boldsymbol{b}^{(1)}} \\boldsymbol{h}^{(1)} & = \\text{diag}\\left(\\sigma^{\\prime}(\\boldsymbol{W}^{(1)}\\boldsymbol{x} + \\boldsymbol{b}^{(1)})\\right) \\in \\R^{m \\times m}\\\\\n\\nabla_{\\boldsymbol{W}^{(1)}} h_k^{(1)} & \\in \\R^{m \\times p}.\n\\end{align*}\\]"
+  },
+  {
+    "objectID": "slides/04-mlp.html#computational-graph",
+    "href": "slides/04-mlp.html#computational-graph",
+    "title": "Multilayer Perceptron",
+    "section": "Computational Graph",
+    "text": "Computational Graph\nA graphical representation of computation:\n\nNodes indicate variables (scalar, vector, matrix, etc.)\nEdges indicate operations (addition, multiplication, function evaluation, etc.)"
+  },
+  {
+    "objectID": "slides/04-mlp.html#computational-graph-for-a-neural-network",
+    "href": "slides/04-mlp.html#computational-graph-for-a-neural-network",
+    "title": "Multilayer Perceptron",
+    "section": "Computational Graph for a Neural Network",
+    "text": "Computational Graph for a Neural Network\n\nThe computational graph for a neural network is the following\n\n\n\n\n\n\n\nThe square nodes represent unknown parameters.\nThe process of transforming the input \\(\\boldsymbol{x}\\) to the output \\(y\\) following the arrows is called forward propagation."
+  },
+  {
+    "objectID": "slides/04-mlp.html#back-propagation-1",
+    "href": "slides/04-mlp.html#back-propagation-1",
+    "title": "Multilayer Perceptron",
+    "section": "Back-propagation",
+    "text": "Back-propagation\n\nThe process of computing the gradient of the loss function with respect to the parameters is called back-propagation.\nThe back-propogation algorithm is simply an application of the chain rule to compute the gradient of the loss function with respect to the parameters.\nTo each edge in the computational graph, we associate a gradient that represents the derivative of the starting node with respect to the variable at the end node."
+  },
+  {
+    "objectID": "slides/04-mlp.html#example",
+    "href": "slides/04-mlp.html#example",
+    "title": "Multilayer Perceptron",
     "section": "Example",
-    "text": "Example\n\nLinear Regression:\n\n\\(\\mathcal{H} = \\{h: h(\\boldsymbol{x}) = \\boldsymbol{x}^T \\boldsymbol{\\beta}, \\boldsymbol{\\beta} \\in \\R^p\\}\\)\n\\(L(y, h(\\boldsymbol{x})) = (y - h(\\boldsymbol{x}))^2\\)\n\nLogistic Regression:\n\n\\(\\mathcal{H} = \\left\\{h: h(\\boldsymbol{x}) = \\frac{1}{1 + \\exp(-\\boldsymbol{x}^T \\boldsymbol{\\beta})}, \\boldsymbol{\\beta} \\in \\R^p\\right\\}\\)\n\\(L(y, h(\\boldsymbol{x})) = -y \\log(h(\\boldsymbol{x})) - (1 - y) \\log(1 - h(\\boldsymbol{x}))\\)\n\n(Linear) Support Vector Machine:\n\n\\(\\mathcal{H} = \\{h: h(\\boldsymbol{x}) = \\boldsymbol{w}^T \\boldsymbol{x} + b, \\boldsymbol{w} \\in \\R^p, b \\in \\R\\}\\)\n\\(L(y, h(\\boldsymbol{x})) = \\max(0, 1 - y \\cdot h(\\boldsymbol{x}))\\)"
+    "text": "Example\nConsider the same dataset as the previous example. We want to build a regression model using neural networks."
   },
   {
-    "objectID": "slides/03-ml_basics.html#maximum-likelihood-ml-v.s.-erm",
-    "href": "slides/03-ml_basics.html#maximum-likelihood-ml-v.s.-erm",
-    "title": "Machine Learning Basics",
-    "section": "Maximum Likelihood (ML) v.s. ERM",
-    "text": "Maximum Likelihood (ML) v.s. ERM\n\nIn fact, the ML principle is a special case of the ERM principle.\nThat is, specifying a likelihood function gives a loss function, i.e., use the negative log-likelihood as the loss function.\nML:\n\nStronger assumptions\nStronger guarantees (consistency, asymptotic normality, etc.)\nAllow us to do more things (e.g., hypothesis testing and confidence intervals)\nLinear regression and logistic regression are ML and hence ERM\n\nERM:\n\nMore flexible and practical, but weaker guarantees\nUsually provide only a point estimate\nSVM is ERM but not ML"
+    "objectID": "slides/04-mlp.html#some-questions",
+    "href": "slides/04-mlp.html#some-questions",
+    "title": "Multilayer Perceptron",
+    "section": "Some questions",
+    "text": "Some questions\n\nReLU v.s. Sigmoid? Which is better?\nHow to choose the number of hidden units? The more the better?\nHow to choose the number of hidden layers? The deeper the better?\nIt seems that kernel regresion gives a slightly better result than MLP does.\n\nIn the previous example, kernel regression takes ~0.01 second to train, while MLP takes ~9.5 seconds."
   },
   {
-    "objectID": "slides/03-ml_basics.html#constructing-learning-algorithms",
-    "href": "slides/03-ml_basics.html#constructing-learning-algorithms",
-    "title": "Machine Learning Basics",
-    "section": "Constructing Learning Algorithms",
-    "text": "Constructing Learning Algorithms\n\nFollowing the ERM principle, we need to specify a loss function and a hypothesis class in order to construct a learning algorithm.\nThe choice of the loss function is based on the types of labels and the problem.\nThe choice of the hypothesis class is more challenging:\n\nSmaller \\(\\mathcal{H}\\) \\(\\rightarrow\\) larger approximation error, smaller estimation error, and less overfitting\nLarger \\(\\mathcal{H}\\) \\(\\rightarrow\\) smaller approximation error, larger estimation error, more overfitting, and requires more data\n\nNext, we will discuss:\n\nhow to measure the “size” (capacity/complexity) of a hypothesis class\nhow to choose an appropriate hypothesis class"
+    "objectID": "slides/04-mlp.html#proof-of-in-p.6",
+    "href": "slides/04-mlp.html#proof-of-in-p.6",
+    "title": "Multilayer Perceptron",
+    "section": "Proof of (*) in P.6",
+    "text": "Proof of (*) in P.6\nShow that for any \\(\\boldsymbol{Z} \\in \\R^{n \\times d}\\), \\(\\boldsymbol{y} \\in \\R^n\\), and \\(\\alpha &gt; 0\\), we have \\[\n(\\boldsymbol{Z}^T \\boldsymbol{Z} + \\alpha I_d)^{-1} \\boldsymbol{Z}^T \\boldsymbol{y} = \\boldsymbol{Z}^T (\\boldsymbol{Z} \\boldsymbol{Z}^T + \\alpha I_n)^{-1} \\boldsymbol{y}.\n\\]\nProof:\n\nThe left hand side is the solution to the equation \\(\\boldsymbol{Z}^T \\boldsymbol{Z} \\boldsymbol{\\beta}+\\alpha \\boldsymbol{\\beta}=\\boldsymbol{Z}^T \\boldsymbol{y}\\).\nRearranging the terms gives \\(\\boldsymbol{\\beta}=\\boldsymbol{Z}^T\\left[\\frac{1}{\\alpha}(\\boldsymbol{y}-\\boldsymbol{Z} \\boldsymbol{\\beta})\\right]\\).\nDefine \\(\\boldsymbol{b}=\\frac{1}{\\alpha}(\\boldsymbol{y}-\\boldsymbol{Z} \\boldsymbol{\\beta})\\), and then \\(\\boldsymbol{\\beta}=\\boldsymbol{Z}^T \\boldsymbol{b}\\).\nSubstituting \\(\\boldsymbol{\\beta}=\\boldsymbol{Z}^T \\boldsymbol{b}\\) into \\(\\boldsymbol{b}=\\frac{1}{\\alpha}(\\boldsymbol{y}-\\boldsymbol{Z} \\boldsymbol{\\beta})\\), we have \\[\n\\boldsymbol{b}=\\frac{1}{\\alpha}\\left(\\boldsymbol{y}-\\boldsymbol{Z} \\boldsymbol{Z}^T \\boldsymbol{b}\\right).\n\\]\nRearranging the terms gives \\(\\left(\\boldsymbol{Z}\\boldsymbol{Z}^{T}+\\alpha I_n\\right) \\boldsymbol{b}=\\boldsymbol{y}\\), which yields \\(\\boldsymbol{b}=\\left(\\boldsymbol{Z} \\boldsymbol{Z}^T+\\alpha I_n\\right)^{-1} \\boldsymbol{y}\\)\nSubstituting into \\(\\boldsymbol{\\beta}=\\boldsymbol{Z}^T \\boldsymbol{b}\\) gives \\(\\boldsymbol{\\beta}=\\boldsymbol{Z}^T\\left(\\boldsymbol{Z} \\boldsymbol{Z}^T+\\alpha I_n\\right)^{-1} \\boldsymbol{y}\\)."
   },
   {
-    "objectID": "slides/03-ml_basics.html#complexity-v.s.-dimension",
-    "href": "slides/03-ml_basics.html#complexity-v.s.-dimension",
-    "title": "Machine Learning Basics",
-    "section": "Complexity v.s. Dimension",
-    "text": "Complexity v.s. Dimension\n\nLet \\(\\mathcal{H}\\) be a parametric hypothesis class ,e.g., \\(\\mathcal{H} = \\{h: h(\\boldsymbol{x}) = \\boldsymbol{x}^T \\boldsymbol{\\beta}, \\boldsymbol{\\beta} \\in \\R^p\\}\\).\nAn intuitive way to measure the complexity of \\(\\mathcal{H}\\) is to count the number of unknown parameters, i.e., the dimension of \\(\\mathcal{H}\\).\nIn this case, the dimension of \\(\\dim(\\mathcal{H}) = p\\)."
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#shattering",
-    "href": "slides/03-ml_basics.html#shattering",
-    "title": "Machine Learning Basics",
-    "section": "Shattering",
-    "text": "Shattering\nA hypothesis class \\(\\mathcal{H}\\) is said to shatter a set of points \\(S = \\{x_1, \\ldots, x_n\\}\\) if for all possible binary labelings (0/1) of these points, there exists a function \\(h \\in \\mathcal{H}\\) that can perfectly separate the points.\n\n\n\nImage Source: Figure 7.6 of ESL"
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#shattering-1",
-    "href": "slides/03-ml_basics.html#shattering-1",
-    "title": "Machine Learning Basics",
-    "section": "Shattering",
-    "text": "Shattering\nDefinition (Restriction of \\(\\mathcal{H}\\) to \\(S\\)) Let \\(\\mathcal{H}\\) be a class of functions from \\(\\mathcal{X}\\) to \\(\\{0,1\\}\\) and let \\(S = \\{x_1, \\ldots, x_n\\} \\subset \\mathcal{X}\\). The restriction of \\(\\mathcal{H}\\) to \\(S\\) is the set of functions from \\(S\\) to \\(\\{0, 1\\}\\) that can be derived from \\(\\mathcal{H}\\). That is, \\[\n   \\mathcal{H}_S = \\{(h(x_1), \\ldots, h(x_n)): h \\in \\mathcal{H}\\}\n\\]\nDefinition (Shattering) A hypothesis class \\(\\mathcal{H}\\) shatters a finite set \\(S \\subset \\mathcal{X}\\) if the restriction of \\(\\mathcal{H}\\) to \\(S\\) is the set of all functions from \\(S\\) to \\(\\{0, 1\\}\\). That is, \\(|\\mathcal{H}_S| = 2^{|S|}\\)."
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#vapnik-chervonenkis-vc-dimension",
-    "href": "slides/03-ml_basics.html#vapnik-chervonenkis-vc-dimension",
-    "title": "Machine Learning Basics",
-    "section": "Vapnik-Chervonenkis (VC) Dimension",
-    "text": "Vapnik-Chervonenkis (VC) Dimension\nDefinition (VC-dimension) The VC-dimension of a hypothesis class \\(\\mathcal{H}\\), denoted \\(\\text{VC-dim}(\\mathcal{H})\\), is the maximal size of a set \\(S \\subset \\mathcal{X}\\) that can be shattered by \\(\\mathcal{H}\\). If \\(\\mathcal{H}\\) can shatter sets of arbitrarily large size we say that \\(\\mathcal{H}\\) has infinite VC-dimension.\n\nOne can show that for linear models, e.g., \\(\\mathcal{H} = \\{h: h(\\boldsymbol{x}) = \\beta_0 + \\boldsymbol{x}^T \\boldsymbol{\\beta}, \\boldsymbol{\\beta} \\in \\R^p\\}\\), the VC-dimension is \\(p+1\\) (the same as the number of parameters).\nHowever, for nonlinear models, the calculation of the VC-dimension is often challenging."
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#example-infinite-vc-dimension",
-    "href": "slides/03-ml_basics.html#example-infinite-vc-dimension",
-    "title": "Machine Learning Basics",
-    "section": "Example (Infinite VC-dimension)",
-    "text": "Example (Infinite VC-dimension)\n\nLet \\(\\mathcal{H} = \\{h: h(x) = \\mathbb{I}(\\sin(\\alpha x) &gt; 0), \\alpha &gt; 0\\}\\). Then \\(\\text{VC-dim}(\\mathcal{H}) = \\infty\\).\nProof:\n\nFor any \\(n\\), let \\(x_1 = 2\\pi 10^{-1}, \\ldots, x_n = 2\\pi 10^{-n}\\).\nThen the parameter \\(\\alpha = \\frac{1}{2}\\left(1 + \\sum_{i=1}^n (1-y_i)10^i\\right)\\) can perfectly separate the points, where \\(y_i \\in \\{0, 1\\}\\) is any labeling of the points.\n\n\n\n\n\n\n\n\n\nImage Source: Figure 7.5 of ESL"
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#goodness-of-fit-v.s.-generalization-ability",
-    "href": "slides/03-ml_basics.html#goodness-of-fit-v.s.-generalization-ability",
-    "title": "Machine Learning Basics",
-    "section": "Goodness-of-fit v.s. Generalization ability",
-    "text": "Goodness-of-fit v.s. Generalization ability\n\nGoodness-of-fit: how well the model fits the data.\nGeneralization ability: how well the model generalizes to unseen data.\nRecall that for an ERM \\(\\hat{h}_{n, \\mathcal{H}}\\), we have\n\ntraining error (error on training data) \\(\\hat{R}_n = R_{\\text{emp}}(\\hat{h}_{n, \\mathcal{H}})\\)\ngeneralization error (error on unseen data) \\(R(\\hat{h}_{n, \\mathcal{H}}) = \\E_{(X, Y) \\sim F} \\left[L(Y, \\hat{h}_{n,\\mathcal{H}}(X)) \\mid \\mathcal{T}\\right]\\), where \\(\\mathcal{T}\\) denotes the training dataset.\n\nWe can write \\[\\begin{align*}\n   R(\\hat{h}_{n, \\mathcal{H}}) & = \\hat{R}_n + \\left(R(\\hat{h}_{n, \\mathcal{H}}) - \\hat{R}_n\\right)\\\\\n   \\textcolor{blue}{\\text{generalization error}} & = \\textcolor{blue}{\\text{training error}} + \\textcolor{blue}{\\text{generalization gap}}\n\\end{align*}\\]"
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#overfitting-and-underfitting",
-    "href": "slides/03-ml_basics.html#overfitting-and-underfitting",
-    "title": "Machine Learning Basics",
-    "section": "Overfitting and Underfitting",
-    "text": "Overfitting and Underfitting\n\nTo have low generalization error, we need to have both low training error and small generalization gap.\n\nLarge training error \\(\\rightarrow\\) underfitting\nLow training error but large generalization gap \\(\\rightarrow\\) overfitting\n\n\n\n\n\n\n\n\n\nImage Source: Figure 5.3 in DL"
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#vc-inequality",
-    "href": "slides/03-ml_basics.html#vc-inequality",
-    "title": "Machine Learning Basics",
-    "section": "VC Inequality",
-    "text": "VC Inequality\n\nThe VC theory provides an upper bound for the generalization gap, known as the VC inequality: with probability at least \\(1 - \\delta\\) \\[\nR(h) \\leq R_{\\text{emp}}(h)+\\varepsilon \\sqrt{1+\\frac{4 R_{\\text{emp}}(h)}{\\varepsilon}}, \\quad \\varepsilon = O\\left(\\frac{d - \\log \\delta}{n}\\right)\n\\] simultaneously for all \\(h \\in \\mathcal{H}\\), where \\(\\text{VC-dim}(\\mathcal{H}) = d &lt; \\infty\\).\nThe generalization gap increases as\n\nthe VC-dimension increases\nthe samples size \\(n\\) decreases\n\nThis upper bound is only a loose bound and does not work for models with infinite VC-dimension."
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#regularized-erm",
-    "href": "slides/03-ml_basics.html#regularized-erm",
-    "title": "Machine Learning Basics",
-    "section": "Regularized ERM",
-    "text": "Regularized ERM\n\nTo prevent overfitting, we can add a regularization term to the empirical risk: \\[\nR_{\\text{reg}}(h) = R_{\\text{emp}}(h) + \\lambda \\Omega(h)\n\\] where \\(\\Omega(h)\\) is a regularization term and \\(\\lambda\\) is the regularization parameter.\nTypically, \\(\\Omega(h)\\) measures the smoothness or complexity of the model \\(h\\).\n\n\n\n\n  \n  \n  \n    \n      \n        image/svg+xml\n        \n        \n      \n    \n  \n  \n    \n      \n        \n        \n        \n        \n        \n        \n        \n        \n        \n      \n      \n      x\n      y\n    \n  \n\n\n\n\n\nImage Source: https://en.wikipedia.org/wiki/Regularization_(mathematics)"
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#regularized-erm-1",
-    "href": "slides/03-ml_basics.html#regularized-erm-1",
-    "title": "Machine Learning Basics",
-    "section": "Regularized ERM",
-    "text": "Regularized ERM\n\nFor example, \\(\\Omega(h) = \\|h^{\\prime}(x)\\|_2^2 = \\int \\left(h^{\\prime}(x)\\right)^2dx\\). (\\(L_2\\) Regularization)\nIf \\(h(x) = \\beta_0 + \\beta_1 x\\), then \\(h^{\\prime}(x) = \\beta_1\\) and \\(\\Omega(h) = \\beta_1^2\\).\nThe \\(L_1\\) regularization is \\(\\Omega(h) = \\|h^{\\prime}(x)\\|_1 = \\int |h^{\\prime}(x)|dx\\).\nIf \\(h(x) = \\beta_0 + \\beta_1 x\\), then \\(h^{\\prime}(x) = \\beta_1\\) and \\(\\Omega(h) = |\\beta_1|\\).\nUsing \\(L_1\\) gives you sparsity; using \\(L_2\\) gives you smoothness/insensitivity:\n\nConsider a linear model \\(h(\\boldsymbol{x}) = \\boldsymbol{x}^T \\boldsymbol{\\beta}\\).\nA good model should not be too sensitive to the input, i.e., small changes in the input should not lead to large changes in the output.\nThat is, if \\(\\boldsymbol{x} \\approx \\tilde{\\boldsymbol{x}}\\) , then \\(|\\boldsymbol{x}^T \\boldsymbol{\\beta} - \\tilde{\\boldsymbol{x}}^T \\boldsymbol{\\beta}|\\) should be small.\nNote that \\[\n|\\boldsymbol{x}^T \\boldsymbol{\\beta} - \\tilde{\\boldsymbol{x}}^T \\boldsymbol{\\beta}| = |(\\boldsymbol{x} - \\tilde{\\boldsymbol{x}})^T \\boldsymbol{\\beta}| \\leq \\|\\boldsymbol{x} - \\tilde{\\boldsymbol{x}}\\|_2 \\|\\boldsymbol{\\beta}\\|_2\n\\]"
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#bias-variance-tradeoff",
-    "href": "slides/03-ml_basics.html#bias-variance-tradeoff",
-    "title": "Machine Learning Basics",
-    "section": "Bias-Variance Tradeoff",
-    "text": "Bias-Variance Tradeoff\n\nAdding a reguralization term often increases the bias but reduces the variance of the model.\nThis tradeoff is known as the bias-variance tradeoff.\n\n\n\n\n\n\n\n\nImage Source: Figure 5.6 in DL"
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#quick-summary-1",
-    "href": "slides/03-ml_basics.html#quick-summary-1",
-    "title": "Machine Learning Basics",
-    "section": "Quick Summary",
-    "text": "Quick Summary\n\nThe VC dimension measures the complexity of a hypothesis class.\nThe VC inequality provides an upper bound for the generalization gap, provided that the VC dimension is finite.\nThe bound is often criticized for being too loose and does not work for models with infinite VC dimension.\nExample of infinite VC dimension:\n\nNeural Networks\nKernel methods (e.g., kernel SVM, kernel regression)\n\\(K\\)-nearest neighbors (with small \\(K\\), say \\(K = 1\\))"
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#double-descent-curve",
-    "href": "slides/03-ml_basics.html#double-descent-curve",
-    "title": "Machine Learning Basics",
-    "section": "Double Descent Curve",
-    "text": "Double Descent Curve\n\n\n\nBelkin, M., Hsu, D., Ma, S., & Mandal, S. (2019). Reconciling modern machine-learning practice and the classical bias–variance trade-off. Proceedings of the National Academy of Sciences, 116(32), 15849-15854."
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#estimating-the-generalization-error",
-    "href": "slides/03-ml_basics.html#estimating-the-generalization-error",
-    "title": "Machine Learning Basics",
-    "section": "Estimating the Generalization Error",
-    "text": "Estimating the Generalization Error\n\nAlthough the VC inequality provides an upper bound for the generalization gap, it is often too loose.\nIn order to have a more accurate insight into the model’s generalization ability, we need to estimate the generalization error.\nTo achieve this, we need to have an extra dataset, called the validation dataset \\(\\mathcal{V} = \\{(\\tilde{x}_i, \\tilde{y}_i)\\}_{i=1}^m\\).\nThe generalization error is then estimated as \\[\n\\hat{R}_{\\text{gen}} = \\frac{1}{m} \\sum_{i=1}^m L(\\tilde{y}_i, \\hat{h}_{n, \\mathcal{H}}(\\tilde{x}_i)).\n\\]\nAssuming the \\(\\mathcal{V}\\) and \\(\\mathcal{T}\\) (training dataset) are i.i.d, \\(\\hat{R}_{\\text{gen}}\\) is an unbiased estimate of the generalization error, i.e., \\(\\E[\\hat{R}_{\\text{gen}} \\mid \\mathcal{T}] = R(\\hat{h}_{n, \\mathcal{H}})\\)."
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#k-fold-cross-validation-cv",
-    "href": "slides/03-ml_basics.html#k-fold-cross-validation-cv",
-    "title": "Machine Learning Basics",
-    "section": "\\(k\\)-fold Cross-Validation (CV)",
-    "text": "\\(k\\)-fold Cross-Validation (CV)\n\nIn practice, we often do not have an extra validation dataset and hence we need to use the training dataset to estimate the generalization error.\nOne common method is the \\(k\\)-fold cross-validation:\n\nSplit the training dataset \\(\\mathcal{T}\\) into \\(k\\) equal-sized folds.\nFor each fold \\(i = 1, \\ldots, k\\), train the model on the remaining \\(k-1\\) folds and evaluate the model on the \\(i\\)th fold.\nAverage the \\(k\\) validation errors to obtain the estimated generalization error."
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#k-fold-cross-validation",
-    "href": "slides/03-ml_basics.html#k-fold-cross-validation",
-    "title": "Machine Learning Basics",
-    "section": "\\(k\\)-fold Cross-Validation",
-    "text": "\\(k\\)-fold Cross-Validation\n\nWhen \\(k = n\\), it is called the leave-one-out cross-validation (LOOCV), i.e., train the model on \\(n-1\\) samples and evaluate on the remaining one.\nChoice of \\(k\\)?\n\nLarger \\(k\\) \\(\\rightarrow\\) low bias, high variance (the model is trained on a larger dataset and validated on a smaller dataset)\nSmaller \\(k\\) \\(\\rightarrow\\) high bias, low variance (the model is trained on a smaller dataset and validated on a larger dataset)\n\\(k = 5\\) or \\(k = 10\\) are common choices."
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#cv-for-hyperparameter-tuning",
-    "href": "slides/03-ml_basics.html#cv-for-hyperparameter-tuning",
-    "title": "Machine Learning Basics",
-    "section": "CV for Hyperparameter Tuning",
-    "text": "CV for Hyperparameter Tuning\n\nIn practice, the models often have hyperparameters that need to be tuned, e.g., the regularization parameter \\(\\lambda\\).\nWe can use CV to choose the best hyperparameters:\n\nFor each hyperparameter value, perform \\(k\\)-fold CV to estimate the generalization error.\nChoose the hyperparameter value that minimizes the CV error.\n\nHowever, the CV error after the selection will overestimate the generalization error.\nSuch bias is known as the selection bias."
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#cv-for-hyperparameter-tuning-1",
-    "href": "slides/03-ml_basics.html#cv-for-hyperparameter-tuning-1",
-    "title": "Machine Learning Basics",
-    "section": "CV for Hyperparameter Tuning",
-    "text": "CV for Hyperparameter Tuning\n\nTo avoid the selection bias, we first split the dataset into two parts: the training dataset and the test dataset.\nThe test dataset should not be used in the neither the traing process nor hyperparameter tuning process.\nThe training dataset is further split into \\(k\\)-folds for CV.\nAfter all the processes, including training, hyperparameter tuning, model selection, etc., we evaluate the final model on the test dataset to estimate the generalization error."
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#example-using-cv-to-choose-the-regularization-parameter",
-    "href": "slides/03-ml_basics.html#example-using-cv-to-choose-the-regularization-parameter",
-    "title": "Machine Learning Basics",
-    "section": "Example: Using CV to Choose the Regularization Parameter",
-    "text": "Example: Using CV to Choose the Regularization Parameter\n\nfrom sklearn.linear_model import LassoCV\nfrom sklearn import datasets\n\nX, y = datasets.load_diabetes(return_X_y=True)\n\nX /= X.std(axis=0)\n\nalpha_seq = np.logspace(-2, 2, 100)\nreg = LassoCV(alphas = alpha_seq, cv = 5, random_state = 42)\nreg.fit(X, y)\n\nprint(\"best alpha:\", np.round(reg.alpha_, 4))\n\nbest alpha: 0.0774"
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#example-using-cv-to-choose-the-regularization-parameter-1",
-    "href": "slides/03-ml_basics.html#example-using-cv-to-choose-the-regularization-parameter-1",
-    "title": "Machine Learning Basics",
-    "section": "Example: Using CV to Choose the Regularization Parameter",
-    "text": "Example: Using CV to Choose the Regularization Parameter"
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#proof-of-example-infinite-vc-dimension",
-    "href": "slides/03-ml_basics.html#proof-of-example-infinite-vc-dimension",
-    "title": "Machine Learning Basics",
-    "section": "Proof of Example (Infinite VC-dimension)",
-    "text": "Proof of Example (Infinite VC-dimension)\n\nWe need to show that the model \\(h(x) = \\mathbb{I}(\\sin(\\alpha x) &gt; 0)\\) with \\(\\alpha = \\frac{1}{2}\\left(1 + \\sum_{i=1}^n (1-y_i)10^i\\right)\\) can perfectly separate the \\(n\\) points.\nConsider the \\(j\\)th sample \\(x_j = 2\\pi 10^{-j}\\).\nIf \\(y_j = 0\\), then \\[\\begin{align*}\n   \\alpha x_j & = \\pi 10^{-j} \\left(1 + \\sum_{i=1}^n (1-y_i)10^i\\right) = \\pi 10^{-j} \\left(1 + \\sum_{\\{i: y_i = 0\\}} 10^i\\right)\\\\\n   & = \\pi 10^{-j}\\left(1 + 10^j + \\sum_{\\{i: y_i = 0, i \\neq j\\}} 10^i\\right)\\\\\n   & = \\pi \\left(10^{-j} + 1 + \\sum_{\\{i: y_i = 0, i &gt; j\\}} 10^{i-j} + \\sum_{\\{i: y_i = 0, i &lt; j\\}} 10^{i-j}\\right)\n\\end{align*}\\]\n\n\n\nReference: https://mlweb.loria.fr/book/en/VCdiminfinite.html"
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#proof-of-example-infinite-vc-dimension-1",
-    "href": "slides/03-ml_basics.html#proof-of-example-infinite-vc-dimension-1",
-    "title": "Machine Learning Basics",
-    "section": "Proof of Example (Infinite VC-dimension)",
-    "text": "Proof of Example (Infinite VC-dimension)\n\nFor \\(i&gt;j\\), \\(10^{i-j}\\) is even and so is \\(\\sum_{\\{i: y_i = 0, i &gt; j\\}} 10^{i-j}\\), say \\[\n\\sum_{\\{i: y_i = 0, i &gt; j\\}} 10^{i-j} = 2m, \\quad m \\in \\mathbb{N}.\n\\]\nNote that \\[\n\\sum_{\\{i: y_i = 0, i &lt; j\\}} 10^{i-j} &lt; \\sum_{i=1}^{\\infty} 10^{-i} = \\sum_{i=0}^{\\infty} 10^{-i} - 1 = \\frac{1}{1-0.1} - 1 = \\frac{1}{9}.  \n\\]\nTherefore, \\(\\alpha x_j = \\pi(1 + 2m +\\epsilon)\\), where \\[\n0 &lt; \\epsilon = 10^{-j} + \\sum_{\\{i: y_i = 0, i &lt; j\\}} 10^{i-j} &lt; \\frac{1}{10} + \\frac{1}{9} &lt; 1.\n\\]\nHence \\(\\sin(\\alpha x_j) &lt; 0\\) and \\(h(x_j) = 0\\)."
-  },
-  {
-    "objectID": "slides/03-ml_basics.html#proof-of-example-infinite-vc-dimension-2",
-    "href": "slides/03-ml_basics.html#proof-of-example-infinite-vc-dimension-2",
-    "title": "Machine Learning Basics",
-    "section": "Proof of Example (Infinite VC-dimension)",
-    "text": "Proof of Example (Infinite VC-dimension)\n\nIf \\(y_j = 1\\), then \\[\\begin{align*}\n   \\alpha x_j & = \\pi 10^{-j} \\left(1 + \\sum_{i=1}^n (1-y_i)10^i\\right) = \\pi 10^{-j} \\left(1 + \\sum_{\\{i: y_i = 0\\}} 10^i\\right)\\\\\n   & = \\pi \\left(10^{-j} + \\sum_{\\{i: y_i = 0, i &gt; j\\}} 10^{i-j} + \\sum_{\\{i: y_i = 0, i &lt; j\\}} 10^{i-j}\\right)\n\\end{align*}\\]\nSimilarly, we have \\(\\alpha x_j = \\pi(2m +\\epsilon)\\), where \\[\n0 &lt; \\epsilon = 10^{-j} + \\sum_{\\{i: y_i = 0, i &lt; j\\}} 10^{i-j} &lt; \\frac{1}{10} + \\frac{1}{9} &lt; 1.\n\\]\nHence \\(\\sin(\\alpha x_j) &gt; 0\\) and \\(h(x_j) = 1\\).\n\n\n\n\nHome"
-  },
-  {
-    "objectID": "slides/01-intro.html#course-description",
-    "href": "slides/01-intro.html#course-description",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Course Description",
-    "text": "Course Description\n\n\\[\n\\newcommand{\\mc}[1]{\\mathcal{#1}}\n\\newcommand{\\R}{\\mathbb{R}}\n\\newcommand{\\E}{\\mathbb{E}}\n\\renewcommand{\\P}{\\mathbb{P}}\n\\newcommand{\\var}{{\\rm Var}} % Variance\n\\newcommand{\\mse}{{\\rm MSE}} % MSE\n\\newcommand{\\bias}{{\\rm Bias}} % MSE\n\\newcommand{\\cov}{{\\rm Cov}} % Covariance\n\\newcommand{\\iid}{\\stackrel{\\rm iid}{\\sim}}\n\\newcommand{\\ind}{\\stackrel{\\rm ind}{\\sim}}\n\\renewcommand{\\choose}[2]{\\binom{#1}{#2}}  % Choose\n\\newcommand{\\chooses}[2]{{}_{#1}C_{#2}}  % Small choose\n\\newcommand{\\cd}{\\stackrel{d}{\\rightarrow}}\n\\newcommand{\\cas}{\\stackrel{a.s.}{\\rightarrow}}\n\\newcommand{\\cp}{\\stackrel{p}{\\rightarrow}}\n\\newcommand{\\bin}{{\\rm Bin}}\n\\newcommand{\\ber}{{\\rm Ber}}\n\\newcommand{\\diag}{{\\rm diag}}\n\\DeclareMathOperator*{\\argmax}{argmax}\n\\DeclareMathOperator*{\\argmin}{argmin}\n\\]\n\n\nThis course provides an introduction to some commonly used models in deep learning:\n\nMultilayer Perceptron (MLP) or Fully-connected neural network (FCN)\nConvolutional Neural Network (CNN)\nRecurrent Neural Network (RNN)\nGenerative models\n\nThe course will cover the basic theory, practical implementation, and some applications of these models."
-  },
-  {
-    "objectID": "slides/01-intro.html#prerequisites",
-    "href": "slides/01-intro.html#prerequisites",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Prerequisites",
-    "text": "Prerequisites\n\nKnowledge of linear algebra, calculus, probability, and statistics is required.\nExperiences in Python programming is also required (import libraries, write functions, etc.)\nKnowledge of object-oriented programming is a plus.\nKnowledge of machine learning would also be helpful (we will cover some basics in the course)."
-  },
-  {
-    "objectID": "slides/01-intro.html#references",
-    "href": "slides/01-intro.html#references",
-    "title": "STAT 5011: Course Introduction",
-    "section": "References",
-    "text": "References\nDeep Learning: https://www.deeplearningbook.org"
-  },
-  {
-    "objectID": "slides/01-intro.html#references-1",
-    "href": "slides/01-intro.html#references-1",
-    "title": "STAT 5011: Course Introduction",
-    "section": "References",
-    "text": "References\nDive into Deep Learning: https://d2l.ai"
-  },
-  {
-    "objectID": "slides/01-intro.html#other-resources",
-    "href": "slides/01-intro.html#other-resources",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Other Resources",
-    "text": "Other Resources\n\nT. Hastie, R. Tibshirani, and J. Friedman (2009). The Elements of Statistical Learning.\nC. M. Bishop (2006). Pattern Recognition and Machine Learning.\nS. Shalev-Shwartz and S. Ben-David (2014). Understanding Machine Learning: From Theory to Algorithms.\nV. Vapnik (2000). The Nature of Statistical Learning Theory\nC. C. Aggarwal (2023). Neural Networks and Deep Learning"
-  },
-  {
-    "objectID": "slides/01-intro.html#schedule",
-    "href": "slides/01-intro.html#schedule",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Schedule",
-    "text": "Schedule\n\n\n\n\n\n\n\n\n\nWeek\nDate\nTopics\nReading\n\n\n\n\n1\n9/3\nCourse Introduction\n\n\n\n2\n9/10\nReview of Linear Models\n\n\n\n3\n9/17\nNo class (Mid-Autumn Festival)\n\n\n\n4\n9/24\nMachine Learning Basics\nDL Ch. 5\n\n\n5\n10/1\nMultilayer Perceptron\nD2L Ch. 5 & DL Ch. 6\n\n\n6\n10/8\nRegularization for Deep Learning\nDL Ch. 7\n\n\n7\n10/15\nOptimization for DL Models\nD2L Ch. 12 & DL Ch. 8\n\n\n8\n10/22\nProject Proposal\n\n\n\n9\n10/29\nImplementation of DL Models\nD2L Ch. 6\n\n\n10\n11/5\nConvolutional Networks\nD2L Ch. 7, 8 & DL Ch. 9\n\n\n11\n11/12\nRecurrent Networks\nD2L Ch. 9, 10 & DL Ch. 10\n\n\n12\n11/19\nHyperparameter Optimization and Tuning\nD2L Ch. 19 & DL Ch. 11\n\n\n13\n11/26\nGenerative Models: Autoencoders, GAN, Diffusion models\nD2L Ch. 20 & DL Ch. 14\n\n\n14\n12/3\nAdditional Topics: Attention Mechanisms and Gaussian Process\nD2L Ch. 11, 18\n\n\n15-16\n12/10-17\nFinal Project Presentation"
-  },
-  {
-    "objectID": "slides/01-intro.html#grading",
-    "href": "slides/01-intro.html#grading",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Grading",
-    "text": "Grading\n\nHomework: 30%\nProject proposal: 20%\n\nA 20-minute presentation\n\nFinal Project: 50%\n\nA 30-minute presentation (25%)\nA final report (25%)\n\nOffice hours: Tue. 15:00-17:00"
-  },
-  {
-    "objectID": "slides/01-intro.html#homework",
-    "href": "slides/01-intro.html#homework",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Homework",
-    "text": "Homework\n\nThere will be 3 homework assignments.\nHomework includes some math problems and programming exercises.\nProgramming assignments will be done using IPython notebooks and exported to PDF.\nMath problems will be submitted as a PDF file (using LaTeX preferably).\nDO NOT:\n\nPlagiarism: copy solution from others or from the internet.\nTake photos of your computer screen.\nTake photos of your handwritten solutions."
-  },
-  {
-    "objectID": "slides/01-intro.html#project-proposal",
-    "href": "slides/01-intro.html#project-proposal",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Project Proposal",
-    "text": "Project Proposal\n\nA group of 2-3 students\nPick a topic that you plan to solve using deep learning models, for example:\n\nimage classification/segmentation\nstock price prediction\nweather forcasting\n\nIt could be something related to your thesis research.\nThe proposal should include:\n\nDiscription of your problem\nExample dataset\nSummary of 1-2 references\n\nGive a 20-minute presentation on 10/22"
-  },
-  {
-    "objectID": "slides/01-intro.html#final-project",
-    "href": "slides/01-intro.html#final-project",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Final Project",
-    "text": "Final Project\n\nOral Presentation (25%)\n\n30-minute presentation\nFocus the model you used, the dataset, and the results\nCompare to other models\n\nWritten Report (25%)\n\nUse the template: NeurIPS\n6-page including references; one report per group\nInclude: introduction, methods, results, and conclusion\n\nMore details will be provided later."
-  },
-  {
-    "objectID": "slides/01-intro.html#what-is-deep-learning",
-    "href": "slides/01-intro.html#what-is-deep-learning",
-    "title": "STAT 5011: Course Introduction",
-    "section": "What is Deep Learning?",
-    "text": "What is Deep Learning?"
-  },
-  {
-    "objectID": "slides/01-intro.html#what-is-dlml",
-    "href": "slides/01-intro.html#what-is-dlml",
-    "title": "STAT 5011: Course Introduction",
-    "section": "What is DL/ML?",
-    "text": "What is DL/ML?\n\nDeep learning is a subfield of machine learning that is based on deep neural networks (DNN).\nDNN is a powerful approximating class of parametric class of functions.\nML is a field of study that focuses on automatic detection/extraction of patterns from raw data.\nTo achieve this, ML uses a variety of statistical models:\n\nlinear regression, logistic regression,\ntree models,\n\\(k\\)-nearest neighbors (kNN), etc."
-  },
-  {
-    "objectID": "slides/01-intro.html#turing-test",
-    "href": "slides/01-intro.html#turing-test",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Turing Test",
-    "text": "Turing Test\n\nThe Turing test, originally called the imitation game by Alan Turing in 1950, is a test of a machine’s ability to exhibit intelligent behaviour equivalent to that of a human.\nThe field of AI research was founded at a workshop at Dartmouth College in 1956.\n\n\n\n\n\n\n\n\nImage source: Wikipedia"
-  },
-  {
-    "objectID": "slides/01-intro.html#hebbs-theory",
-    "href": "slides/01-intro.html#hebbs-theory",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Hebb’s Theory",
-    "text": "Hebb’s Theory\n\nIn 1949, Donald Hebb1 proposed a theory of learning in which the connection between two neurons is strengthened if they are activated simultaneously.\nHebbian learning rule:\n\nThe connection between two neurons: \\(w_{ij} \\leftarrow w_{ij} + \\Delta w_{ij}\\)\nThe change in the connection: \\(\\Delta w_{ij} = \\eta x_i x_j\\)\nwhere \\(\\eta\\) is the learning rate, \\(x_i\\) and \\(x_j\\) are the activities of the two neurons.\n\n\nHebb, D. O. (1949). The Organization of Behavior: A Neuropsychological Theory."
-  },
-  {
-    "objectID": "slides/01-intro.html#biological-neuron-model",
-    "href": "slides/01-intro.html#biological-neuron-model",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Biological Neuron Model",
-    "text": "Biological Neuron Model\n\n\nimage/svg+xml\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nDendrite\n\n\n\n\n\n\n\n\nSoma (cell body)\n\n\n\n\n\n\n\n\n\n\nAxon terminal\n\n\n\n\n\n\n\n\n\n\n\n\nMyelinated axon trunk\n\n\n\n\n\n\n\n\n\n\nMyelin sheat\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nInputs\n\n\n\n\nOutputs\n\n\n\n\n\nInput points = synapses\nOutput points = synapses\n\n\n\n\n\nImage source: Wikipedia"
-  },
-  {
-    "objectID": "slides/01-intro.html#artificial-neuron",
-    "href": "slides/01-intro.html#artificial-neuron",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Artificial Neuron",
-    "text": "Artificial Neuron\n\nMcCulloch and Pitts (1943) proposed a simple mathematical model for neurons.\nA neuron has \\(n\\) inputs \\(x = (x_1, ... ,x_n) \\in \\R^n\\) and one output \\(y \\in \\{-1, 1\\}\\).\n\\((u * v)\\) is the inner product of two vectors, \\(b\\) is a threshold value, and \\(\\text{sign}(u)= 1\\) if \\(u &gt; 0\\) and \\(\\text{sign}(u)= -1\\) if \\(u\\leq 0\\).\nDuring the learning process, the model chooses appropriate coefficients \\(w, b\\) of the neuron."
-  },
-  {
-    "objectID": "slides/01-intro.html#rosenblatts-perceptron-1960s",
-    "href": "slides/01-intro.html#rosenblatts-perceptron-1960s",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Rosenblatt’s Perceptron (1960s)",
-    "text": "Rosenblatt’s Perceptron (1960s)\n\nRosenblatt considered a model that is a composition of several neurons.\nEach neuron has its own weight \\(w\\) and threshold \\(b\\)."
-  },
-  {
-    "objectID": "slides/01-intro.html#perceptron-learning-algorithm-pla",
-    "href": "slides/01-intro.html#perceptron-learning-algorithm-pla",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Perceptron Learning Algorithm (PLA)",
-    "text": "Perceptron Learning Algorithm (PLA)\n\nThe weights and bias between the input and the hidden layer are random numbers and kept fixed.\nLet \\((x_1,y_1),\\ldots,(x_n,y_n)\\) be the training data and \\(z_i\\) be the transformation of the input \\(x_i\\) in the hidden layer.\n\nInitialize weights: \\(w^{(0)} = 0\\).\nIf the next example of the training data \\((z_{k+1}, y_{k+1})\\) is classified correctly, i.e., \\[\n      y_{k+1}(w^{(k)}\\cdot z_{k+1}) &gt; 0,\n  \\] then \\(w^{(k + 1)} = w^{(k)}\\).\nIf the next element is classified incorrectly, i.e., \\[\n     y_{k+1}(w^{(k)}\\cdot z_{k+1}) \\leq 0,\n\\] then \\(w^{(k +1)} = w^{(k)} +y_{k+1}z_{k+1}\\)."
-  },
-  {
-    "objectID": "slides/01-intro.html#mark-i-perceptron",
-    "href": "slides/01-intro.html#mark-i-perceptron",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Mark I Perceptron",
-    "text": "Mark I Perceptron\n\n\n\nMark I Perceptron (1960)"
-  },
-  {
-    "objectID": "slides/01-intro.html#rosenblatts-experiment",
-    "href": "slides/01-intro.html#rosenblatts-experiment",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Rosenblatt’s Experiment",
-    "text": "Rosenblatt’s Experiment\n\n\n\n\n\n\n\nRosenblatt, F. (1960). Perceptron simulation experiments. Proceedings of the IRE, 48(3), pages 301-309."
-  },
-  {
-    "objectID": "slides/01-intro.html#theoretical-analysis-of-pla",
-    "href": "slides/01-intro.html#theoretical-analysis-of-pla",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Theoretical Analysis of PLA",
-    "text": "Theoretical Analysis of PLA\nIn 1962, Novikoff1 proved the first theorem about the PLA. If\n\nthe norm of the training vectors \\(z\\) is bounded by some constant \\(R\\) (\\(|z| \\leq R\\)),and\n(linear separability) the training data can be separated with margin \\(\\rho\\): \\[\n     \\sup_w \\min_i y_i(z_i \\cdot w) &gt; \\rho\n\\]\n\nThen after at most \\(N \\leq \\frac{R^2}{\\rho^2}\\) steps, the hyperplane that separates the training data will be constructed.\nNovikoff, A. B. J. (1962). On convergence proofs on perceptrons. In Proceedings of the Symposium on the Mathematical Theory of Automata, Vol. XII, pages 615–622."
-  },
-  {
-    "objectID": "slides/01-intro.html#learning-theory",
-    "href": "slides/01-intro.html#learning-theory",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Learning Theory",
-    "text": "Learning Theory\n\nNovikoff’s result and Rosenblatt’s experiment raised several questions:\n\nWhat can be learned?\nWhat is the principle for designing learning algorithms?\nHow can we assure that the algorithm is actually learning, not just memorizing?\n\nThese questions led to the development of the statistical learning theory during 70s-80s.\nImportant results include:\n\nVapnik-Chervonenkis (VC) theory (for characterizing the capacity of a model)\nProbably Approximately Correct (PAC) learning theory (for characterizing whether a model can learn from a finite sample)\nEmpirical Risk Minimization (ERM) principle (for designing learning algorithms)"
-  },
-  {
-    "objectID": "slides/01-intro.html#revival-of-neural-networks",
-    "href": "slides/01-intro.html#revival-of-neural-networks",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Revival of Neural Networks",
-    "text": "Revival of Neural Networks\n\nIn 1986, several authors independently proposed a method for simultaneously constructing the vector coefficients for all neurons of the Perceptron using the so-called back-propagation method12.\nThe idea is to replace to McCulloch-Pitts neuron model with a sigmoid approximation, i.e., \\[\n     y = S(w\\cdot x - b)\n\\] where \\(S(x)\\) is a sigmoid function (differentiable, monotonic, \\(S(-\\infty) = -1\\) and \\(S(\\infty) = 1\\)).\nThis allows us to apply gradient-based optimization methods to find the optimal weights.\n\nLe Cun, Y. (1986). Learning processes in an asymmetric threshold network, Disordered systems and biological organizations, Les Houches, France, Springer, pages 233-240.Rumelhart, D. E., Hinton, G. E., & Williams, R. J. (1986). Learning internal representations by error propagation, Parallel distributed processing: Explorations in the microstructure of cognition, Vol. I, Badford Books, Cambridge, MA., pages 318-362."
-  },
-  {
-    "objectID": "slides/01-intro.html#example-of-sigmoid-functions",
-    "href": "slides/01-intro.html#example-of-sigmoid-functions",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Example of sigmoid functions",
-    "text": "Example of sigmoid functions\n\n\n\n\nSigmoidal Functions\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\t\n\t\t\n\t\n\n\n\n  \n  \n\n\n\n  \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\t\n\t\n\t\n\t\n\n\n\n\n\t\n\t\n\t\n\n\n\n  \n  \n  \n  \n\n\n\n\t\n\n\n\n\n\t\n\t\t\n\t\t\n\t\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\n\t\n\n\n\n\n\t\n\t  \n\t  \n\t  \n\t\n\t\n\t  \n\t\n\t\n\t  \n\t  \n\t  \n\t\n\t\n\t  \n\t\n\t\n\t  \n\t  \n\t  \n\t\n\n\n\t\n\t  \n\t  \n\t  \n\t  \n\t\n\t\n\t  \n\t  \n\t\n\t\n\t  \n\t  \n\t  \n\t  \n\t\n\t\n\t  \n\t  \n\t\n\t\n\t  \n\t  \n\t  \n\t  \n\t\n\n\n\n\n\t\n\t\n\t\n\t  \n\t  \n\t  \n\t  \n\t\n\t\n\t  \n\t  \n\t  \n\t\n\t\n\t\n\n\n\n\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nImage source: Wikipedia"
-  },
-  {
-    "objectID": "slides/01-intro.html#universal-approximation-theorem",
-    "href": "slides/01-intro.html#universal-approximation-theorem",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Universal Approximation Theorem",
-    "text": "Universal Approximation Theorem\n\nIn 1989, Cybenko1 proved the universal approximation theorem for feedforward neural networks.\nThe theorem states that\n\n\n… networks with one internal layer and an arbitrary continuous sigmoidal function can approximate continuous functions wtih arbitrary precision providing that no constraints are placed on the number of nodes or the size of the weights.\n\n\nThat is, the finite sum \\(G(x) = \\sum_{i=1}^h a_i S(w_i \\cdot x - b_i)\\), \\(x \\in D \\subseteq \\R^n\\), is dense in the space of continuous functions on \\(D\\) where \\(D\\) is compact.\n\nCybenko, G. (1989). Approximation by superpositions of a sigmoidal function. Mathematics of Control, Signals, and Systems, 2(4), pages 303-314."
-  },
-  {
-    "objectID": "slides/01-intro.html#in-the-1990s",
-    "href": "slides/01-intro.html#in-the-1990s",
-    "title": "STAT 5011: Course Introduction",
-    "section": "In the 1990s",
-    "text": "In the 1990s\n\nLe Cun (1989)1 proposed convolutional network for data with grid-like structure, e.g., images.\nHochreiter and Schmidhuber (1997)2 introduced the Long Short-Term Memory (LSTM) network to model sequential data, e.g., language and time series data.\nDue to the difficulty in training, more attention is now focused on the alternatives to neural networks, for example,\n\nsupport vector machine (SVM, Cortes and Vapnik (1995))\nkernel methods3\ngraphical models4\n\n\nLe Cun, Y. (1989). Generalization and network design strategies. Technical Report CRG-TR-89-4, University of Toronto.Hochreiter, S., & Schmidhuber, J. (1997). Long short-term memory. Neural computation, 9(8), pages 1735-1780.Schölkopf, B., & Smola, A. J. (2002). Learning with kernels: support vector machines, regularization, optimization, and beyond. MIT press.Jordan, M. I. (1999). Learning in graphical models. MIT press."
-  },
-  {
-    "objectID": "slides/01-intro.html#s---present",
-    "href": "slides/01-intro.html#s---present",
-    "title": "STAT 5011: Course Introduction",
-    "section": "2000s - present",
-    "text": "2000s - present\n\nIn 2006, Geoffrey Hinton1 showed that a kind of neural network called a deep belief network could be efficiently trained using a strategy called greedy layer-wise pretraining.\nThis wave of neural networks research popularized the use of the term deep learning to emphasize that researchers were now able to train deeper neural networks than had been possible before.\nDeep neural networks started to outperform other ML models (e.g., AlexNet (2012), VGG (2014), ResNet (2015)).\nAlso the presence of big data motivates researchers and practitioners to develop complicated models.\nIn 2023, ChatGPT broke the Turing test2.\n\nHinton, G. E., Osindero, S., & Teh, Y. W. (2006). A fast learning algorithm for deep belief nets. Neural computation, 18(7), pages 1527-1554.Biever, C. (2023). ChatGPT broke the Turing test-the race is on for new ways to assess AI. Nature, 619(7971), 686-689."
-  },
-  {
-    "objectID": "slides/01-intro.html#three-waves-of-neural-networks",
-    "href": "slides/01-intro.html#three-waves-of-neural-networks",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Three Waves of Neural Networks",
-    "text": "Three Waves of Neural Networks\n\nThe first wave: 1940s-1960s\n\nFundamental concepts: artificial neuron, perceptron\nPerceptron learning algorithm\n\nThe second wave: 1980s-1990s\n\nBack-propagation algorithm\nNetwork design strategies: convolutional networks, LSTM\n\nThe third wave: 2000s-present\n\nDeep neural networks\nLarge datasets and computational resources\nLarge Language Model (LLM), e.g., ChatGPT"
-  },
-  {
-    "objectID": "slides/01-intro.html#the-end-of-the-second-wave",
-    "href": "slides/01-intro.html#the-end-of-the-second-wave",
-    "title": "STAT 5011: Course Introduction",
-    "section": "The end of the second wave",
-    "text": "The end of the second wave\nGoodfellow et al. (2016) pointed out\n\nThe second wave of neural networks research lasted until the mid-1990s. Ventures based on neural networks and other AI technologies began to make unrealistically ambitious claims while seeking investments. When AI research did not fulfill these unreasonable expectations, investors were disappointed."
-  },
-  {
-    "objectID": "slides/01-intro.html#an-impending-ai-doom-model-collapse",
-    "href": "slides/01-intro.html#an-impending-ai-doom-model-collapse",
-    "title": "STAT 5011: Course Introduction",
-    "section": "An Impending AI Doom: Model Collapse",
-    "text": "An Impending AI Doom: Model Collapse\n\nShumailov et al. (2023)1 showed that training on generated data can make models forget.\nThey demonstrated that training on generated data can lead to catastrophic forgetting, a phenomenon where models forget how to perform well on real data.\n\n\n\n\n\n\nShumailov, I., Shumaylov, Z., Zhao, Y., Gal, Y., Papernot, N., & Anderson, R. (2023). The curse of recursion: Training on generated data makes models forget. arXiv preprint arXiv:2305.17493."
-  },
-  {
-    "objectID": "slides/01-intro.html#other-readings",
-    "href": "slides/01-intro.html#other-readings",
-    "title": "STAT 5011: Course Introduction",
-    "section": "Other readings",
-    "text": "Other readings\n\nThe story of Frank Rosenblatt: Professor’s perceptron paved the way for AI – 60 years too soon\n\nWhat is ‘model collapse’? An expert explains the rumours about an impending AI doom.\n\n\n\n\nHome"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Statistical Deep Learning (Fall 2024)",
-    "section": "",
-    "text": "Week\nDate\nTopics\nSlides\nReading\n\n\n\n\n1\n9/3\nCourse Introduction\nSlide\n\n\n\n2\n9/10\nReview of Linear Models\nSlide\n\n\n\n3\n9/17\nNo class (Mid-Autumn Festival)\n\n\n\n\n4\n9/24\nMachine Learning Basics\nSlide\nDL Ch. 5\n\n\n5\n10/1\nMultilayer Perceptron\n\nD2L Ch. 5 & DL Ch. 6\n\n\n6\n10/8\nRegularization for Deep Learning\n\nDL Ch. 7\n\n\n7\n10/15\nOptimization for DL Models\n\nD2L Ch. 12 & DL Ch. 8\n\n\n8\n10/22\nProject Proposal\n\n\n\n\n9\n10/29\nImplementation of DL Models\n\nD2L Ch. 6\n\n\n10\n11/5\nConvolutional Networks\n\nD2L Ch. 7, 8 & DL Ch. 9\n\n\n11\n11/12\nRecurrent Networks\n\nD2L Ch. 9, 10 & DL Ch. 10\n\n\n12\n11/19\nHyperparameter Optimization and Tuning\n\nD2L Ch. 19 & DL Ch. 11\n\n\n13\n11/26\nGenerative Models: Autoencoders, GAN, Diffusion models\n\nD2L Ch. 20 & DL Ch. 14\n\n\n14\n12/3\nAdditional Topics: Attention Mechanisms and Gaussian Process\n\nD2L Ch. 11, 18\n\n\n15-16\n12/10-17\nFinal Project Presentation"
-  },
-  {
-    "objectID": "index.html#course-schedule",
-    "href": "index.html#course-schedule",
-    "title": "Statistical Deep Learning (Fall 2024)",
-    "section": "",
-    "text": "Week\nDate\nTopics\nSlides\nReading\n\n\n\n\n1\n9/3\nCourse Introduction\nSlide\n\n\n\n2\n9/10\nReview of Linear Models\nSlide\n\n\n\n3\n9/17\nNo class (Mid-Autumn Festival)\n\n\n\n\n4\n9/24\nMachine Learning Basics\nSlide\nDL Ch. 5\n\n\n5\n10/1\nMultilayer Perceptron\n\nD2L Ch. 5 & DL Ch. 6\n\n\n6\n10/8\nRegularization for Deep Learning\n\nDL Ch. 7\n\n\n7\n10/15\nOptimization for DL Models\n\nD2L Ch. 12 & DL Ch. 8\n\n\n8\n10/22\nProject Proposal\n\n\n\n\n9\n10/29\nImplementation of DL Models\n\nD2L Ch. 6\n\n\n10\n11/5\nConvolutional Networks\n\nD2L Ch. 7, 8 & DL Ch. 9\n\n\n11\n11/12\nRecurrent Networks\n\nD2L Ch. 9, 10 & DL Ch. 10\n\n\n12\n11/19\nHyperparameter Optimization and Tuning\n\nD2L Ch. 19 & DL Ch. 11\n\n\n13\n11/26\nGenerative Models: Autoencoders, GAN, Diffusion models\n\nD2L Ch. 20 & DL Ch. 14\n\n\n14\n12/3\nAdditional Topics: Attention Mechanisms and Gaussian Process\n\nD2L Ch. 11, 18\n\n\n15-16\n12/10-17\nFinal Project Presentation"
-  },
-  {
-    "objectID": "index.html#important-dates",
-    "href": "index.html#important-dates",
-    "title": "Statistical Deep Learning (Fall 2024)",
-    "section": "Important Dates:",
-    "text": "Important Dates:\n\n9/17: No Class (Mid-Autumn Festival)\n10/22: Proposal Presentation\n12/10-17: Final Project Presentation"
-  },
-  {
-    "objectID": "resources.html",
-    "href": "resources.html",
-    "title": "Resources",
-    "section": "",
-    "text": "Goodfellow et al. (2016) Deep Learning\nZhang et al. (2023) Dive into Deep Learning\nT. Hastie, R. Tibshirani, and J. Friedman (2009). The Elements of Statistical Learning.\nC. M. Bishop (2006). Pattern Recognition and Machine Learning.\nS. Shalev-Shwartz and S. Ben-David (2014). Understanding Machine Learning: From Theory to Algorithms.\nV. Vapnik (2000). The Nature of Statistical Learning Theory\nC. C. Aggarwal (2023). Neural Networks and Deep Learning"
-  },
-  {
-    "objectID": "resources.html#references",
-    "href": "resources.html#references",
-    "title": "Resources",
-    "section": "",
-    "text": "Goodfellow et al. (2016) Deep Learning\nZhang et al. (2023) Dive into Deep Learning\nT. Hastie, R. Tibshirani, and J. Friedman (2009). The Elements of Statistical Learning.\nC. M. Bishop (2006). Pattern Recognition and Machine Learning.\nS. Shalev-Shwartz and S. Ben-David (2014). Understanding Machine Learning: From Theory to Algorithms.\nV. Vapnik (2000). The Nature of Statistical Learning Theory\nC. C. Aggarwal (2023). Neural Networks and Deep Learning"
+    "objectID": "slides/04-mlp.html#feature-map-of-rbf-kernel",
+    "href": "slides/04-mlp.html#feature-map-of-rbf-kernel",
+    "title": "Multilayer Perceptron",
+    "section": "Feature map of RBF kernel",
+    "text": "Feature map of RBF kernel\nConsider the univariate RBF kernel \\(k(x, y) = \\exp\\left(-(x - y)^2\\right)\\). We have \\[\\begin{align*}\nk(x, y) & = \\exp\\left(-(x - y)^2\\right) = \\exp\\left(-x^2 + 2xy - y^2\\right) = \\exp(-x^2)\\exp(2xy)\\exp(-y^2)\\\\\n& = \\exp(-x^2)\\left(\\sum_{m=0}^{\\infty} \\frac{2^mx^my^m}{m!}\\right)\\exp(-y^2)\\\\\n& = \\exp(-x^2) \\left(1, \\sqrt{\\frac{2^1}{1!}}x, \\sqrt{\\frac{2^2}{2!}}x^2, \\sqrt{\\frac{2^3}{3!}}x^3, \\ldots \\right)^T\\\\\n& \\qquad \\left(1, \\sqrt{\\frac{2^1}{1!}}y, \\sqrt{\\frac{2^2}{2!}}y^2, \\sqrt{\\frac{2^3}{3!}}y^3, \\ldots \\right)\\exp(-y^2)\n\\end{align*}\\]\nHence the feature map corresponding to the RBF kernel is \\[\n\\phi(x) = \\exp(-x^2)\\left(1, \\sqrt{\\frac{2^1}{1!}}x, \\sqrt{\\frac{2^2}{2!}}x^2, \\sqrt{\\frac{2^3}{3!}}x^3, \\ldots \\right)^T.\n\\]\n\n\n\nHome"
   },
   {
     "objectID": "slides/02-lm.html#outline",
@@ -796,5 +474,530 @@
     "title": "Generalized Linear Models",
     "section": "Iteratively Re-Weighted Least Squares (IRWLS)",
     "text": "Iteratively Re-Weighted Least Squares (IRWLS)\nThere is no analytic solution for the MLE of the logistic regression. However, the Newton-Raphson method can be used to find the MLE. The Newton-Raphson method is an iterative method that updates the parameter \\(\\boldsymbol{\\beta}\\) as follows:\n\\[\\begin{align*}\n\\boldsymbol{\\beta}^{(t+1)} & = \\boldsymbol{\\beta}^{(t)} - \\left[\\nabla^2 \\ell(\\boldsymbol{\\beta}^{(t)})\\right]^{-1} \\nabla \\ell\\left(\\boldsymbol{\\beta}^{(t)}\\right) \\\\\n& = \\boldsymbol{\\beta}^{(t)}+\\left(X^T W^{(t)}X\\right)^{-1} X^T\\left(\\boldsymbol{y}-\\mathbf{p}^{(t)}\\right) \\\\\n& = \\left(X^T W^{(t)} X\\right)^{-1} X^T W^{(t)}\\left[X \\boldsymbol{\\beta}^{(t)}+\\left(W^{(t)}\\right)^{-1}\\left(\\boldsymbol{y}-\\mathbf{p}^{(t)}\\right)\\right] \\\\\n& = \\left(X^T W^{(t)} X\\right)^{-1} X^T W^{(t)} \\mathbf{z}^{(t)}\n\\end{align*}\\] where \\[\\begin{align*}\n\\mathbf{z}^{(t)} & =X \\boldsymbol{\\beta}^{(t)}+\\left(W^{(t)}\\right)^{-1}\\left(\\boldsymbol{y}-\\mathbf{p}^{(t)}\\right), \\quad \\mathbf{p}^{(t)} = [p^{(t)}(\\boldsymbol{x}_1), \\ldots, p^{(t)}(\\boldsymbol{x}_n)]^T\\\\\np^{(t)}(\\boldsymbol{x}_i) & = \\frac{\\exp(\\boldsymbol{x}_i^T\\boldsymbol{\\beta}^{(t)})}{1+\\exp(\\boldsymbol{x}_i^T\\boldsymbol{\\beta}^{(t)})}, \\quad\nW^{(t)} = \\diag(\\mathbf{p}^{(t)})\\diag(1-\\mathbf{p}^{(t)}).\n\\end{align*}\\]\n\n\n\nHome"
+  },
+  {
+    "objectID": "resources.html",
+    "href": "resources.html",
+    "title": "Resources",
+    "section": "",
+    "text": "Goodfellow et al. (2016) Deep Learning\nZhang et al. (2023) Dive into Deep Learning\nT. Hastie, R. Tibshirani, and J. Friedman (2009). The Elements of Statistical Learning.\nC. M. Bishop (2006). Pattern Recognition and Machine Learning.\nS. Shalev-Shwartz and S. Ben-David (2014). Understanding Machine Learning: From Theory to Algorithms.\nV. Vapnik (2000). The Nature of Statistical Learning Theory\nC. C. Aggarwal (2023). Neural Networks and Deep Learning"
+  },
+  {
+    "objectID": "resources.html#references",
+    "href": "resources.html#references",
+    "title": "Resources",
+    "section": "",
+    "text": "Goodfellow et al. (2016) Deep Learning\nZhang et al. (2023) Dive into Deep Learning\nT. Hastie, R. Tibshirani, and J. Friedman (2009). The Elements of Statistical Learning.\nC. M. Bishop (2006). Pattern Recognition and Machine Learning.\nS. Shalev-Shwartz and S. Ben-David (2014). Understanding Machine Learning: From Theory to Algorithms.\nV. Vapnik (2000). The Nature of Statistical Learning Theory\nC. C. Aggarwal (2023). Neural Networks and Deep Learning"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Statistical Deep Learning (Fall 2024)",
+    "section": "",
+    "text": "Week\nDate\nTopics\nSlides\nReading\n\n\n\n\n1\n9/3\nCourse Introduction\nSlide\n\n\n\n2\n9/10\nReview of Linear Models\nSlide\n\n\n\n3\n9/17\nNo class (Mid-Autumn Festival)\n\n\n\n\n4\n9/24\nMachine Learning Basics\nSlide\nDL Ch. 5\n\n\n5\n10/1\nMultilayer Perceptron\nSlide\nD2L Ch. 5 & DL Ch. 6\n\n\n6\n10/8\nRegularization for Deep Learning\n\nDL Ch. 7\n\n\n7\n10/15\nOptimization for DL Models\n\nD2L Ch. 12 & DL Ch. 8\n\n\n8\n10/22\nProject Proposal\n\n\n\n\n9\n10/29\nImplementation of DL Models\n\nD2L Ch. 6\n\n\n10\n11/5\nConvolutional Networks\n\nD2L Ch. 7, 8 & DL Ch. 9\n\n\n11\n11/12\nRecurrent Networks\n\nD2L Ch. 9, 10 & DL Ch. 10\n\n\n12\n11/19\nHyperparameter Optimization and Tuning\n\nD2L Ch. 19 & DL Ch. 11\n\n\n13\n11/26\nGenerative Models: Autoencoders, GAN, Diffusion models\n\nD2L Ch. 20 & DL Ch. 14\n\n\n14\n12/3\nAdditional Topics: Attention Mechanisms and Gaussian Process\n\nD2L Ch. 11, 18\n\n\n15-16\n12/10-17\nFinal Project Presentation"
+  },
+  {
+    "objectID": "index.html#course-schedule",
+    "href": "index.html#course-schedule",
+    "title": "Statistical Deep Learning (Fall 2024)",
+    "section": "",
+    "text": "Week\nDate\nTopics\nSlides\nReading\n\n\n\n\n1\n9/3\nCourse Introduction\nSlide\n\n\n\n2\n9/10\nReview of Linear Models\nSlide\n\n\n\n3\n9/17\nNo class (Mid-Autumn Festival)\n\n\n\n\n4\n9/24\nMachine Learning Basics\nSlide\nDL Ch. 5\n\n\n5\n10/1\nMultilayer Perceptron\nSlide\nD2L Ch. 5 & DL Ch. 6\n\n\n6\n10/8\nRegularization for Deep Learning\n\nDL Ch. 7\n\n\n7\n10/15\nOptimization for DL Models\n\nD2L Ch. 12 & DL Ch. 8\n\n\n8\n10/22\nProject Proposal\n\n\n\n\n9\n10/29\nImplementation of DL Models\n\nD2L Ch. 6\n\n\n10\n11/5\nConvolutional Networks\n\nD2L Ch. 7, 8 & DL Ch. 9\n\n\n11\n11/12\nRecurrent Networks\n\nD2L Ch. 9, 10 & DL Ch. 10\n\n\n12\n11/19\nHyperparameter Optimization and Tuning\n\nD2L Ch. 19 & DL Ch. 11\n\n\n13\n11/26\nGenerative Models: Autoencoders, GAN, Diffusion models\n\nD2L Ch. 20 & DL Ch. 14\n\n\n14\n12/3\nAdditional Topics: Attention Mechanisms and Gaussian Process\n\nD2L Ch. 11, 18\n\n\n15-16\n12/10-17\nFinal Project Presentation"
+  },
+  {
+    "objectID": "index.html#important-dates",
+    "href": "index.html#important-dates",
+    "title": "Statistical Deep Learning (Fall 2024)",
+    "section": "Important Dates:",
+    "text": "Important Dates:\n\n9/17: No Class (Mid-Autumn Festival)\n10/22: Proposal Presentation\n12/10-17: Final Project Presentation"
+  },
+  {
+    "objectID": "slides/01-intro.html#course-description",
+    "href": "slides/01-intro.html#course-description",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Course Description",
+    "text": "Course Description\n\n\\[\n\\newcommand{\\mc}[1]{\\mathcal{#1}}\n\\newcommand{\\R}{\\mathbb{R}}\n\\newcommand{\\E}{\\mathbb{E}}\n\\renewcommand{\\P}{\\mathbb{P}}\n\\newcommand{\\var}{{\\rm Var}} % Variance\n\\newcommand{\\mse}{{\\rm MSE}} % MSE\n\\newcommand{\\bias}{{\\rm Bias}} % MSE\n\\newcommand{\\cov}{{\\rm Cov}} % Covariance\n\\newcommand{\\iid}{\\stackrel{\\rm iid}{\\sim}}\n\\newcommand{\\ind}{\\stackrel{\\rm ind}{\\sim}}\n\\renewcommand{\\choose}[2]{\\binom{#1}{#2}}  % Choose\n\\newcommand{\\chooses}[2]{{}_{#1}C_{#2}}  % Small choose\n\\newcommand{\\cd}{\\stackrel{d}{\\rightarrow}}\n\\newcommand{\\cas}{\\stackrel{a.s.}{\\rightarrow}}\n\\newcommand{\\cp}{\\stackrel{p}{\\rightarrow}}\n\\newcommand{\\bin}{{\\rm Bin}}\n\\newcommand{\\ber}{{\\rm Ber}}\n\\newcommand{\\diag}{{\\rm diag}}\n\\DeclareMathOperator*{\\argmax}{argmax}\n\\DeclareMathOperator*{\\argmin}{argmin}\n\\]\n\n\nThis course provides an introduction to some commonly used models in deep learning:\n\nMultilayer Perceptron (MLP) or Fully-connected neural network (FCN)\nConvolutional Neural Network (CNN)\nRecurrent Neural Network (RNN)\nGenerative models\n\nThe course will cover the basic theory, practical implementation, and some applications of these models."
+  },
+  {
+    "objectID": "slides/01-intro.html#prerequisites",
+    "href": "slides/01-intro.html#prerequisites",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Prerequisites",
+    "text": "Prerequisites\n\nKnowledge of linear algebra, calculus, probability, and statistics is required.\nExperiences in Python programming is also required (import libraries, write functions, etc.)\nKnowledge of object-oriented programming is a plus.\nKnowledge of machine learning would also be helpful (we will cover some basics in the course)."
+  },
+  {
+    "objectID": "slides/01-intro.html#references",
+    "href": "slides/01-intro.html#references",
+    "title": "STAT 5011: Course Introduction",
+    "section": "References",
+    "text": "References\nDeep Learning: https://www.deeplearningbook.org"
+  },
+  {
+    "objectID": "slides/01-intro.html#references-1",
+    "href": "slides/01-intro.html#references-1",
+    "title": "STAT 5011: Course Introduction",
+    "section": "References",
+    "text": "References\nDive into Deep Learning: https://d2l.ai"
+  },
+  {
+    "objectID": "slides/01-intro.html#other-resources",
+    "href": "slides/01-intro.html#other-resources",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Other Resources",
+    "text": "Other Resources\n\nT. Hastie, R. Tibshirani, and J. Friedman (2009). The Elements of Statistical Learning.\nC. M. Bishop (2006). Pattern Recognition and Machine Learning.\nS. Shalev-Shwartz and S. Ben-David (2014). Understanding Machine Learning: From Theory to Algorithms.\nV. Vapnik (2000). The Nature of Statistical Learning Theory\nC. C. Aggarwal (2023). Neural Networks and Deep Learning"
+  },
+  {
+    "objectID": "slides/01-intro.html#schedule",
+    "href": "slides/01-intro.html#schedule",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Schedule",
+    "text": "Schedule\n\n\n\n\n\n\n\n\n\nWeek\nDate\nTopics\nReading\n\n\n\n\n1\n9/3\nCourse Introduction\n\n\n\n2\n9/10\nReview of Linear Models\n\n\n\n3\n9/17\nNo class (Mid-Autumn Festival)\n\n\n\n4\n9/24\nMachine Learning Basics\nDL Ch. 5\n\n\n5\n10/1\nMultilayer Perceptron\nD2L Ch. 5 & DL Ch. 6\n\n\n6\n10/8\nRegularization for Deep Learning\nDL Ch. 7\n\n\n7\n10/15\nOptimization for DL Models\nD2L Ch. 12 & DL Ch. 8\n\n\n8\n10/22\nProject Proposal\n\n\n\n9\n10/29\nImplementation of DL Models\nD2L Ch. 6\n\n\n10\n11/5\nConvolutional Networks\nD2L Ch. 7, 8 & DL Ch. 9\n\n\n11\n11/12\nRecurrent Networks\nD2L Ch. 9, 10 & DL Ch. 10\n\n\n12\n11/19\nHyperparameter Optimization and Tuning\nD2L Ch. 19 & DL Ch. 11\n\n\n13\n11/26\nGenerative Models: Autoencoders, GAN, Diffusion models\nD2L Ch. 20 & DL Ch. 14\n\n\n14\n12/3\nAdditional Topics: Attention Mechanisms and Gaussian Process\nD2L Ch. 11, 18\n\n\n15-16\n12/10-17\nFinal Project Presentation"
+  },
+  {
+    "objectID": "slides/01-intro.html#grading",
+    "href": "slides/01-intro.html#grading",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Grading",
+    "text": "Grading\n\nHomework: 30%\nProject proposal: 20%\n\nA 20-minute presentation\n\nFinal Project: 50%\n\nA 30-minute presentation (25%)\nA final report (25%)\n\nOffice hours: Tue. 15:00-17:00"
+  },
+  {
+    "objectID": "slides/01-intro.html#homework",
+    "href": "slides/01-intro.html#homework",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Homework",
+    "text": "Homework\n\nThere will be 3 homework assignments.\nHomework includes some math problems and programming exercises.\nProgramming assignments will be done using IPython notebooks and exported to PDF.\nMath problems will be submitted as a PDF file (using LaTeX preferably).\nDO NOT:\n\nPlagiarism: copy solution from others or from the internet.\nTake photos of your computer screen.\nTake photos of your handwritten solutions."
+  },
+  {
+    "objectID": "slides/01-intro.html#project-proposal",
+    "href": "slides/01-intro.html#project-proposal",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Project Proposal",
+    "text": "Project Proposal\n\nA group of 2-3 students\nPick a topic that you plan to solve using deep learning models, for example:\n\nimage classification/segmentation\nstock price prediction\nweather forcasting\n\nIt could be something related to your thesis research.\nThe proposal should include:\n\nDiscription of your problem\nExample dataset\nSummary of 1-2 references\n\nGive a 20-minute presentation on 10/22"
+  },
+  {
+    "objectID": "slides/01-intro.html#final-project",
+    "href": "slides/01-intro.html#final-project",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Final Project",
+    "text": "Final Project\n\nOral Presentation (25%)\n\n30-minute presentation\nFocus the model you used, the dataset, and the results\nCompare to other models\n\nWritten Report (25%)\n\nUse the template: NeurIPS\n6-page including references; one report per group\nInclude: introduction, methods, results, and conclusion\n\nMore details will be provided later."
+  },
+  {
+    "objectID": "slides/01-intro.html#what-is-deep-learning",
+    "href": "slides/01-intro.html#what-is-deep-learning",
+    "title": "STAT 5011: Course Introduction",
+    "section": "What is Deep Learning?",
+    "text": "What is Deep Learning?"
+  },
+  {
+    "objectID": "slides/01-intro.html#what-is-dlml",
+    "href": "slides/01-intro.html#what-is-dlml",
+    "title": "STAT 5011: Course Introduction",
+    "section": "What is DL/ML?",
+    "text": "What is DL/ML?\n\nDeep learning is a subfield of machine learning that is based on deep neural networks (DNN).\nDNN is a powerful approximating class of parametric class of functions.\nML is a field of study that focuses on automatic detection/extraction of patterns from raw data.\nTo achieve this, ML uses a variety of statistical models:\n\nlinear regression, logistic regression,\ntree models,\n\\(k\\)-nearest neighbors (kNN), etc."
+  },
+  {
+    "objectID": "slides/01-intro.html#turing-test",
+    "href": "slides/01-intro.html#turing-test",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Turing Test",
+    "text": "Turing Test\n\nThe Turing test, originally called the imitation game by Alan Turing in 1950, is a test of a machine’s ability to exhibit intelligent behaviour equivalent to that of a human.\nThe field of AI research was founded at a workshop at Dartmouth College in 1956.\n\n\n\n\n\n\n\n\nImage source: Wikipedia"
+  },
+  {
+    "objectID": "slides/01-intro.html#hebbs-theory",
+    "href": "slides/01-intro.html#hebbs-theory",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Hebb’s Theory",
+    "text": "Hebb’s Theory\n\nIn 1949, Donald Hebb1 proposed a theory of learning in which the connection between two neurons is strengthened if they are activated simultaneously.\nHebbian learning rule:\n\nThe connection between two neurons: \\(w_{ij} \\leftarrow w_{ij} + \\Delta w_{ij}\\)\nThe change in the connection: \\(\\Delta w_{ij} = \\eta x_i x_j\\)\nwhere \\(\\eta\\) is the learning rate, \\(x_i\\) and \\(x_j\\) are the activities of the two neurons.\n\n\nHebb, D. O. (1949). The Organization of Behavior: A Neuropsychological Theory."
+  },
+  {
+    "objectID": "slides/01-intro.html#biological-neuron-model",
+    "href": "slides/01-intro.html#biological-neuron-model",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Biological Neuron Model",
+    "text": "Biological Neuron Model\n\n\nimage/svg+xml\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nDendrite\n\n\n\n\n\n\n\n\nSoma (cell body)\n\n\n\n\n\n\n\n\n\n\nAxon terminal\n\n\n\n\n\n\n\n\n\n\n\n\nMyelinated axon trunk\n\n\n\n\n\n\n\n\n\n\nMyelin sheat\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nInputs\n\n\n\n\nOutputs\n\n\n\n\n\nInput points = synapses\nOutput points = synapses\n\n\n\n\n\nImage source: Wikipedia"
+  },
+  {
+    "objectID": "slides/01-intro.html#artificial-neuron",
+    "href": "slides/01-intro.html#artificial-neuron",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Artificial Neuron",
+    "text": "Artificial Neuron\n\nMcCulloch and Pitts (1943) proposed a simple mathematical model for neurons.\nA neuron has \\(n\\) inputs \\(x = (x_1, ... ,x_n) \\in \\R^n\\) and one output \\(y \\in \\{-1, 1\\}\\).\n\\((u * v)\\) is the inner product of two vectors, \\(b\\) is a threshold value, and \\(\\text{sign}(u)= 1\\) if \\(u &gt; 0\\) and \\(\\text{sign}(u)= -1\\) if \\(u\\leq 0\\).\nDuring the learning process, the model chooses appropriate coefficients \\(w, b\\) of the neuron."
+  },
+  {
+    "objectID": "slides/01-intro.html#rosenblatts-perceptron-1960s",
+    "href": "slides/01-intro.html#rosenblatts-perceptron-1960s",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Rosenblatt’s Perceptron (1960s)",
+    "text": "Rosenblatt’s Perceptron (1960s)\n\nRosenblatt considered a model that is a composition of several neurons.\nEach neuron has its own weight \\(w\\) and threshold \\(b\\)."
+  },
+  {
+    "objectID": "slides/01-intro.html#perceptron-learning-algorithm-pla",
+    "href": "slides/01-intro.html#perceptron-learning-algorithm-pla",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Perceptron Learning Algorithm (PLA)",
+    "text": "Perceptron Learning Algorithm (PLA)\n\nThe weights and bias between the input and the hidden layer are random numbers and kept fixed.\nLet \\((x_1,y_1),\\ldots,(x_n,y_n)\\) be the training data and \\(z_i\\) be the transformation of the input \\(x_i\\) in the hidden layer.\n\nInitialize weights: \\(w^{(0)} = 0\\).\nIf the next example of the training data \\((z_{k+1}, y_{k+1})\\) is classified correctly, i.e., \\[\n      y_{k+1}(w^{(k)}\\cdot z_{k+1}) &gt; 0,\n  \\] then \\(w^{(k + 1)} = w^{(k)}\\).\nIf the next element is classified incorrectly, i.e., \\[\n     y_{k+1}(w^{(k)}\\cdot z_{k+1}) \\leq 0,\n\\] then \\(w^{(k +1)} = w^{(k)} +y_{k+1}z_{k+1}\\)."
+  },
+  {
+    "objectID": "slides/01-intro.html#mark-i-perceptron",
+    "href": "slides/01-intro.html#mark-i-perceptron",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Mark I Perceptron",
+    "text": "Mark I Perceptron\n\n\n\nMark I Perceptron (1960)"
+  },
+  {
+    "objectID": "slides/01-intro.html#rosenblatts-experiment",
+    "href": "slides/01-intro.html#rosenblatts-experiment",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Rosenblatt’s Experiment",
+    "text": "Rosenblatt’s Experiment\n\n\n\n\n\n\n\nRosenblatt, F. (1960). Perceptron simulation experiments. Proceedings of the IRE, 48(3), pages 301-309."
+  },
+  {
+    "objectID": "slides/01-intro.html#theoretical-analysis-of-pla",
+    "href": "slides/01-intro.html#theoretical-analysis-of-pla",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Theoretical Analysis of PLA",
+    "text": "Theoretical Analysis of PLA\nIn 1962, Novikoff1 proved the first theorem about the PLA. If\n\nthe norm of the training vectors \\(z\\) is bounded by some constant \\(R\\) (\\(|z| \\leq R\\)),and\n(linear separability) the training data can be separated with margin \\(\\rho\\): \\[\n     \\sup_w \\min_i y_i(z_i \\cdot w) &gt; \\rho\n\\]\n\nThen after at most \\(N \\leq \\frac{R^2}{\\rho^2}\\) steps, the hyperplane that separates the training data will be constructed.\nNovikoff, A. B. J. (1962). On convergence proofs on perceptrons. In Proceedings of the Symposium on the Mathematical Theory of Automata, Vol. XII, pages 615–622."
+  },
+  {
+    "objectID": "slides/01-intro.html#learning-theory",
+    "href": "slides/01-intro.html#learning-theory",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Learning Theory",
+    "text": "Learning Theory\n\nNovikoff’s result and Rosenblatt’s experiment raised several questions:\n\nWhat can be learned?\nWhat is the principle for designing learning algorithms?\nHow can we assure that the algorithm is actually learning, not just memorizing?\n\nThese questions led to the development of the statistical learning theory during 70s-80s.\nImportant results include:\n\nVapnik-Chervonenkis (VC) theory (for characterizing the capacity of a model)\nProbably Approximately Correct (PAC) learning theory (for characterizing whether a model can learn from a finite sample)\nEmpirical Risk Minimization (ERM) principle (for designing learning algorithms)"
+  },
+  {
+    "objectID": "slides/01-intro.html#revival-of-neural-networks",
+    "href": "slides/01-intro.html#revival-of-neural-networks",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Revival of Neural Networks",
+    "text": "Revival of Neural Networks\n\nIn 1986, several authors independently proposed a method for simultaneously constructing the vector coefficients for all neurons of the Perceptron using the so-called back-propagation method12.\nThe idea is to replace to McCulloch-Pitts neuron model with a sigmoid approximation, i.e., \\[\n     y = S(w\\cdot x - b)\n\\] where \\(S(x)\\) is a sigmoid function (differentiable, monotonic, \\(S(-\\infty) = -1\\) and \\(S(\\infty) = 1\\)).\nThis allows us to apply gradient-based optimization methods to find the optimal weights.\n\nLe Cun, Y. (1986). Learning processes in an asymmetric threshold network, Disordered systems and biological organizations, Les Houches, France, Springer, pages 233-240.Rumelhart, D. E., Hinton, G. E., & Williams, R. J. (1986). Learning internal representations by error propagation, Parallel distributed processing: Explorations in the microstructure of cognition, Vol. I, Badford Books, Cambridge, MA., pages 318-362."
+  },
+  {
+    "objectID": "slides/01-intro.html#example-of-sigmoid-functions",
+    "href": "slides/01-intro.html#example-of-sigmoid-functions",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Example of sigmoid functions",
+    "text": "Example of sigmoid functions\n\n\n\n\nSigmoidal Functions\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\t\n\t\t\n\t\n\n\n\n  \n  \n\n\n\n  \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\t\n\t\n\t\n\t\n\n\n\n\n\t\n\t\n\t\n\n\n\n  \n  \n  \n  \n\n\n\n\t\n\n\n\n\n\t\n\t\t\n\t\t\n\t\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\n\t\n\n\n\n\n\t\n\t  \n\t  \n\t  \n\t\n\t\n\t  \n\t\n\t\n\t  \n\t  \n\t  \n\t\n\t\n\t  \n\t\n\t\n\t  \n\t  \n\t  \n\t\n\n\n\t\n\t  \n\t  \n\t  \n\t  \n\t\n\t\n\t  \n\t  \n\t\n\t\n\t  \n\t  \n\t  \n\t  \n\t\n\t\n\t  \n\t  \n\t\n\t\n\t  \n\t  \n\t  \n\t  \n\t\n\n\n\n\n\t\n\t\n\t\n\t  \n\t  \n\t  \n\t  \n\t\n\t\n\t  \n\t  \n\t  \n\t\n\t\n\t\n\n\n\n\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nImage source: Wikipedia"
+  },
+  {
+    "objectID": "slides/01-intro.html#universal-approximation-theorem",
+    "href": "slides/01-intro.html#universal-approximation-theorem",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Universal Approximation Theorem",
+    "text": "Universal Approximation Theorem\n\nIn 1989, Cybenko1 proved the universal approximation theorem for feedforward neural networks.\nThe theorem states that\n\n\n… networks with one internal layer and an arbitrary continuous sigmoidal function can approximate continuous functions wtih arbitrary precision providing that no constraints are placed on the number of nodes or the size of the weights.\n\n\nThat is, the finite sum \\(G(x) = \\sum_{i=1}^h a_i S(w_i \\cdot x - b_i)\\), \\(x \\in D \\subseteq \\R^n\\), is dense in the space of continuous functions on \\(D\\) where \\(D\\) is compact.\n\nCybenko, G. (1989). Approximation by superpositions of a sigmoidal function. Mathematics of Control, Signals, and Systems, 2(4), pages 303-314."
+  },
+  {
+    "objectID": "slides/01-intro.html#in-the-1990s",
+    "href": "slides/01-intro.html#in-the-1990s",
+    "title": "STAT 5011: Course Introduction",
+    "section": "In the 1990s",
+    "text": "In the 1990s\n\nLe Cun (1989)1 proposed convolutional network for data with grid-like structure, e.g., images.\nHochreiter and Schmidhuber (1997)2 introduced the Long Short-Term Memory (LSTM) network to model sequential data, e.g., language and time series data.\nDue to the difficulty in training, more attention is now focused on the alternatives to neural networks, for example,\n\nsupport vector machine (SVM, Cortes and Vapnik (1995))\nkernel methods3\ngraphical models4\n\n\nLe Cun, Y. (1989). Generalization and network design strategies. Technical Report CRG-TR-89-4, University of Toronto.Hochreiter, S., & Schmidhuber, J. (1997). Long short-term memory. Neural computation, 9(8), pages 1735-1780.Schölkopf, B., & Smola, A. J. (2002). Learning with kernels: support vector machines, regularization, optimization, and beyond. MIT press.Jordan, M. I. (1999). Learning in graphical models. MIT press."
+  },
+  {
+    "objectID": "slides/01-intro.html#s---present",
+    "href": "slides/01-intro.html#s---present",
+    "title": "STAT 5011: Course Introduction",
+    "section": "2000s - present",
+    "text": "2000s - present\n\nIn 2006, Geoffrey Hinton1 showed that a kind of neural network called a deep belief network could be efficiently trained using a strategy called greedy layer-wise pretraining.\nThis wave of neural networks research popularized the use of the term deep learning to emphasize that researchers were now able to train deeper neural networks than had been possible before.\nDeep neural networks started to outperform other ML models (e.g., AlexNet (2012), VGG (2014), ResNet (2015)).\nAlso the presence of big data motivates researchers and practitioners to develop complicated models.\nIn 2023, ChatGPT broke the Turing test2.\n\nHinton, G. E., Osindero, S., & Teh, Y. W. (2006). A fast learning algorithm for deep belief nets. Neural computation, 18(7), pages 1527-1554.Biever, C. (2023). ChatGPT broke the Turing test-the race is on for new ways to assess AI. Nature, 619(7971), 686-689."
+  },
+  {
+    "objectID": "slides/01-intro.html#three-waves-of-neural-networks",
+    "href": "slides/01-intro.html#three-waves-of-neural-networks",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Three Waves of Neural Networks",
+    "text": "Three Waves of Neural Networks\n\nThe first wave: 1940s-1960s\n\nFundamental concepts: artificial neuron, perceptron\nPerceptron learning algorithm\n\nThe second wave: 1980s-1990s\n\nBack-propagation algorithm\nNetwork design strategies: convolutional networks, LSTM\n\nThe third wave: 2000s-present\n\nDeep neural networks\nLarge datasets and computational resources\nLarge Language Model (LLM), e.g., ChatGPT"
+  },
+  {
+    "objectID": "slides/01-intro.html#the-end-of-the-second-wave",
+    "href": "slides/01-intro.html#the-end-of-the-second-wave",
+    "title": "STAT 5011: Course Introduction",
+    "section": "The end of the second wave",
+    "text": "The end of the second wave\nGoodfellow et al. (2016) pointed out\n\nThe second wave of neural networks research lasted until the mid-1990s. Ventures based on neural networks and other AI technologies began to make unrealistically ambitious claims while seeking investments. When AI research did not fulfill these unreasonable expectations, investors were disappointed."
+  },
+  {
+    "objectID": "slides/01-intro.html#an-impending-ai-doom-model-collapse",
+    "href": "slides/01-intro.html#an-impending-ai-doom-model-collapse",
+    "title": "STAT 5011: Course Introduction",
+    "section": "An Impending AI Doom: Model Collapse",
+    "text": "An Impending AI Doom: Model Collapse\n\nShumailov et al. (2023)1 showed that training on generated data can make models forget.\nThey demonstrated that training on generated data can lead to catastrophic forgetting, a phenomenon where models forget how to perform well on real data.\n\n\n\n\n\n\nShumailov, I., Shumaylov, Z., Zhao, Y., Gal, Y., Papernot, N., & Anderson, R. (2023). The curse of recursion: Training on generated data makes models forget. arXiv preprint arXiv:2305.17493."
+  },
+  {
+    "objectID": "slides/01-intro.html#other-readings",
+    "href": "slides/01-intro.html#other-readings",
+    "title": "STAT 5011: Course Introduction",
+    "section": "Other readings",
+    "text": "Other readings\n\nThe story of Frank Rosenblatt: Professor’s perceptron paved the way for AI – 60 years too soon\n\nWhat is ‘model collapse’? An expert explains the rumours about an impending AI doom.\n\n\n\n\nHome"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#recap-of-the-last-lecture",
+    "href": "slides/03-ml_basics.html#recap-of-the-last-lecture",
+    "title": "Machine Learning Basics",
+    "section": "Recap of the Last Lecture",
+    "text": "Recap of the Last Lecture\n\n\\[\n\\newcommand{\\mc}[1]{\\mathcal{#1}}\n\\newcommand{\\R}{\\mathbb{R}}\n\\newcommand{\\E}{\\mathbb{E}}\n\\renewcommand{\\P}{\\mathbb{P}}\n\\newcommand{\\var}{{\\rm Var}} % Variance\n\\newcommand{\\mse}{{\\rm MSE}} % MSE\n\\newcommand{\\bias}{{\\rm Bias}} % MSE\n\\newcommand{\\cov}{{\\rm Cov}} % Covariance\n\\newcommand{\\iid}{\\stackrel{\\rm iid}{\\sim}}\n\\newcommand{\\ind}{\\stackrel{\\rm ind}{\\sim}}\n\\renewcommand{\\choose}[2]{\\binom{#1}{#2}}  % Choose\n\\newcommand{\\chooses}[2]{{}_{#1}C_{#2}}  % Small choose\n\\newcommand{\\cd}{\\stackrel{d}{\\rightarrow}}\n\\newcommand{\\cas}{\\stackrel{a.s.}{\\rightarrow}}\n\\newcommand{\\cp}{\\stackrel{p}{\\rightarrow}}\n\\newcommand{\\bin}{{\\rm Bin}}\n\\newcommand{\\ber}{{\\rm Ber}}\n\\newcommand{\\diag}{{\\rm diag}}\n\\DeclareMathOperator*{\\argmax}{argmax}\n\\DeclareMathOperator*{\\argmin}{argmin}\n\\]\n\n\nRelationship between likelihood and loss function\n\nNormal likelihood \\(\\leftrightarrow\\) squared error loss\nMultinomial/Binomial likelihood \\(\\leftrightarrow\\) cross-entropy loss\n\nPenalization/Regularization: \\(L_1\\) and \\(L_2\\) regularization\nLink function: a function that connects the conditional mean \\(\\E(Y \\mid \\boldsymbol{x})\\) and the linear predictor \\(\\boldsymbol{x}^T \\boldsymbol{\\beta}\\):\n\nReal-valued response: identity link \\(\\E(Y \\mid \\boldsymbol{x}) = \\boldsymbol{x}^T \\boldsymbol{\\beta}\\)\nBinary response: logit link \\(\\E(Y \\mid \\boldsymbol{x}) = \\frac{1}{1 + \\exp(-\\boldsymbol{x}^T \\boldsymbol{\\beta})}\\)\nMultinomial response: softmax link \\[\n\\E(Y \\mid \\boldsymbol{x}) = \\left[\\frac{\\exp(\\boldsymbol{x}^T \\boldsymbol{\\beta_1})}{\\sum_{k=1}^K \\exp(\\boldsymbol{x}^T \\boldsymbol{\\beta}_k)}, \\ldots, \\frac{\\exp(\\boldsymbol{x}^T \\boldsymbol{\\beta_K})}{\\sum_{k=1}^K \\exp(\\boldsymbol{x}^T \\boldsymbol{\\beta}_k)}\\right]^T\n\\]"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#outline",
+    "href": "slides/03-ml_basics.html#outline",
+    "title": "Machine Learning Basics",
+    "section": "Outline",
+    "text": "Outline\n\nEmpirical Risk Minimization (ERM)\n\nA general framework for machine learning\nDecomposition of the generalization error of a model\n\nVapnik-Chervonenkis (VC) Theory\n\nMeasuring the complexity of a set of models\nProviding an upper bound for the generalization error\n\nValidation of a trained model\n\nEstimating the generalization error\n\\(k\\)-fold cross-validation\nCross-validation for hyperparameter tuning"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#different-types-of-learning",
+    "href": "slides/03-ml_basics.html#different-types-of-learning",
+    "title": "Machine Learning Basics",
+    "section": "Different Types of Learning",
+    "text": "Different Types of Learning\nThere are many types of learning:\n\nSupervised Learning\nUnsupervised Learning\nReinforcement Learning\nSemi-supervised Learning\nActive Learning\nOnline Learning\nTransfer Learning\nMulti-task Learning\nFederated Learning, etc."
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#supervised-learning",
+    "href": "slides/03-ml_basics.html#supervised-learning",
+    "title": "Machine Learning Basics",
+    "section": "Supervised Learning",
+    "text": "Supervised Learning\n\nThe dataset consists of pairs \\((x_i, y_i)\\), \\(x_i \\in \\mathcal{X}\\), \\(y_i \\in \\mathcal{Y}\\), where \\(x_i\\) is called the feature and \\(y_i\\) is the associated label.\n\n\\(\\mathcal{X} \\subseteq \\R^p\\) is called the feature space (usually \\(\\mathcal{X} = \\R^p\\))\n\\(\\mathcal{Y} \\subseteq \\R^K\\) is called the label space\n\nThe goal is to learn a function \\(f: \\mathcal{X} \\to \\mathcal{Y}\\) that maps the feature to the label.\nExamples:\n\nimage/text classification\nprediction\n\nCommonly used models:\n\nLinear regression/Logistic regression\nSupport vector machine (SVM)\nNeural network, and many others"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#general-framework-of-supervised-learning",
+    "href": "slides/03-ml_basics.html#general-framework-of-supervised-learning",
+    "title": "Machine Learning Basics",
+    "section": "General Framework of Supervised Learning",
+    "text": "General Framework of Supervised Learning\n\nIn this course, we will mainly focus on supervised learning.\nSupervised learning can also be viewed as a function estimation problem, i.e., estimating the function \\(f\\) that maps the feature \\(x\\) to the label \\(y\\).\nDepending the types of labels, many different models have been developed.\nInstead of focusing on individual models, we will discuss a general framework for supervised learning, called Empirical Risk Minimization (ERM)."
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#empirical-risk-minimization-erm",
+    "href": "slides/03-ml_basics.html#empirical-risk-minimization-erm",
+    "title": "Machine Learning Basics",
+    "section": "Empirical Risk Minimization (ERM)",
+    "text": "Empirical Risk Minimization (ERM)\n\nThe ERM principle for supervised learning requires:\n\nA loss function \\(L(y, g(x))\\) that measures the discrepancy between the true label \\(y\\) and the predicted label \\(g(x)\\).\nA hypothesis class \\(\\mathcal{G}\\) which is a class of functions \\(g: \\mathcal{X} \\to \\mathcal{Y}\\).\nA training dataset \\((x_1, y_1), \\ldots, (x_n, y_n)\\)."
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#loss-function",
+    "href": "slides/03-ml_basics.html#loss-function",
+    "title": "Machine Learning Basics",
+    "section": "Loss function",
+    "text": "Loss function\n\nA loss function \\(L: \\mathcal{Y} \\times \\R^K \\to \\R\\) quantifies how well \\(\\hat{y}\\) approximates \\(y\\):\n\nsmaller values of \\(L(y, \\hat{y}\\)) indicate that \\(\\hat{y}\\) is a good approximation of \\(y\\)\ntypically (but not always) \\(L(y, y) = 0\\) and \\(L(y, \\hat{y}) \\geq 0\\) for all \\(\\hat{y}\\), and \\(y\\)\n\nExamples:\n\nQuadratic loss: \\(L(y, \\hat{y}) = (y - \\hat{y})^2\\) or \\(L(y, \\hat{y}) = \\|y - \\hat{y}\\|^2\\)\nAbsolute loss: \\(L(y, \\hat{y}) = |y - \\hat{y}|\\)\nCross-Entropy loss: \\(L(y, \\hat{y}) = -y \\log(\\hat{y}) - (1 - y) \\log(1 - \\hat{y})\\) or \\(L(y, \\hat{y}) = -\\sum_{i=1}^K y_i\\log\\hat{y}_i\\)"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#risk-function",
+    "href": "slides/03-ml_basics.html#risk-function",
+    "title": "Machine Learning Basics",
+    "section": "Risk Function",
+    "text": "Risk Function\n\nAssume that \\((X, Y) \\sim F\\) and \\(F\\) is an unknown distribution.\nGiven a loss function ,the risk function of a model \\(h\\) is \\[\nR(h) = \\E_{(X, Y) \\sim F}[L(Y, h(X))].\n\\]\nThe optimal \\(h\\) is the one that minimizes the risk function: \\[\nh^{\\star} = \\argmin_{h: \\mathcal{X} \\to \\mathcal{Y}} R(h).\n\\]\nDenote the optimal risk as \\(R^{\\star} = R(h^{\\star})\\).\nHowever, it is impossible to obtain either \\(h^{\\star}\\) or \\(R^{\\star}\\) because:\n\nthe space of all possible functions \\(\\{h: \\mathcal{X} \\to \\mathcal{Y}\\}\\) is too large, and\nthe data distribution \\(F\\) is unknown."
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#hypothesis-class",
+    "href": "slides/03-ml_basics.html#hypothesis-class",
+    "title": "Machine Learning Basics",
+    "section": "Hypothesis Class",
+    "text": "Hypothesis Class\n\nTo make the problem tractable, we restrict the space of functions to a hypothesis class \\(\\mathcal{H}\\).\nWe denote the best model in \\(\\mathcal{H}\\) as \\(h_{\\mathcal{H}}^{\\star} = \\argmin_{h \\in \\mathcal{H}} R(h)\\).\nIts associated risk is \\(R_{\\mathcal{H}}^{\\star} = R(h_{\\mathcal{H}}^{\\star})\\).\nBy definition, it is obvious that \\(R_{\\mathcal{H}}^{\\star} \\geq R^{\\star}\\).\nExamples:\n\nLinear regression: \\(\\mathcal{H} = \\{h: h(\\boldsymbol{x}) = \\boldsymbol{x}^T \\boldsymbol{\\beta}, \\boldsymbol{\\beta} \\in \\R^p\\} = \\R^p\\)\nLogistic regression: \\(\\mathcal{H} = \\left\\{h: h(\\boldsymbol{x}) = \\frac{1}{1 + \\exp(-\\boldsymbol{x}^T \\boldsymbol{\\beta})}, \\boldsymbol{\\beta} \\in \\R^p\\right\\} = \\R^p\\)\n\nThe difference between \\(R_{\\mathcal{H}}^{\\star}\\) and \\(R^{\\star}\\) is called the approximation error.\nIntuitively, the larger the hypothesis class, the smaller the approximation error."
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#empirical-risk",
+    "href": "slides/03-ml_basics.html#empirical-risk",
+    "title": "Machine Learning Basics",
+    "section": "Empirical Risk",
+    "text": "Empirical Risk\n\nAssuming that \\((x_1, y_1), \\ldots, (x_n, y_n) \\iid F\\), the empirical risk is \\[\nR_{\\text{emp}}(h) = \\E_{(X, Y) \\sim \\widehat{F}_n}[L(Y, h(X))]\n        = \\frac{1}{n} \\sum_{i=1}^n L(y_i, h(x_i))\n\\] where \\(\\widehat{F}_n = \\frac{1}{n}\\sum_{i=1}^n \\delta_{(x_i, y_i)}\\) is the empirical distribution of the data.\nWe choose the \\(h\\) that minimizes the empirical risk function, i.e., the empirical risk minimizer: \\[\n\\hat{h}_{n, \\mathcal{H}} = \\argmin_{h \\in \\mathcal{H}} R_{\\text{emp}}(h)\n\\] where \\(\\mathcal{H}\\) is the hypothesis class.\nDenote the empirical risk associated with \\(\\hat{h}_{n, \\mathcal{H}}\\) as \\(\\hat{R}_n = R_{\\text{emp}}(\\hat{h}_{n, \\mathcal{H}})\\) and this is what we obtain in practice."
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#quick-summary",
+    "href": "slides/03-ml_basics.html#quick-summary",
+    "title": "Machine Learning Basics",
+    "section": "Quick Summary",
+    "text": "Quick Summary\n\nGoal: find the best model \\(h^{\\star} = \\argmin_h R(h)\\), which is impossible since\n\nthe space of all possible functions is too large \\(\\textcolor{red}{\\rightarrow}\\) restrict to hypothesis class\nthe data distribution is unknown \\(\\textcolor{red}{\\rightarrow}\\) use empirical data\n\nWe have three models:\n\n\\(h^{\\star}\\): the best model (associated risk \\(R^{\\star} = R(h^{\\star})\\))\n\\(h_{\\mathcal{H}}^{\\star}\\): the best model in the hypothesis class \\(\\mathcal{H}\\) (associated risk \\(R_{\\mathcal{H}}^{\\star} = R(h^{\\star}_{\\mathcal{H}})\\))\n\\(\\hat{h}_{n, \\mathcal{H}}\\): the empirical risk minimizer, i.e., the trained model (empirical risk, or the training error, \\(\\hat{R}_n = R_{\\text{emp}}(\\hat{h}_{n, \\mathcal{H}})\\))\n\nWe want \\(\\hat{h}_{n, \\mathcal{H}}\\) to be as close as possible to \\(h^{\\star}\\) in terms of the risk function \\(R(h)\\)."
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#error-decomposition",
+    "href": "slides/03-ml_basics.html#error-decomposition",
+    "title": "Machine Learning Basics",
+    "section": "Error Decomposition",
+    "text": "Error Decomposition\n\nGoal: \\(R(\\hat{h}_{n,\\mathcal{H}}) - R^{\\star} = R(\\hat{h}_{n,\\mathcal{H}}) - R(h^{\\star}) = 0\\).\nDecomposition: \\[\\begin{align*}\nR(\\hat{h}_{n,\\mathcal{H}}) - R^{\\star} & = \\underbrace{R(\\hat{h}_{n,\\mathcal{H}}) - R_{\\mathcal{H}}^{\\star}}_{\\textcolor{blue}{\\text{estimation error}}} \\quad + \\underbrace{R_{\\mathcal{H}}^{\\star} - R^{\\star}}_{\\textcolor{blue}{\\text{approximation error}}}\\\\\n& = \\underbrace{R(\\hat{h}_{n,\\mathcal{H}}) - R(h_{\\mathcal{H}}^{\\star})}_{\\textcolor{blue}{\\text{estimation error}}} \\quad + \\quad \\underbrace{R(h_{\\mathcal{H}}^{\\star}) - R(h^{\\star})}_{\\textcolor{blue}{\\text{approximation error}}}\\\\\n\\end{align*}\\]\nThe approximation error comes from the use of a hypothesis class \\(\\mathcal{H}\\).\n\nLarger \\(\\mathcal{H}\\) \\(\\rightarrow\\) smaller approximation error\n\nThe estimation error comes from the use of empirical data.\n\nMore data \\(\\rightarrow\\) smaller estimation error"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#error-decomposition-1",
+    "href": "slides/03-ml_basics.html#error-decomposition-1",
+    "title": "Machine Learning Basics",
+    "section": "Error Decomposition",
+    "text": "Error Decomposition"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#example",
+    "href": "slides/03-ml_basics.html#example",
+    "title": "Machine Learning Basics",
+    "section": "Example",
+    "text": "Example\n\nLinear Regression:\n\n\\(\\mathcal{H} = \\{h: h(\\boldsymbol{x}) = \\boldsymbol{x}^T \\boldsymbol{\\beta}, \\boldsymbol{\\beta} \\in \\R^p\\}\\)\n\\(L(y, h(\\boldsymbol{x})) = (y - h(\\boldsymbol{x}))^2\\)\n\nLogistic Regression:\n\n\\(\\mathcal{H} = \\left\\{h: h(\\boldsymbol{x}) = \\frac{1}{1 + \\exp(-\\boldsymbol{x}^T \\boldsymbol{\\beta})}, \\boldsymbol{\\beta} \\in \\R^p\\right\\}\\)\n\\(L(y, h(\\boldsymbol{x})) = -y \\log(h(\\boldsymbol{x})) - (1 - y) \\log(1 - h(\\boldsymbol{x}))\\)\n\n(Linear) Support Vector Machine:\n\n\\(\\mathcal{H} = \\{h: h(\\boldsymbol{x}) = \\boldsymbol{w}^T \\boldsymbol{x} + b, \\boldsymbol{w} \\in \\R^p, b \\in \\R\\}\\)\n\\(L(y, h(\\boldsymbol{x})) = \\max(0, 1 - y \\cdot h(\\boldsymbol{x}))\\)"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#maximum-likelihood-ml-v.s.-erm",
+    "href": "slides/03-ml_basics.html#maximum-likelihood-ml-v.s.-erm",
+    "title": "Machine Learning Basics",
+    "section": "Maximum Likelihood (ML) v.s. ERM",
+    "text": "Maximum Likelihood (ML) v.s. ERM\n\nIn fact, the ML principle is a special case of the ERM principle.\nThat is, specifying a likelihood function gives a loss function, i.e., use the negative log-likelihood as the loss function.\nML:\n\nStronger assumptions\nStronger guarantees (consistency, asymptotic normality, etc.)\nAllow us to do more things (e.g., hypothesis testing and confidence intervals)\nLinear regression and logistic regression are ML and hence ERM\n\nERM:\n\nMore flexible and practical, but weaker guarantees\nUsually provide only a point estimate\nSVM is ERM but not ML"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#constructing-learning-algorithms",
+    "href": "slides/03-ml_basics.html#constructing-learning-algorithms",
+    "title": "Machine Learning Basics",
+    "section": "Constructing Learning Algorithms",
+    "text": "Constructing Learning Algorithms\n\nFollowing the ERM principle, we need to specify a loss function and a hypothesis class in order to construct a learning algorithm.\nThe choice of the loss function is based on the types of labels and the problem.\nThe choice of the hypothesis class is more challenging:\n\nSmaller \\(\\mathcal{H}\\) \\(\\rightarrow\\) larger approximation error, smaller estimation error, and less overfitting\nLarger \\(\\mathcal{H}\\) \\(\\rightarrow\\) smaller approximation error, larger estimation error, more overfitting, and requires more data\n\nNext, we will discuss:\n\nhow to measure the “size” (capacity/complexity) of a hypothesis class\nhow to choose an appropriate hypothesis class"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#complexity-v.s.-dimension",
+    "href": "slides/03-ml_basics.html#complexity-v.s.-dimension",
+    "title": "Machine Learning Basics",
+    "section": "Complexity v.s. Dimension",
+    "text": "Complexity v.s. Dimension\n\nLet \\(\\mathcal{H}\\) be a parametric hypothesis class ,e.g., \\(\\mathcal{H} = \\{h: h(\\boldsymbol{x}) = \\boldsymbol{x}^T \\boldsymbol{\\beta}, \\boldsymbol{\\beta} \\in \\R^p\\}\\).\nAn intuitive way to measure the complexity of \\(\\mathcal{H}\\) is to count the number of unknown parameters, i.e., the dimension of \\(\\mathcal{H}\\).\nIn this case, the dimension of \\(\\dim(\\mathcal{H}) = p\\)."
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#shattering",
+    "href": "slides/03-ml_basics.html#shattering",
+    "title": "Machine Learning Basics",
+    "section": "Shattering",
+    "text": "Shattering\nA hypothesis class \\(\\mathcal{H}\\) is said to shatter a set of points \\(S = \\{x_1, \\ldots, x_n\\}\\) if for all possible binary labelings (0/1) of these points, there exists a function \\(h \\in \\mathcal{H}\\) that can perfectly separate the points.\n\n\n\nImage Source: Figure 7.6 of ESL"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#shattering-1",
+    "href": "slides/03-ml_basics.html#shattering-1",
+    "title": "Machine Learning Basics",
+    "section": "Shattering",
+    "text": "Shattering\nDefinition (Restriction of \\(\\mathcal{H}\\) to \\(S\\)) Let \\(\\mathcal{H}\\) be a class of functions from \\(\\mathcal{X}\\) to \\(\\{0,1\\}\\) and let \\(S = \\{x_1, \\ldots, x_n\\} \\subset \\mathcal{X}\\). The restriction of \\(\\mathcal{H}\\) to \\(S\\) is the set of functions from \\(S\\) to \\(\\{0, 1\\}\\) that can be derived from \\(\\mathcal{H}\\). That is, \\[\n   \\mathcal{H}_S = \\{(h(x_1), \\ldots, h(x_n)): h \\in \\mathcal{H}\\}\n\\]\nDefinition (Shattering) A hypothesis class \\(\\mathcal{H}\\) shatters a finite set \\(S \\subset \\mathcal{X}\\) if the restriction of \\(\\mathcal{H}\\) to \\(S\\) is the set of all functions from \\(S\\) to \\(\\{0, 1\\}\\). That is, \\(|\\mathcal{H}_S| = 2^{|S|}\\)."
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#vapnik-chervonenkis-vc-dimension",
+    "href": "slides/03-ml_basics.html#vapnik-chervonenkis-vc-dimension",
+    "title": "Machine Learning Basics",
+    "section": "Vapnik-Chervonenkis (VC) Dimension",
+    "text": "Vapnik-Chervonenkis (VC) Dimension\nDefinition (VC-dimension) The VC-dimension of a hypothesis class \\(\\mathcal{H}\\), denoted \\(\\text{VC-dim}(\\mathcal{H})\\), is the maximal size of a set \\(S \\subset \\mathcal{X}\\) that can be shattered by \\(\\mathcal{H}\\). If \\(\\mathcal{H}\\) can shatter sets of arbitrarily large size we say that \\(\\mathcal{H}\\) has infinite VC-dimension.\n\nOne can show that for linear models, e.g., \\(\\mathcal{H} = \\{h: h(\\boldsymbol{x}) = \\beta_0 + \\boldsymbol{x}^T \\boldsymbol{\\beta}, \\boldsymbol{\\beta} \\in \\R^p\\}\\), the VC-dimension is \\(p+1\\) (the same as the number of parameters).\nHowever, for nonlinear models, the calculation of the VC-dimension is often challenging."
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#example-infinite-vc-dimension",
+    "href": "slides/03-ml_basics.html#example-infinite-vc-dimension",
+    "title": "Machine Learning Basics",
+    "section": "Example (Infinite VC-dimension)",
+    "text": "Example (Infinite VC-dimension)\n\nLet \\(\\mathcal{H} = \\{h: h(x) = \\mathbb{I}(\\sin(\\alpha x) &gt; 0), \\alpha &gt; 0\\}\\). Then \\(\\text{VC-dim}(\\mathcal{H}) = \\infty\\).\nProof:\n\nFor any \\(n\\), let \\(x_1 = 2\\pi 10^{-1}, \\ldots, x_n = 2\\pi 10^{-n}\\).\nThen the parameter \\(\\alpha = \\frac{1}{2}\\left(1 + \\sum_{i=1}^n (1-y_i)10^i\\right)\\) can perfectly separate the points, where \\(y_i \\in \\{0, 1\\}\\) is any labeling of the points.\n\n\n\n\n\n\n\n\n\nImage Source: Figure 7.5 of ESL"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#goodness-of-fit-v.s.-generalization-ability",
+    "href": "slides/03-ml_basics.html#goodness-of-fit-v.s.-generalization-ability",
+    "title": "Machine Learning Basics",
+    "section": "Goodness-of-fit v.s. Generalization ability",
+    "text": "Goodness-of-fit v.s. Generalization ability\n\nGoodness-of-fit: how well the model fits the data.\nGeneralization ability: how well the model generalizes to unseen data.\nRecall that for an ERM \\(\\hat{h}_{n, \\mathcal{H}}\\), we have\n\ntraining error (error on training data) \\(\\hat{R}_n = R_{\\text{emp}}(\\hat{h}_{n, \\mathcal{H}})\\)\ngeneralization error (error on unseen data) \\(R(\\hat{h}_{n, \\mathcal{H}}) = \\E_{(X, Y) \\sim F} \\left[L(Y, \\hat{h}_{n,\\mathcal{H}}(X)) \\mid \\mathcal{T}\\right]\\), where \\(\\mathcal{T}\\) denotes the training dataset.\n\nWe can write \\[\\begin{align*}\n   R(\\hat{h}_{n, \\mathcal{H}}) & = \\hat{R}_n + \\left(R(\\hat{h}_{n, \\mathcal{H}}) - \\hat{R}_n\\right)\\\\\n   \\textcolor{blue}{\\text{generalization error}} & = \\textcolor{blue}{\\text{training error}} + \\textcolor{blue}{\\text{generalization gap}}\n\\end{align*}\\]"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#overfitting-and-underfitting",
+    "href": "slides/03-ml_basics.html#overfitting-and-underfitting",
+    "title": "Machine Learning Basics",
+    "section": "Overfitting and Underfitting",
+    "text": "Overfitting and Underfitting\n\nTo have low generalization error, we need to have both low training error and small generalization gap.\n\nLarge training error \\(\\rightarrow\\) underfitting\nLow training error but large generalization gap \\(\\rightarrow\\) overfitting\n\n\n\n\n\n\n\n\n\nImage Source: Figure 5.3 in DL"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#vc-inequality",
+    "href": "slides/03-ml_basics.html#vc-inequality",
+    "title": "Machine Learning Basics",
+    "section": "VC Inequality",
+    "text": "VC Inequality\n\nThe VC theory provides an upper bound for the generalization gap, known as the VC inequality: with probability at least \\(1 - \\delta\\) \\[\nR(h) \\leq R_{\\text{emp}}(h)+\\varepsilon \\sqrt{1+\\frac{4 R_{\\text{emp}}(h)}{\\varepsilon}}, \\quad \\varepsilon = O\\left(\\frac{d - \\log \\delta}{n}\\right)\n\\] simultaneously for all \\(h \\in \\mathcal{H}\\), where \\(\\text{VC-dim}(\\mathcal{H}) = d &lt; \\infty\\).\nThe generalization gap increases as\n\nthe VC-dimension increases\nthe samples size \\(n\\) decreases\n\nThis upper bound is only a loose bound and does not work for models with infinite VC-dimension."
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#regularized-erm",
+    "href": "slides/03-ml_basics.html#regularized-erm",
+    "title": "Machine Learning Basics",
+    "section": "Regularized ERM",
+    "text": "Regularized ERM\n\nTo prevent overfitting, we can add a regularization term to the empirical risk: \\[\nR_{\\text{reg}}(h) = R_{\\text{emp}}(h) + \\lambda \\Omega(h)\n\\] where \\(\\Omega(h)\\) is a regularization term and \\(\\lambda\\) is the regularization parameter.\nTypically, \\(\\Omega(h)\\) measures the smoothness or complexity of the model \\(h\\).\n\n\n\n\n  \n  \n  \n    \n      \n        image/svg+xml\n        \n        \n      \n    \n  \n  \n    \n      \n        \n        \n        \n        \n        \n        \n        \n        \n        \n      \n      \n      x\n      y\n    \n  \n\n\n\n\n\nImage Source: https://en.wikipedia.org/wiki/Regularization_(mathematics)"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#regularized-erm-1",
+    "href": "slides/03-ml_basics.html#regularized-erm-1",
+    "title": "Machine Learning Basics",
+    "section": "Regularized ERM",
+    "text": "Regularized ERM\n\nFor example, \\(\\Omega(h) = \\|h^{\\prime}(x)\\|_2^2 = \\int \\left(h^{\\prime}(x)\\right)^2dx\\). (\\(L_2\\) Regularization)\nIf \\(h(x) = \\beta_0 + \\beta_1 x\\), then \\(h^{\\prime}(x) = \\beta_1\\) and \\(\\Omega(h) = \\beta_1^2\\).\nThe \\(L_1\\) regularization is \\(\\Omega(h) = \\|h^{\\prime}(x)\\|_1 = \\int |h^{\\prime}(x)|dx\\).\nIf \\(h(x) = \\beta_0 + \\beta_1 x\\), then \\(h^{\\prime}(x) = \\beta_1\\) and \\(\\Omega(h) = |\\beta_1|\\).\nUsing \\(L_1\\) gives you sparsity; using \\(L_2\\) gives you smoothness/insensitivity:\n\nConsider a linear model \\(h(\\boldsymbol{x}) = \\boldsymbol{x}^T \\boldsymbol{\\beta}\\).\nA good model should not be too sensitive to the input, i.e., small changes in the input should not lead to large changes in the output.\nThat is, if \\(\\boldsymbol{x} \\approx \\tilde{\\boldsymbol{x}}\\) , then \\(|\\boldsymbol{x}^T \\boldsymbol{\\beta} - \\tilde{\\boldsymbol{x}}^T \\boldsymbol{\\beta}|\\) should be small.\nNote that \\[\n|\\boldsymbol{x}^T \\boldsymbol{\\beta} - \\tilde{\\boldsymbol{x}}^T \\boldsymbol{\\beta}| = |(\\boldsymbol{x} - \\tilde{\\boldsymbol{x}})^T \\boldsymbol{\\beta}| \\leq \\|\\boldsymbol{x} - \\tilde{\\boldsymbol{x}}\\|_2 \\|\\boldsymbol{\\beta}\\|_2\n\\]"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#bias-variance-tradeoff",
+    "href": "slides/03-ml_basics.html#bias-variance-tradeoff",
+    "title": "Machine Learning Basics",
+    "section": "Bias-Variance Tradeoff",
+    "text": "Bias-Variance Tradeoff\n\nAdding a reguralization term often increases the bias but reduces the variance of the model.\nThis tradeoff is known as the bias-variance tradeoff.\n\n\n\n\n\n\n\n\nImage Source: Figure 5.6 in DL"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#quick-summary-1",
+    "href": "slides/03-ml_basics.html#quick-summary-1",
+    "title": "Machine Learning Basics",
+    "section": "Quick Summary",
+    "text": "Quick Summary\n\nThe VC dimension measures the complexity of a hypothesis class.\nThe VC inequality provides an upper bound for the generalization gap, provided that the VC dimension is finite.\nThe bound is often criticized for being too loose and does not work for models with infinite VC dimension.\nExample of infinite VC dimension:\n\nNeural Networks\nKernel methods (e.g., kernel SVM, kernel regression)\n\\(K\\)-nearest neighbors (with small \\(K\\), say \\(K = 1\\))"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#double-descent-curve",
+    "href": "slides/03-ml_basics.html#double-descent-curve",
+    "title": "Machine Learning Basics",
+    "section": "Double Descent Curve",
+    "text": "Double Descent Curve\n\n\n\nBelkin, M., Hsu, D., Ma, S., & Mandal, S. (2019). Reconciling modern machine-learning practice and the classical bias–variance trade-off. Proceedings of the National Academy of Sciences, 116(32), 15849-15854."
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#estimating-the-generalization-error",
+    "href": "slides/03-ml_basics.html#estimating-the-generalization-error",
+    "title": "Machine Learning Basics",
+    "section": "Estimating the Generalization Error",
+    "text": "Estimating the Generalization Error\n\nAlthough the VC inequality provides an upper bound for the generalization gap, it is often too loose.\nIn order to have a more accurate insight into the model’s generalization ability, we need to estimate the generalization error.\nTo achieve this, we need to have an extra dataset, called the validation dataset \\(\\mathcal{V} = \\{(\\tilde{x}_i, \\tilde{y}_i)\\}_{i=1}^m\\).\nThe generalization error is then estimated as \\[\n\\hat{R}_{\\text{gen}} = \\frac{1}{m} \\sum_{i=1}^m L(\\tilde{y}_i, \\hat{h}_{n, \\mathcal{H}}(\\tilde{x}_i)).\n\\]\nAssuming the \\(\\mathcal{V}\\) and \\(\\mathcal{T}\\) (training dataset) are i.i.d, \\(\\hat{R}_{\\text{gen}}\\) is an unbiased estimate of the generalization error, i.e., \\(\\E[\\hat{R}_{\\text{gen}} \\mid \\mathcal{T}] = R(\\hat{h}_{n, \\mathcal{H}})\\)."
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#k-fold-cross-validation-cv",
+    "href": "slides/03-ml_basics.html#k-fold-cross-validation-cv",
+    "title": "Machine Learning Basics",
+    "section": "\\(k\\)-fold Cross-Validation (CV)",
+    "text": "\\(k\\)-fold Cross-Validation (CV)\n\nIn practice, we often do not have an extra validation dataset and hence we need to use the training dataset to estimate the generalization error.\nOne common method is the \\(k\\)-fold cross-validation:\n\nSplit the training dataset \\(\\mathcal{T}\\) into \\(k\\) equal-sized folds.\nFor each fold \\(i = 1, \\ldots, k\\), train the model on the remaining \\(k-1\\) folds and evaluate the model on the \\(i\\)th fold.\nAverage the \\(k\\) validation errors to obtain the estimated generalization error."
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#k-fold-cross-validation",
+    "href": "slides/03-ml_basics.html#k-fold-cross-validation",
+    "title": "Machine Learning Basics",
+    "section": "\\(k\\)-fold Cross-Validation",
+    "text": "\\(k\\)-fold Cross-Validation\n\nWhen \\(k = n\\), it is called the leave-one-out cross-validation (LOOCV), i.e., train the model on \\(n-1\\) samples and evaluate on the remaining one.\nChoice of \\(k\\)?\n\nLarger \\(k\\) \\(\\rightarrow\\) low bias, high variance (the model is trained on a larger dataset and validated on a smaller dataset)\nSmaller \\(k\\) \\(\\rightarrow\\) high bias, low variance (the model is trained on a smaller dataset and validated on a larger dataset)\n\\(k = 5\\) or \\(k = 10\\) are common choices."
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#cv-for-hyperparameter-tuning",
+    "href": "slides/03-ml_basics.html#cv-for-hyperparameter-tuning",
+    "title": "Machine Learning Basics",
+    "section": "CV for Hyperparameter Tuning",
+    "text": "CV for Hyperparameter Tuning\n\nIn practice, the models often have hyperparameters that need to be tuned, e.g., the regularization parameter \\(\\lambda\\).\nWe can use CV to choose the best hyperparameters:\n\nFor each hyperparameter value, perform \\(k\\)-fold CV to estimate the generalization error.\nChoose the hyperparameter value that minimizes the CV error.\n\nHowever, the CV error after the selection will overestimate the generalization error.\nSuch bias is known as the selection bias."
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#cv-for-hyperparameter-tuning-1",
+    "href": "slides/03-ml_basics.html#cv-for-hyperparameter-tuning-1",
+    "title": "Machine Learning Basics",
+    "section": "CV for Hyperparameter Tuning",
+    "text": "CV for Hyperparameter Tuning\n\nTo avoid the selection bias, we first split the dataset into two parts: the training dataset and the test dataset.\nThe test dataset should not be used in the neither the traing process nor hyperparameter tuning process.\nThe training dataset is further split into \\(k\\)-folds for CV.\nAfter all the processes, including training, hyperparameter tuning, model selection, etc., we evaluate the final model on the test dataset to estimate the generalization error."
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#example-using-cv-to-choose-the-regularization-parameter",
+    "href": "slides/03-ml_basics.html#example-using-cv-to-choose-the-regularization-parameter",
+    "title": "Machine Learning Basics",
+    "section": "Example: Using CV to Choose the Regularization Parameter",
+    "text": "Example: Using CV to Choose the Regularization Parameter\n\nfrom sklearn.linear_model import LassoCV\nfrom sklearn import datasets\n\nX, y = datasets.load_diabetes(return_X_y=True)\n\nX /= X.std(axis=0)\n\nalpha_seq = np.logspace(-2, 2, 100)\nreg = LassoCV(alphas = alpha_seq, cv = 5, random_state = 42)\nreg.fit(X, y)\n\nprint(\"best alpha:\", np.round(reg.alpha_, 4))\n\nbest alpha: 0.0774"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#example-using-cv-to-choose-the-regularization-parameter-1",
+    "href": "slides/03-ml_basics.html#example-using-cv-to-choose-the-regularization-parameter-1",
+    "title": "Machine Learning Basics",
+    "section": "Example: Using CV to Choose the Regularization Parameter",
+    "text": "Example: Using CV to Choose the Regularization Parameter"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#proof-of-example-infinite-vc-dimension",
+    "href": "slides/03-ml_basics.html#proof-of-example-infinite-vc-dimension",
+    "title": "Machine Learning Basics",
+    "section": "Proof of Example (Infinite VC-dimension)",
+    "text": "Proof of Example (Infinite VC-dimension)\n\nWe need to show that the model \\(h(x) = \\mathbb{I}(\\sin(\\alpha x) &gt; 0)\\) with \\(\\alpha = \\frac{1}{2}\\left(1 + \\sum_{i=1}^n (1-y_i)10^i\\right)\\) can perfectly separate the \\(n\\) points.\nConsider the \\(j\\)th sample \\(x_j = 2\\pi 10^{-j}\\).\nIf \\(y_j = 0\\), then \\[\\begin{align*}\n   \\alpha x_j & = \\pi 10^{-j} \\left(1 + \\sum_{i=1}^n (1-y_i)10^i\\right) = \\pi 10^{-j} \\left(1 + \\sum_{\\{i: y_i = 0\\}} 10^i\\right)\\\\\n   & = \\pi 10^{-j}\\left(1 + 10^j + \\sum_{\\{i: y_i = 0, i \\neq j\\}} 10^i\\right)\\\\\n   & = \\pi \\left(10^{-j} + 1 + \\sum_{\\{i: y_i = 0, i &gt; j\\}} 10^{i-j} + \\sum_{\\{i: y_i = 0, i &lt; j\\}} 10^{i-j}\\right)\n\\end{align*}\\]\n\n\n\nReference: https://mlweb.loria.fr/book/en/VCdiminfinite.html"
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#proof-of-example-infinite-vc-dimension-1",
+    "href": "slides/03-ml_basics.html#proof-of-example-infinite-vc-dimension-1",
+    "title": "Machine Learning Basics",
+    "section": "Proof of Example (Infinite VC-dimension)",
+    "text": "Proof of Example (Infinite VC-dimension)\n\nFor \\(i&gt;j\\), \\(10^{i-j}\\) is even and so is \\(\\sum_{\\{i: y_i = 0, i &gt; j\\}} 10^{i-j}\\), say \\[\n\\sum_{\\{i: y_i = 0, i &gt; j\\}} 10^{i-j} = 2m, \\quad m \\in \\mathbb{N}.\n\\]\nNote that \\[\n\\sum_{\\{i: y_i = 0, i &lt; j\\}} 10^{i-j} &lt; \\sum_{i=1}^{\\infty} 10^{-i} = \\sum_{i=0}^{\\infty} 10^{-i} - 1 = \\frac{1}{1-0.1} - 1 = \\frac{1}{9}.  \n\\]\nTherefore, \\(\\alpha x_j = \\pi(1 + 2m +\\epsilon)\\), where \\[\n0 &lt; \\epsilon = 10^{-j} + \\sum_{\\{i: y_i = 0, i &lt; j\\}} 10^{i-j} &lt; \\frac{1}{10} + \\frac{1}{9} &lt; 1.\n\\]\nHence \\(\\sin(\\alpha x_j) &lt; 0\\) and \\(h(x_j) = 0\\)."
+  },
+  {
+    "objectID": "slides/03-ml_basics.html#proof-of-example-infinite-vc-dimension-2",
+    "href": "slides/03-ml_basics.html#proof-of-example-infinite-vc-dimension-2",
+    "title": "Machine Learning Basics",
+    "section": "Proof of Example (Infinite VC-dimension)",
+    "text": "Proof of Example (Infinite VC-dimension)\n\nIf \\(y_j = 1\\), then \\[\\begin{align*}\n   \\alpha x_j & = \\pi 10^{-j} \\left(1 + \\sum_{i=1}^n (1-y_i)10^i\\right) = \\pi 10^{-j} \\left(1 + \\sum_{\\{i: y_i = 0\\}} 10^i\\right)\\\\\n   & = \\pi \\left(10^{-j} + \\sum_{\\{i: y_i = 0, i &gt; j\\}} 10^{i-j} + \\sum_{\\{i: y_i = 0, i &lt; j\\}} 10^{i-j}\\right)\n\\end{align*}\\]\nSimilarly, we have \\(\\alpha x_j = \\pi(2m +\\epsilon)\\), where \\[\n0 &lt; \\epsilon = 10^{-j} + \\sum_{\\{i: y_i = 0, i &lt; j\\}} 10^{i-j} &lt; \\frac{1}{10} + \\frac{1}{9} &lt; 1.\n\\]\nHence \\(\\sin(\\alpha x_j) &gt; 0\\) and \\(h(x_j) = 1\\).\n\n\n\n\nHome"
   }
 ]

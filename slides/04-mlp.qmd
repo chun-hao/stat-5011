@@ -1,0 +1,622 @@
+---
+title: "Multilayer Perceptron"
+---
+
+## Midterm Proposal presentation
+
+-  A group of 3-4 students.
+-  Let me know your group members next Tuesday. 
+-  The presentation will be on 10/22.
+   -  Problem statement
+   -  Data description
+   -  1-2 references
+-  Each group has 15 minutes to present.
+-  Homework 1 is due on 10/15.
+
+## Recap of the Last Lecture
+
+{{< include macro.qmd >}}
+
+A general procedure for supervised learning:
+
+1.  Gather a dataset $\mathcal{D} = \{(\boldsymbol{x}_1, y_1), \ldots, (\boldsymbol{x}_n, y_n)\}$.
+2.  Choose an appropriate **loss function** $L$ for your dataset and problem.
+3.  Choose a **hypothesis class** $\mathcal{H}$.
+    -  Not too simple (underfitting), nor too complicated (overfitting).
+4.  Add a **regularization term** to the loss function to better control the complexity of the model.
+5.  Find the model that minimizes the **(regularized) empirical risk function**.
+6.  Use cross-validation to select the hyperparameters (if any).
+7.  Estimate the generalization error of the final model using the test dataset.
+
+## Nonlinear Hypothesis Class
+
+-  A simple and useful hypothesis class is the linear hypothesis class, for example:
+   -  Linear regression: $\mathcal{H} = \{h(\boldsymbol{x}) = \boldsymbol{x}^T\boldsymbol{\beta}, \boldsymbol{\beta} \in \R^p\}$
+   -  Logistic regression: $\mathcal{H} = \left\{h: h(\boldsymbol{x}) = \frac{1}{1 + \exp(-\boldsymbol{x}^T \boldsymbol{\beta})}, \boldsymbol{\beta} \in \R^p\right\} = \R^p$
+-  To extend linear models to represent nonlinear functions of $\boldsymbol{x}$, we can apply the linear model not to $\boldsymbol{x}$ itself but to a transformed input $\phi(\boldsymbol{x})$, where $\phi$ is a nonlinear transformation.
+-  That is,
+    $$
+    \mathcal{H} = \{ h(\boldsymbol{x}) = \phi(\boldsymbol{x})^T \boldsymbol{\beta}, \phi: \R^p \to \R^d, \boldsymbol{\beta}\in \R^d\}.
+    $$
+-  The function $\phi$ is usually called a **feature map** and usually we choose $d \gg p$.
+
+## Choice of Feature Map
+
+There are three common ways to choose the feature map $\phi$:
+
+1.  Kernel method
+    -   Instead of explicitly specifying $\phi$, we can define a symmetric function $k(\boldsymbol{x}, \boldsymbol{x}')$ called a **kernel**, which corresponds to the dot product of some feature map $k(\boldsymbol{x}, \boldsymbol{x}^{\prime}) = \phi(\boldsymbol{x})^T \phi(\boldsymbol{x}^{\prime})$.
+2.  Manual engineering (hand-crafted features)
+    -   Choose a feature map $\phi$ manually, e.g., $\phi(x) = [x, x^2, \exp(x), \sin(x)]$.
+    -   A good feature map requires human effort for each separate task, with practitioners specializing in different domains.
+3.  Deep Learning
+    -   Parametrize the feature map $\phi$ with a deep neural network, $\phi(\boldsymbol{x}) = \phi(\boldsymbol{x}; \boldsymbol{\theta})$.
+    -   The parameter $\boldsymbol{\theta}$ is learned from the data, i.e., we learn the feature map from the data.
+
+## Outline
+
+-  Kernel Methods
+   -  Kernel Ridge Regression
+-  Multilayer Perceptron (MLP)
+   -  Basic Structure
+   -  Activation Function
+-  Training an MLP
+   -  Gradient-based Learning
+   -  Back-propagation
+   -  Computational Graph
+-  Example
+
+## Regression with a Feature Map
+
+-  Consider the regression model with a given feature map $\phi: \R^p \to \R^d$, i.e.,
+   $$
+   y = f(\boldsymbol{x}) = \phi(\boldsymbol{x})^T \boldsymbol{\beta}.
+   $$ 
+-  Given a training dataset $\{(\boldsymbol{x}_i, y_i)\}_{i=1}^n$, let $\boldsymbol{z_i} = \phi(\boldsymbol{x}_i)$ and $\boldsymbol{Z} = [\boldsymbol{z}_1, \boldsymbol{z}_2, \ldots, \boldsymbol{z}_n]^T \in \R^{n \times d}$.
+-  Then the model parameter $\boldsymbol{\beta}$ can be estimated by minimizing the regularized empirical risk function:
+    \begin{align*}
+    \hat{\boldsymbol{\beta}} & = \argmin_{\boldsymbol{\beta} \in \R^d} \|\boldsymbol{y} - \boldsymbol{Z}\boldsymbol{\beta}\|^2 + \alpha \|\boldsymbol{\beta}\|^2_2 = (\boldsymbol{Z}^T \boldsymbol{Z} + \alpha I_d)^{-1} \boldsymbol{Z}^T \boldsymbol{y}\\
+    & \stackrel{\textcolor{red}{\text{(*)}}}{=} \boldsymbol{Z}^T (\boldsymbol{Z} \boldsymbol{Z}^T + \alpha I_n)^{-1} \boldsymbol{y}.
+    \end{align*}
+-   The prediction for a new input $\boldsymbol{x}^{\star}$ is
+    $$
+    \widehat{y^{\star}} = \phi(\boldsymbol{x}^{\star})^T \hat{\boldsymbol{\beta}} = \phi(\boldsymbol{x}^{\star})^T\boldsymbol{Z}^T (\boldsymbol{Z} \boldsymbol{Z}^T + \alpha I_n)^{-1} \boldsymbol{y}.
+    $$
+
+
+::: aside
+See appendix for the proof of equality [(*)]{style="color: red"}.
+:::
+
+## Regression with a Feature Map
+
+-   Note that
+    $$
+    \boldsymbol{Z} \boldsymbol{Z}^T = \begin{bmatrix} \boldsymbol{z}_1^T \\ \boldsymbol{z}_2^T \\ \vdots \\ \boldsymbol{z}_n^T \end{bmatrix} \begin{bmatrix} \boldsymbol{z}_1 & \boldsymbol{z}_2 & \cdots & \boldsymbol{z}_n \end{bmatrix} = \begin{bmatrix}
+    \boldsymbol{z}_1^T \boldsymbol{z}_1 & \boldsymbol{z}_1^T \boldsymbol{z}_2 & \cdots & \boldsymbol{z}_1^T \boldsymbol{z}_n \\
+    \boldsymbol{z}_2^T \boldsymbol{z}_1 & \boldsymbol{z}_2^T \boldsymbol{z}_2 & \cdots & \boldsymbol{z}_2^T \boldsymbol{z}_n \\
+    \vdots & \vdots & \ddots & \vdots \\
+    \boldsymbol{z}_n^T \boldsymbol{z}_1 & \boldsymbol{z}_n^T \boldsymbol{z}_2 & \cdots & \boldsymbol{z}_n^T \boldsymbol{z}_n
+    \end{bmatrix} = \left[\phi(\boldsymbol{x}_i)^T\phi(\boldsymbol{x}_j)\right]_{i,j=1}^n
+    $$
+    and 
+    $$
+    \phi(\boldsymbol{x}^{\star})^T\boldsymbol{Z}^T = \begin{bmatrix} \phi(\boldsymbol{x}^{\star})^T \boldsymbol{z}_1 & \phi(\boldsymbol{x}^{\star})^T \boldsymbol{z}_2 & \cdots & \phi(\boldsymbol{x}^{\star})^T \boldsymbol{z}_n \end{bmatrix} = \left[\phi(\boldsymbol{x}^{\star})^T\phi(\boldsymbol{x}_i)\right]_{i=1}^n.  
+    $$
+-   **BIG NEWS**: we don't need to know the feature map $\phi$ explicitly, but only its inner product $\phi(\boldsymbol{x}_i)^T\phi(\boldsymbol{x}_j)$.
+-   That is, if we can [find a function $k(\boldsymbol{x}, \boldsymbol{x}^{\prime})$ such that $k(\boldsymbol{x}, \boldsymbol{x}^{\prime}) = \phi(\boldsymbol{x})^T\phi(\boldsymbol{x}^{\prime})$ for some $\phi$]{style="color: red"}, then we don't need to know $\phi$ explicitly.
+-   The function $k$ is called a **kernel function** and the model is called a **kernel ridge regression**.
+-   **Mercer Condition**: If the function $k(\cdot, \cdot)$ is symmetric and positive definite, then there exist a $\phi$ such that $k(\boldsymbol{x}, \boldsymbol{x}^{\prime}) = \phi(\boldsymbol{x})^T\phi(\boldsymbol{x}^{\prime})$.
+  
+
+## Kernel Method vs Deep Learning
+
+-  Both kernel method and deep learning utilize nonlinear feature map to obtain a nonlinear hypothesis class.
+-  Kernel method use a kernel function (the inner product of the feature map) to [implicitly define the feature map]{style="color: blue"}. Some common kernel functions include:
+   -  Linear kernel: $k(\boldsymbol{x}, \boldsymbol{x}^{\prime}) = \boldsymbol{x}^T\boldsymbol{x}^{\prime} \Rightarrow \phi(\boldsymbol{x}) = \boldsymbol{x}$.
+   -  Polynomial kernel: $k(\boldsymbol{x}, \boldsymbol{x}^{\prime}) = (\boldsymbol{x}^T\boldsymbol{x}^{\prime} + c)^d$.
+   -  Radial basis function (RBF) kernel: $k(\boldsymbol{x}, \boldsymbol{x}^{\prime}) = \exp\left(-\gamma\|\boldsymbol{x} - \boldsymbol{x}^{\prime}\|^2\right)$.[^rbf]
+-  Deep learning uses a deep neural network to [parametrize the feature map]{style="color: blue"}.
+
+[^rbf]: See the appendix for the feature map of the RBF kernel.
+
+## Example: Kernel Regression
+
+Generate a dataset from the model $y = \sin(2\pi x) + x + \epsilon$, where $\epsilon \sim N(0, 0.5^2)$.
+
+```{python}
+#| echo: true
+#| fig-align: center 
+import numpy as np
+import matplotlib.pyplot as plt
+
+rng = np.random.default_rng(100)
+n = 100
+X = rng.uniform(low=0, high=3, size=n)
+y = np.sin(2 * np.pi * X) + X + rng.normal(loc=0, scale=0.5, size=n)
+plt.scatter(X, y, c="black", s=20)
+plt.show()
+```
+
+--- 
+
+Compare four different models:
+
+-   Linear kernel (linear ridge regression, $\alpha = 1$)
+-   RBF kernel with $\gamma = 1$ and $\gamma = 100$ (both with $\alpha = 1$)
+-   RBF kernel with hyperparameters $\alpha$ and $\gamma$ selected by cross-validation.
+
+```{python}
+#| echo: true
+#| output: false
+from sklearn.kernel_ridge import KernelRidge
+from sklearn.model_selection import GridSearchCV
+
+# Ridge regression
+mod1 = KernelRidge(alpha = 1, kernel='linear').fit(X.reshape(-1, 1), y)
+
+# Kernel ridge regression with RBF kernel and different gamma (bandwidth)
+mod2 = KernelRidge(alpha = 1, kernel='rbf', gamma=1).fit(X.reshape(-1, 1), y)
+mod3 = KernelRidge(alpha = 1, kernel='rbf', gamma=100).fit(X.reshape(-1, 1), y)
+
+# Use cross-validation to select the hyperparameters
+mod4 = GridSearchCV(
+    KernelRidge(kernel="rbf", gamma=0.1),
+    param_grid={"alpha": [1, 0.1, 0.01, 0.001], "gamma": np.logspace(-2, 2, 5)},
+).fit(X.reshape(-1, 1), y)
+```
+
+---
+
+-   Small value of $\gamma$ leads to underfitting and large value of $\gamma$ leads to overfitting.
+
+```{python}
+#| echo: false
+#| fig-align: center 
+
+plt.scatter(X, y, c="gray", s=10)
+X_plot = np.linspace(0, 3, 1000)
+y_plot1 = mod1.predict(X_plot.reshape(-1, 1))
+y_plot2 = mod2.predict(X_plot.reshape(-1, 1))
+y_plot3 = mod3.predict(X_plot.reshape(-1, 1))
+y_plot4 = mod4.predict(X_plot.reshape(-1, 1))
+y_true = np.sin(2 * np.pi * X_plot) + X_plot
+
+plt.plot(X_plot, y_plot1, c="black", label='Linear Kernel')
+plt.plot(X_plot, y_plot2, c="red", label='RBF Kernel ($\gamma=1$)')
+plt.plot(X_plot, y_plot3, c="blue", label='RBF Kernel ($\gamma=100$)')
+plt.plot(X_plot, y_plot4, c="green", label='RBF Kernel (CV)')
+plt.plot(X_plot, y_true, c="gray", label='Truth')
+
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("Kernel Ridge Regression")
+_ = plt.legend()
+
+plt.show()
+```
+
+## Multilayer Perceptron (MLP)
+
+-  It is also called a **feedforward neural network** because information flows through the function being evaluated from $\boldsymbol{x}$, through the intermediate computations used to define $f$ , and finally to the output $y$.
+-  When **feedback** connections are included, they are called **recurrent neural networks**.
+
+![](images/lec04/perceptron.png){fig-align="center" width=30%}
+
+## Multilayer Perceptron (MLP)
+
+:::: {.columns}
+
+::: {.column width="40%"}
+![](images/lec04/neural_network-0.png){fig-align="center" width=100%}
+:::
+
+::: {.column width="60%"}
+-   Input: $\boldsymbol{x} = [x_1, x_2, \ldots, x_p]^T \in \R^p$.
+-   Hidden Units:
+    \begin{align*}
+    h_i & = \sigma\left(\sum_{j=1}^p w_{ij} x_j + b_i\right), \quad i = 1, \ldots, m, \\ 
+        & = \sigma\left(\boldsymbol{w}_i^T \boldsymbol{x} + b_i\right), \quad i = 1, \ldots, m, \\
+    \boldsymbol{w}_i & = [w_{i1}, w_{i2}, \ldots, w_{ip}]^T \in \R^p, \quad b_i \in \R.
+    \end{align*}
+-   Output: 
+    \begin{align*}
+    y & = \beta_0 + \sum_{j=1}^m \beta_{j} h_j = \beta_0 + \boldsymbol{\beta}^T \boldsymbol{h},\\
+    \boldsymbol{h} & = [h_{1}, h_{2}, \ldots, h_{m}]^T \in \R^m, \\
+    \boldsymbol{\beta} & = [\beta_{1}, \beta_{2}, \ldots, \beta_{m}]^T \in \R^m, \quad \beta_0 \in \R.
+    \end{align*}
+:::
+
+::::
+
+## Feature Map in MLP
+
+-   The relationship between the input $\boldsymbol{x}$ and the hidden unit $\boldsymbol{h}$ is
+    $$
+    \boldsymbol{h} = \sigma\left(\boldsymbol{W} \boldsymbol{x} + \boldsymbol{b}\right),
+    $$
+    where
+    $$
+    \boldsymbol{W} = \begin{bmatrix} \boldsymbol{w}_1^T \\ \boldsymbol{w}_2^T \\ \vdots \\ \boldsymbol{w}_m^T \end{bmatrix} \in \R^{m \times p}, \quad \boldsymbol{b} = \begin{bmatrix} b_1 \\ b_2 \\ \vdots \\ b_m \end{bmatrix} \in \R^m.
+    $$
+-   The function $\sigma: \R \to \R$ is called an **activation function** and is applied element-wise to the vector $\boldsymbol{W} \boldsymbol{x} + \boldsymbol{b}$.
+-   Tha map $\boldsymbol{x} \mapsto \sigma\left(\boldsymbol{W} \boldsymbol{x} + \boldsymbol{b}\right)$ can be viewed as a feature map parametrized by $\boldsymbol{W}$ and $\boldsymbol{b}$.
+-   That is, we replace the linear predictor $\beta_0 + \boldsymbol{x}^T \boldsymbol{\beta}$ with $\beta_0 + \boldsymbol{\beta}^T \boldsymbol{h} = \beta_0 + \boldsymbol{\beta}^T \sigma\left(\boldsymbol{W} \boldsymbol{x} + \boldsymbol{b}\right)$.
+
+-   Finally, we can link the predictor $\beta_0 + \boldsymbol{\beta}^T \sigma\left(\boldsymbol{W} \boldsymbol{x} + \boldsymbol{b}\right)$ to the output $y$ (or more specifically $\E(Y \mid \boldsymbol{x})$) using a link function, e.g., identity, logit, or softmax. 
+
+
+## Activation function
+
+-   The main role of the activation function is to introduce nonlinearity into the model.
+-   If $\sigma(x) = x$, then the MLP is equivalent to a linear model since
+    \begin{align*}
+    \beta_0 + \boldsymbol{\beta}^T \boldsymbol{h} & = \beta_0 + \boldsymbol{\beta}^T \sigma(\boldsymbol{W} \boldsymbol{x} + \boldsymbol{b}) = \beta_0 + \boldsymbol{\beta}^T \boldsymbol{W} \boldsymbol{x} + \boldsymbol{\beta}^T \boldsymbol{b}\\
+    & = \left(\beta_0 + \boldsymbol{\beta}^T \boldsymbol{b}\right) + \left(\boldsymbol{\beta}^T \boldsymbol{W}\right) \boldsymbol{x} = \tilde{\beta}_0 + \tilde{\boldsymbol{\beta}}^T \boldsymbol{x}.
+    \end{align*}
+-   From this perspective, $\sigma$ can be any nonlinear function.
+-   However, the choice of activation function has a crucial impact on training, especially when the neural network is deep, i.e., it has many hidden layers.
+-   Common choices of activation functions include:
+    -   Rectified Linear Unit (ReLU): $\sigma(x) = \max(0, x)$
+    -   Logistic: $\sigma(x) = \frac{1}{1 + \exp(-x)}$
+    -   Hyperbolic Tangent (tanh): $\sigma(x) = \tanh(x)$
+
+## Activation Functions
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.linspace(-5, 5, 100)
+y_relu = np.maximum(0, x)
+y_logistic = 1 / (1 + np.exp(-x))
+y_tanh = np.tanh(x)
+
+plt.plot(x, y_relu, label='ReLU', c='black')
+plt.plot(x, y_logistic, label='Logistic', c='red')
+plt.plot(x, y_tanh, label='tanh', c='blue')
+
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("Activation Functions")
+_ = plt.legend()
+plt.show()
+```
+
+## More Hidden Layers
+
+-   Increasing the number of hidden layers is straightforward and it allows the model to learn more complex functions.
+-   The MLP is also called a **fully connected neural network (FCNN)** because we have connections between all the units in adjacent layers.
+
+![](images/lec04/neural_network-1.png){fig-align="center" width=50%}
+
+## The general form of an FCNN
+
+-   An $L$-layer FCNN (the $L$th layer is the output layer) can be written recursively as
+    $$
+    f^{(L)}(\boldsymbol{x}) = \boldsymbol{W}^{(L)}\boldsymbol{h}^{(L-1)} +  \boldsymbol{b}^{(L)} \in \R^k,
+    $$
+    where
+    $$
+    \boldsymbol{h}^{(l)} = \sigma^{(l)}\left(\boldsymbol{W}^{(l)} \boldsymbol{h}^{(l-1)} + \boldsymbol{b}^{(l)}\right), \quad l = 1, \ldots, L-1,
+    $$
+    and $\boldsymbol{h}^{(0)} = \boldsymbol{x} \in \R^p$.
+-   The function $\sigma^{(l)}$ is the activation function for the $l$-th layer. Typically, we use the same activation function for all layers.
+-   The parameter of the model is $\theta = \{\boldsymbol{W}^{(1)}, \ldots, \boldsymbol{W}^{(L)}, \boldsymbol{b}^{(1)}, \ldots, \boldsymbol{b}^{(L)}\}$.
+-   Denote the number of nodes in the $l$th layer by $m_l$ ($m_0 = p$ and $m_{L} = k$), i.e., $\boldsymbol{h}^{(l)} \in \R^{m_l}$.
+-   Then $\boldsymbol{W}^{(l)} \in \R^{m_l \times m_{l-1}}$ and $\boldsymbol{b}^{(l)} \in \R^{m_l}$ and the total number of parameters is
+    $$
+        \sum_{i=1}^{L} m_l\cdot m_{l-1} + m_l = \sum_{i=1}^{L} m_l(m_{l-1} + 1).
+    $$
+
+
+# Back-propagation
+
+## Training a Neural Network
+
+-   Suppose now we have a dataset $\mathcal{D} = \{(\boldsymbol{x}_1, y_1), \ldots, (\boldsymbol{x}_n, y_n)\}$ and we have chosen a hypothesis class $\mathcal{H}^{(L)}$ consisting of $L$-layer FCNNs.
+-   Based on the dataset, we can also specify an appropriate loss function $\ell$.
+-   Following the ERM principle, we want to find the model $\hat{f} \in \mathcal{H}^{(L)}$ that minimizes the empirical risk function
+    $$
+    \hat{f} = \argmin_{f \in \mathcal{H}^{(L)}} \frac{1}{n} \sum_{i=1}^n \ell(y_i, f(\boldsymbol{x}_i)).
+    $$ 
+-   Since $\mathcal{H}^{(L)}$ is parametrized by the weights and biases, we need to find the optimal weights and biases that minimize the empirical risk function.
+-   Let $J(\theta) = \frac{1}{n} \sum_{i=1}^n \ell(y_i, f_{\theta}(\boldsymbol{x}_i))$. The goal is to find $\theta$ that minimizes $J(\theta)$. 
+
+## Gradient Descent
+
+-   The gardient descent algorithm is a simple and widely used optimization algorithm for finding the minimum of a function.
+-   Let $g: \R^d \to \R$ be a differentiable function. The gradient of $g$ at $\boldsymbol{x} \in \R^d$ is the vector of partial derivatives of $g$ at $\boldsymbol{x}$:
+    $$
+    \nabla g(\boldsymbol{x}) = \left[\frac{\partial}{\partial x_1} g(\boldsymbol{x}), \ldots, \frac{\partial}{\partial x_d} g(\boldsymbol{x})\right]^T.
+    $$
+-   Consider the first-order Taylor expansion of $g$ at $\boldsymbol{x}$:
+    $$
+    g(\boldsymbol{x} + \boldsymbol{\epsilon}) = g(\boldsymbol{x}) + \boldsymbol{\epsilon} ^T\nabla g(\boldsymbol{x})  + O(\|\boldsymbol{\epsilon}\|^2).
+    $$
+-   When $\|\boldsymbol{\epsilon}\|$ is small, we can approximate $g(\boldsymbol{x} + \boldsymbol{\epsilon})$ by $g(\boldsymbol{x}) + \boldsymbol{\epsilon} ^T\nabla g(\boldsymbol{x})$.
+-   Taking $\boldsymbol{\epsilon} = -\eta \nabla g(\boldsymbol{x})$ for some small $\eta > 0$, we have
+    $$
+    g(\boldsymbol{x} - \eta \nabla g(\boldsymbol{x})) \approx g(\boldsymbol{x}) - \eta \|\nabla g(\boldsymbol{x})\|^2 \leq g(\boldsymbol{x}).
+    $$
+-   That is, if we move in the **opposite** direction of the gradient **by an appropriate distance**, we can decrease the value of $g$. This is called the **gradient descent** algorithm.
+
+---
+
+
+![](images/lec04/GD_algorithm.png){fig-align="center" width=100%}
+
+-   You can also stop the algorithm when the gradient is small enough, i.e., $\|\nabla g(\boldsymbol{x})\| < \epsilon$ for some small $\epsilon > 0$.
+
+## Example: Gradient Descent
+
+```{r}
+#| echo: false 
+library(ggplot2)
+library(tidyverse)
+library(plotly)
+library(gridExtra)
+
+gd <- function(eta, f_grad) {
+    x <- 10.0
+    results <- c(x)
+    for (i in 1:10) {
+        x <- x - eta * f_grad(x)
+        results <- c(results, x)
+    }
+    #print(paste("epoch 10, x:", x))
+    return(results)
+}
+
+show_trace <- function(results, f) {
+    n <- max(abs(min(results)), abs(max(results)))
+    f_line <- seq(-n, n, 0.01)
+    ggplot() +
+        xlim(-n, n) + 
+        geom_function(fun = f, color = "gray") + 
+        geom_point(aes(x = results, y = f(results)), 
+                   color = "black", size = 2) +
+        geom_point(aes(x = results[1], y = f(results[1])), 
+                   color = "red", shape = 17, size = 3) +
+        geom_path(aes(x = results, y = f(results)), col = "black") + 
+        ylab("f(x)") + 
+        xlab("x") 
+}
+```
+
+```{r}
+#| echo: false
+#| fig-align: center
+#| fig-width: 10
+#| fig-height: 6.5
+ 
+f <- function(x) x^2
+f_grad <- function(x) 2*x
+
+good_gd <- show_trace(gd(0.2, f_grad), f)
+small_gd <- show_trace(gd(0.05, f_grad), f)
+large_gd <- show_trace(gd(1.1, f_grad), f)
+
+c <- 0.15 * pi
+
+f <- function(x) x * cos(c * x)
+f_grad <- function(x) cos(c * x) - c * x * sin(c * x)
+
+local_gd <- show_trace(gd(2, f_grad), f)
+
+grid.arrange(good_gd, small_gd, large_gd, local_gd, ncol=2)
+```
+
+## Gradient Descent
+
+-   The gradient descent/ascent algorithm is the most simple optimization algorithm for finding the minimum/maximum of a function.
+-   It is a **first-order optimization** algorithm that uses only the first-order derivative information.
+-   The extra parameter $\eta$ is called the **learning rate**, which controls the step size of the algorithm.
+-   Learning rate is a crucial hyperparameter in the gradient descent algorithm as it determines the convergence rate and the stability of the algorithm.
+-   If the learning rate is too small, the algorithm may converge very slowly. If it is too large, the algorithm may diverge.
+-   There are also second-order optimization algorithms that use the second-order derivative information (the Hessian matrix), e.g., Newton's method, IRWLS.
+-   Modern deep learning frameworks use variants of gradient descent algorithms, e.g., Adam, RMSprop, Adagrad, etc.
+
+## Train a Neural Network using GD
+
+-   Recall that the goal is to find the optimal weights and biases that minimize the empirical risk function $J(\theta) = \frac{1}{n} \sum_{i=1}^n \ell(y_i, f_{\theta}(\boldsymbol{x}_i))$.
+-   To apply the gradient descent algorithm, we need to compute the gradient of $J(\theta)$ with respect to the weights and biases.
+-   For simplicity, we assume that $L = 2$ (one hidden layer, $m_0 = p$, $m_1 = m$, $m_2 = 1$), i.e.,
+    $$
+    f_{\theta}(\boldsymbol{x}) = \boldsymbol{W}^{(2)}\sigma\left(\boldsymbol{W}^{(1)}\boldsymbol{x} + \boldsymbol{b}^{(1)}\right) + \boldsymbol{b}^{(2)}.
+    $$
+-   The parameters are $\theta = \{\boldsymbol{W}^{(1)}, \boldsymbol{W}^{(2)}, \boldsymbol{b}^{(1)}, \boldsymbol{b}^{(2)}\}$ where $\boldsymbol{W}^{(1)} \in \R^{m \times p}$, $\boldsymbol{W}^{(2)} \in \R^{1 \times m}$, $\boldsymbol{b}^{(1)} \in \R^m$, and $\boldsymbol{b}^{(2)} \in \R$.
+
+--- 
+
+-   MSE loss:
+    $$
+    J(\theta) = \frac{1}{n} \sum_{i=1}^n (y_i - f_{\theta}(\boldsymbol{x}_i))^2, \quad \nabla J(\theta) = -\frac{2}{n}\sum_{i=1}^n(y_i - f_{\theta}(\boldsymbol{x}_i)) \nabla f_{\theta}(\boldsymbol{x}_i).
+    $$
+-   Cross-entropy loss (classification):
+    \begin{align*}
+    J(\theta) & = -\frac{1}{n} \sum_{i=1}^n \left[y_i \log p_{\theta}(\boldsymbol{x}_i) + (1 - y_i) \log\left(1 - p_{\theta}(\boldsymbol{x}_i) \right)\right], \qquad p_{\theta}(\boldsymbol{x}_i) = \frac{1}{1+\exp(-f_{\theta}(\boldsymbol{x}_i))}\\
+    & = -\frac{1}{n} \sum_{i=1}^n \left[y_i \log\left(\frac{p_{\theta}(\boldsymbol{x}_i)}{1 - p_{\theta}(\boldsymbol{x}_i)}\right) + \log\left(1 - p_{\theta}(\boldsymbol{x}_i) \right)\right]\\ 
+    & = -\frac{1}{n} \sum_{i=1}^n \left[y_i f_{\theta}(\boldsymbol{x}_i) - \log\left(1 + \exp(f_{\theta}(\boldsymbol{x}_i)) \right)\right]\\ 
+    \nabla J(\theta) & = -\frac{1}{n} \sum_{i=1}^n \left[y_i \nabla f_{\theta}(\boldsymbol{x}_i) - \frac{\exp(f_{\theta}(\boldsymbol{x}_i))}{1 + \exp(f_{\theta}(\boldsymbol{x}_i))}\nabla f_{\theta}(\boldsymbol{x}_i) \right]\\
+    & = -\frac{1}{n} \sum_{i=1}^n \left(y_i - p_{\theta}(\boldsymbol{x}_i)\right)\nabla f_{\theta}(\boldsymbol{x}_i). 
+    \end{align*}
+-   To compute $\nabla J(\theta)$, we need to compute $\nabla f_{\theta}(\boldsymbol{x}_i)$ for all $i = 1, \ldots, n$.
+
+## Chain Rule
+
+Write 
+\begin{align*}
+f_{\theta}(\boldsymbol{x}) & = \boldsymbol{W}^{(2)}\sigma\left(\boldsymbol{W}^{(1)}\boldsymbol{x} + \boldsymbol{b}^{(1)}\right) + \boldsymbol{b}^{(2)} = \boldsymbol{W}^{(2)}\boldsymbol{h}^{(1)} + \boldsymbol{b}^{(2)}\\
+\boldsymbol{h}^{(1)} & = \sigma\left(\boldsymbol{W}^{(1)}\boldsymbol{x} + \boldsymbol{b}^{(1)}\right), 
+\end{align*}
+and we have 
+\begin{align*}
+\nabla_{\boldsymbol{b}^{(2)}} f_{\theta}(\boldsymbol{x}) & = 1\\
+\nabla_{\boldsymbol{W}^{(2)}} f_{\theta}(\boldsymbol{x}) & = \boldsymbol{h}^{(1)} = \sigma\left(\boldsymbol{W}^{(1)}\boldsymbol{x} + \boldsymbol{b}^{(1)}\right) \in \R^m\\
+\nabla_{\boldsymbol{b}^{(1)}} f_{\theta}(\boldsymbol{x}) & = \left[\nabla_{\boldsymbol{b}^{(1)}} \boldsymbol{h}^{(1)}\right] \left(\boldsymbol{W}^{(2)}\right)^T \in \R^m\\
+\nabla_{\boldsymbol{W}^{(1)}} f_{\theta}(\boldsymbol{x}) & = \boldsymbol{W}^{(2)}\nabla_{\boldsymbol{W}^{(1)}} \boldsymbol{h}^{(1)} = \sum_{k=1}^m W_k^{(2)} \nabla_{\boldsymbol{W}^{(1)}} h_k^{(1)}\in \R^{m \times p}\\
+\nabla_{\boldsymbol{b}^{(1)}} \boldsymbol{h}^{(1)} & = \text{diag}\left(\sigma^{\prime}(\boldsymbol{W}^{(1)}\boldsymbol{x} + \boldsymbol{b}^{(1)})\right) \in \R^{m \times m}\\
+\nabla_{\boldsymbol{W}^{(1)}} h_k^{(1)} & \in \R^{m \times p}.
+\end{align*}
+
+## Computational Graph
+
+A graphical representation of computation:
+
+-   Nodes indicate variables (scalar, vector, matrix, etc.)
+-   Edges indicate operations (addition, multiplication, function evaluation, etc.)
+
+![](images/lec04/comp_graph-0.png){fig-align="center" width=30%}
+
+## Computational Graph for a Neural Network
+
+-   The computational graph for a neural network is the following
+
+![](images/lec04/comp_graph-1.png){fig-align="center" width=100%}
+
+-   The square nodes represent unknown parameters.
+-   The process of transforming the input $\boldsymbol{x}$ to the output $y$ following the arrows is called **forward propagation**.
+
+## Back-propagation
+
+-   The process of computing the gradient of the loss function with respect to the parameters is called **back-propagation**.
+-   The back-propogation algorithm is simply an application of the chain rule to compute the gradient of the loss function with respect to the parameters.
+-   To each edge in the computational graph, we associate a gradient that represents the derivative of the starting node with respect to the variable at the end node.
+
+
+![](images/lec04/comp_graph-2.png){fig-align="center" width=100%}
+
+
+## Example
+
+Consider the same dataset as the previous example. We want to build a regression model using neural networks.
+```{python}
+#| echo: false
+#| fig-align: center 
+import numpy as np
+import matplotlib.pyplot as plt
+
+rng = np.random.default_rng(100)
+n = 100
+X = rng.uniform(low=0, high=3, size=n)
+y = np.sin(2 * np.pi * X) + X + rng.normal(loc=0, scale=0.5, size=n)
+plt.scatter(X, y, c="black", s=20)
+plt.show()
+```
+
+---
+
+Setup an MLP with one hidden layer with 10 units and the logistic activation function.
+
+```{python}
+#| echo: true
+#| output: fragment 
+import keras
+from keras import layers
+
+model = keras.Sequential(
+    [
+        layers.Dense(units = 10, activation = "sigmoid", 
+                     input_shape = (1,), name = "hidden_layer"),
+        layers.Dense(units = 1, activation = None, 
+                     name = "output_layer")
+    ],
+    name="Shallow_MLP"
+)
+model.summary()
+```
+
+---
+
+Use the Adam optimizer with a learning rate of 0.3 and train the model for 1000 epochs (iterations).
+
+```{python}
+#| echo: true
+#| output: false 
+#| code-line-numbers: "2,3,5"
+import time 
+opt = keras.optimizers.Adam(learning_rate=0.3)
+model.compile(loss="mean_squared_error", optimizer=opt)
+t0 = time.time()
+model.fit(X.reshape(-1, 1), y, batch_size=n, epochs=1000, verbose=0) 
+MLP_time = time.time() - t0
+```
+
+```{python} 
+#| echo: false
+#| fig-align: center
+from sklearn.kernel_ridge import KernelRidge 
+import matplotlib.pyplot as plt
+import numpy as np
+ 
+plt.scatter(X, y, c="gray", s=10)
+
+kr = KernelRidge(alpha = 1, kernel='rbf', gamma=10)
+t0 = time.time()
+kr.fit(X.reshape(-1, 1), y)
+kr_time = time.time() - t0
+
+X_plot = np.linspace(0, 3, 100)
+y_MLP = model.predict(X_plot.reshape(-1, 1), verbose=0)
+y_KR = kr.predict(X_plot.reshape(-1, 1))
+y_true = np.sin(2 * np.pi * X_plot) + X_plot
+
+plt.plot(X_plot, y_MLP, c="red", label="MLP")
+plt.plot(X_plot, y_KR, c="blue", label="RBF kernel ($\gamma=10$)")
+plt.plot(X_plot, y_true, c="gray", label="Truth")
+
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("Kernel Ridge Regression vs MLP")
+_ = plt.legend()
+
+plt.show() 
+```
+
+## Some questions
+
+-   ReLU v.s. Sigmoid? Which is better?
+-   How to choose the number of hidden units? The more the better?
+-   How to choose the number of hidden layers? The deeper the better?
+-   It seems that kernel regresion gives a slightly better result than MLP does.
+    -   In the previous example, kernel regression takes ~0.01 second to train, while MLP takes ~9.5 seconds.
+
+# Appendix
+
+## Proof of (*) in P.6
+
+Show that for any $\boldsymbol{Z} \in \R^{n \times d}$, $\boldsymbol{y} \in \R^n$, and $\alpha > 0$, we have
+$$
+(\boldsymbol{Z}^T \boldsymbol{Z} + \alpha I_d)^{-1} \boldsymbol{Z}^T \boldsymbol{y} = \boldsymbol{Z}^T (\boldsymbol{Z} \boldsymbol{Z}^T + \alpha I_n)^{-1} \boldsymbol{y}.
+$$
+
+**Proof**:
+
+1.  The left hand side is the solution to the equation $\boldsymbol{Z}^T \boldsymbol{Z} \boldsymbol{\beta}+\alpha \boldsymbol{\beta}=\boldsymbol{Z}^T \boldsymbol{y}$.
+2.  Rearranging the terms gives $\boldsymbol{\beta}=\boldsymbol{Z}^T\left[\frac{1}{\alpha}(\boldsymbol{y}-\boldsymbol{Z} \boldsymbol{\beta})\right]$.
+3.  Define $\boldsymbol{b}=\frac{1}{\alpha}(\boldsymbol{y}-\boldsymbol{Z} \boldsymbol{\beta})$, and then $\boldsymbol{\beta}=\boldsymbol{Z}^T \boldsymbol{b}$.
+4.  Substituting $\boldsymbol{\beta}=\boldsymbol{Z}^T \boldsymbol{b}$ into $\boldsymbol{b}=\frac{1}{\alpha}(\boldsymbol{y}-\boldsymbol{Z} \boldsymbol{\beta})$, we have
+$$
+\boldsymbol{b}=\frac{1}{\alpha}\left(\boldsymbol{y}-\boldsymbol{Z} \boldsymbol{Z}^T \boldsymbol{b}\right).
+$$
+5.  Rearranging the terms gives $\left(\boldsymbol{Z}\boldsymbol{Z}^{T}+\alpha I_n\right) \boldsymbol{b}=\boldsymbol{y}$, which yields $\boldsymbol{b}=\left(\boldsymbol{Z} \boldsymbol{Z}^T+\alpha I_n\right)^{-1} \boldsymbol{y}$
+6.  Substituting into $\boldsymbol{\beta}=\boldsymbol{Z}^T \boldsymbol{b}$ gives $\boldsymbol{\beta}=\boldsymbol{Z}^T\left(\boldsymbol{Z} \boldsymbol{Z}^T+\alpha I_n\right)^{-1} \boldsymbol{y}$.
+
+## Feature map of RBF kernel
+
+Consider the univariate RBF kernel $k(x, y) = \exp\left(-(x - y)^2\right)$. We have
+\begin{align*}
+k(x, y) & = \exp\left(-(x - y)^2\right) = \exp\left(-x^2 + 2xy - y^2\right) = \exp(-x^2)\exp(2xy)\exp(-y^2)\\
+& = \exp(-x^2)\left(\sum_{m=0}^{\infty} \frac{2^mx^my^m}{m!}\right)\exp(-y^2)\\
+& = \exp(-x^2) \left(1, \sqrt{\frac{2^1}{1!}}x, \sqrt{\frac{2^2}{2!}}x^2, \sqrt{\frac{2^3}{3!}}x^3, \ldots \right)^T\\
+& \qquad \left(1, \sqrt{\frac{2^1}{1!}}y, \sqrt{\frac{2^2}{2!}}y^2, \sqrt{\frac{2^3}{3!}}y^3, \ldots \right)\exp(-y^2)
+\end{align*}
+
+Hence the feature map corresponding to the RBF kernel is 
+$$
+\phi(x) = \exp(-x^2)\left(1, \sqrt{\frac{2^1}{1!}}x, \sqrt{\frac{2^2}{2!}}x^2, \sqrt{\frac{2^3}{3!}}x^3, \ldots \right)^T.
+$$
