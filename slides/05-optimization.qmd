@@ -1,0 +1,443 @@
+---
+title: "Optimization in DL"
+---
+
+## Recap of the Last Lecture
+
+{{< include macro.qmd >}}
+
+-   An $L$-layer FCNN (the $L$th layer is the output layer) can be written recursively as
+    $$
+    f^{(L)}(\boldsymbol{x}) = \boldsymbol{W}^{(L)}\boldsymbol{h}^{(L-1)} +  \boldsymbol{b}^{(L)} \in \R^k,
+    $$
+    where
+    $$
+    \boldsymbol{h}^{(l)} = \sigma\left(\boldsymbol{W}^{(l)} \boldsymbol{h}^{(l-1)} + \boldsymbol{b}^{(l)}\right), \quad l = 1, \ldots, L-1,
+    $$
+    and $\boldsymbol{h}^{(0)} = \boldsymbol{x} \in \R^p$.
+-   We use a link function to connect the predictor $f^{(L)}(\boldsymbol{x})$ to the conditional expectation $\E(Y \mid \boldsymbol{x})$.  
+-   The parameters of the model can be learning by minimizing the empirical risk using the **gradient descent algorithm**.
+-   The gradient of the loss function with respect to the parameters can be computed using the **back-propagation**.
+-   In practice, all the gradients computations are done automatically, for example, using `torch.autograd`. 
+
+## Deep Neural Networks
+
+-   Neural network is a very flexible and powerful class of models; there are many ways to design them:
+    -   Depth (number of hidden layers)
+    -   Width (number of hidden units)
+    -   Activation functions
+    -   Optimization (learning rate and learning schedule)
+    -   Regularization
+-   It is impossible for us to know the best architecture for a given problem in advance. Typically, we monitor the learning process and adjust the architectures accordingly.
+-   Numerous experiments have shown that **deep but narrow networks** are more efficient than **shallow but wide networks**.
+-   However, training deep networks is challenging due to various reasons and we will discuss some strategies to address these challenges.
+
+
+## Outline
+
+
+-   Deep Neural Networks
+    -   Depth v.s. Width
+    -   Challenges of training deep networks
+    -   Depth-Friendly Architectures   
+-   First-order Optimization Methods
+    -   Stochastic Gradient Descent
+    -   Learning Rate Schedules
+    -   Momentum
+    -   Adaptive Learning Rates
+
+
+## Deep vs Shallow Networks
+
+-   Using the same number of nodes (parameters), deep networks can represent more complex functions than shallow networks:
+    -   Shallow network (one hidden layer): **linear combination** of simple nonlinear functions
+    -   Deep networks (multiple hidden layers): **functional composition** of simple nonlinear functions
+-   Earlier layers capture primitive features, and later layers capture more complex features.
+
+---
+
+![](images/lec05/cnn_feature.png){fig-align="center" width=70%}
+
+::: aside
+Image source: Figure 1.2 of DL.
+:::
+
+## Challenges of Training Deep Networks
+
+-   Deeper networks are often harder to train, and are also unstable to parameter initialization or hyperparameter choices.
+-   The main reason is that the loss function is high dimensional and highly non-convex, due to the recursive composition of nonlinear functions.
+-   The loss function loos like:
+
+:::: columns
+
+::: {.column width="50%"}
+![](images/lec05/loss_landscape_1.png){fig-align="center" width=70%}
+
+:::
+
+::: {.column width="50%"}
+![](images/lec05/loss_landscape_2.png){fig-align="center" width=70%}
+
+:::
+
+::::
+
+::: aside
+Image source: Li, H., Xu, Z., Taylor, G., Studer, C., & Goldstein, T. (2018). [Visualizing the loss landscape of neural nets](https://proceedings.neurips.cc/paper_files/paper/2018/file/a41b3bb3e6b050b6c9067c67f663b915-Paper.pdf). *NeurIPS*.
+:::
+
+## Challenges of Training Deep Networks
+
+-   The challenges of training deep networks include:
+    -   Complicated loss landscape (local minima, saddle points, flat regions, cliffs, etc)
+    -   Vanishing and exploding gradients
+    -   Convergence (the convergence rate slows down exponentially with depth)
+-   Next, we will discuss some special architectures and optimization strategies to address these challenges. 
+
+## Local Minima
+
+-   In convex optimization problem, it can be reduced to the problem of finding a local minimum, which is guaranteed to be the global minimum.
+-   With nonconvex functions, such as neural nets, it is possible to have many local minima, which is due to the **model identifiability** problem.
+-   For example, 
+    -   **weight space symmetry (permutation symmetry)**: we can reorder the neurons in any hidden layer, along with the corresponding permutation of the weights and biases associated with them
+    -   **scaling symmetry**: in any ReLU network, we can scale all the incoming weights and biases of a unit by $a$ and all its outgoing weights by $1/a$.
+-   The parameters in neural networks are not interpretable and so is any unidentifiable models.
+-   Thus it is not important to find a true global minimum rather than to find a point in parameter space that has low but not minimal cost, i.e., good local minima.
+
+## Saddle Points and Flat Regions
+
+-   These regions are where the gradient is close to zero, but not local minima:
+    -   **Saddle points**: points where the gradient is zero but the Hessian has both positive and negative eigenvalues.
+    -   **Flat regions**: regions where the gradient is close to zero but the Hessian has all eigenvalues near zero.
+-   Gradient-based optimization algorithms can get stuck in these regions.
+
+![](images/lec05/saddle_points.png){fig-align="center" width=70%}
+
+::: aside
+Image source: Figure 4.13 of Aggarwal (2023) Neural Networks and Deep Learning.
+:::
+
+## Vanishing Gradients
+
+-   The vanishing gradient problem is a common issue in training deep networks: the gradient in the earlier layers is close to zero.
+-   This problem would lead to slow convergence or even the model cannot be trained.
+-   Consider a deep network with $L$ layers, each layer with 1 node and no bias term.
+-   Denote the weights of the $l$-th layer as $w_l$ and $h_l = \sigma(w_l h_{l-1})$.
+-   The gradient of the loss $\ell$ with respect to $w_l$ is
+    $$
+    \frac{\partial \ell}{\partial w_l} = \frac{\partial \ell}{\partial h_L} \cdot \frac{\partial h_L}{\partial h_{L-1}} \cdot \frac{\partial h_{L-1}}{\partial h_{L-2}} \cdots \frac{\partial h_{l+1}}{\partial h_{l}} \cdot \frac{\partial h_l}{\partial w_l}.
+    $$
+-   Note that $\frac{\partial h_l}{\partial h_{l-1}} = \sigma^{\prime}(w_l h_{l-1})w_{l}$ and hence
+    \begin{align*}
+    \frac{\partial \ell}{\partial w_l} & = \frac{\partial \ell}{\partial h_L} \cdot \frac{\partial h_L}{\partial h_{L-1}}  \cdots \frac{\partial h_{l+1}}{\partial h_{l}} \cdot \frac{\partial h_l}{\partial w_l} 
+    = \frac{\partial \ell}{\partial h_L} \left(\prod_{i=l+1}^L w_i \right)\left(\prod_{i=l+1}^L \sigma^{\prime}(w_ih_{i-1})\right)\frac{\partial h_l}{\partial w_l}.
+    \end{align*}
+-   When $L$ is large and $\sigma^{\prime}(x) < 1$, the gradient $\frac{\partial \ell}{\partial w_l}$ is close to zero.
+
+## Cliffs and Exploding Gradients
+
+-   Cliffs are regions where the gradient is very steep, which can cause the optimization algorithm to diverge.
+-   This issue can be avoided by the **gradient clipping** method:
+    -   **Value Clipping**: Each component of the gradient vector is individually clipped to lie within a predefined range, such as [-threshold, threshold].
+    -   **Norm Clipping**: The entire gradient vector is scaled down if its norm (such as the L2 norm) exceeds the threshold, preserving its direction but reducing its magnitude.
+
+
+![](images/lec05/cliffs.png){fig-align="center" width=60%}
+
+::: aside
+Image source: Figure 8.3 of DL.
+:::
+
+
+# Depth-Friendly Architectures
+
+## Activation Function Choice
+
+The specific choice of activation function often has a considerable eﬀect on thes everity of the vanishing gradient problem. The following are the derivatives of some common activation functions:
+
+![](images/lec05/activation_derivative.png){fig-align="center" width=50%}
+
+::: aside
+Image source: Figure 4.8 of Aggarwal (2023) Neural Networks and Deep Learning.
+:::
+
+## Dead Neurons
+
+-   In recent years, the use of the sigmoid and the tanh activation functions has been increasingly replaced with the ReLU and the hard tanh functions.
+-   The ReLU is faster to train because its gradient computation amounts to checking nonnegativity.
+-   However the ReLU activation introduces a new problem of **dead neurons**: when a neuron has negative activation, it is dead.
+-   The negative activation would happen for a couple of reasons:
+    -   The weights are initialized to be negative
+    -   The learning rate is too high
+-   Once a neuron is dead, the weights of this neuron will never be updated further during training.
+-   Some solutions are:
+    -   Choose a modest learning rate 
+    -   Use some variants of ReLU
+
+## Variants of ReLU
+
+There are several variants of ReLU that are designed to address the dying ReLU problem, for example,
+
+-   **Leaky ReLU**: $f(x) = \max(\alpha x, x)$
+-   **Exponential Linear Unit (ELU)**: $f(x) = \begin{cases} x & \text{if } x > 0, \\ \alpha(\exp(x) - 1) & \text{if } x \leq 0. \end{cases}$
+
+![](images/lec05/relu.png){fig-align="center" width=60%}
+
+::: aside
+Image source: Clevert, D. A., Unterthiner, T., & Hochreiter, S. (2016). Fast and accurate deep network learning by exponential linear units (elus). ICLR.
+:::
+
+## Maxout Networks
+
+-   The *maxout network* is proposed by Goodfellow et. al. (2013) to address the dying ReLU problem.
+-   The maxout unit outputs $\max(W_1x + b_1, W_2x + b_2)$. 
+-   It can be viewed as a generalization of the ReLU and the leaky ReLU:
+    -   If $W_2 = 0$ and $b_2 = 0$, then it is the ReLU.
+    -   If $W_2 = \alpha W_1$ and $b_2 = \alpha b_1$, then it is the leaky ReLU.
+-   However, it does not saturate at all, and is linear almost everywhere. In spite of its linearity, it has been shown that maxout networks are universal function approximators. 
+-   Maxout has advantages over the ReLU, and it enhances the performance of ensemble methods like Dropout.
+-   However, one drawback with maxout is that it doubles the number of parameters.
+
+## Skip connections
+
+-   The skip connection is proposed by He et. al. (2016)[^resnet].
+-   The idea is to reformulate the layers as **learning residual functions** with reference to the layer inputs, instead of learning unreferenced functions.
+-   This is often called **residual learning**.
+
+
+![](images/lec05/skip_connection.png){fig-align="center" width=70%}
+
+[^resnet]: He, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep residual learning for image recognition. In *Proceedings of the IEEE conference on Computer Vision and Pattern Recognition* (pp. 770-778).
+
+## Loss Landscape with Skip Connections
+
+-   The ResNet-56 is a network proposed by He et. al. (2016), which has 56 layers and 0.85M parameters. 
+-   With the skip connections, the loss function becomes much smoother and easier to optimize.
+
+![](images/lec05/loss_skip.png){fig-align="center" width=70%}
+
+::: aside
+Image source: Li, H., Xu, Z., Taylor, G., Studer, C., & Goldstein, T. (2018). [Visualizing the loss landscape of neural nets](https://proceedings.neurips.cc/paper_files/paper/2018/file/a41b3bb3e6b050b6c9067c67f663b915-Paper.pdf). *NeurIPS*.
+:::
+
+## Batch Normalization 
+
+-   Batch normalization (BN) is a method to address the vanishing and exploding gradient problems.
+-   The idea is simple: we normalize the output of a unit $i$ over a batch of training samples (substract the mean and divide by the standard deviation) and then scale and shift the result.
+-   More specifically, let $x_{ij}$ be the output of $j$the sample in the $i$th unit. Then the BN layer computes
+\begin{align*}
+\mu_i & = \frac{1}{m}\sum_{j=1}^m x_{ij}, \quad \sigma_i^2 = \frac{1}{m}\sum_{j=1}^m (x_{ij} - \mu_i)^2, \\
+\tilde{x}_{ij} & = \frac{x_{ij} - \mu_i}{\sigma_i}, \quad y_{ij} = \gamma_i \tilde{x}_{ij} + \beta_i
+\end{align*}
+where $\gamma_i$ and $\beta_i$ are learnable parameters.
+-   There are two types of batch normalization:
+    -   **post-activation BN**: normalize the output of the activation function
+    -   **pre-activation BN**: normalize the input to the activation function
+-   It is argued that the pre-activation BN is better than the post-activation BN.
+
+## Benefits of Batch Normalization
+
+-   Batch normalization has several benefits:
+    -   It reduces the internal covariate shift, which is the change in the distribution of the inputs to a layer.
+    -   It acts as a regularizer, which reduces the need for dropout.
+    -   It allows for higher learning rates, which accelerates the convergence.
+    -   It makes the optimization more stable and less sensitive to the initialization.
+-   A variant of batch normalization, known as **layer normalization**, is known to work well with recurrent networks.
+
+# First-order Optimization Methods
+
+## Recap of Gradient Descent
+
+-   Given the loss function $J(\theta) = \frac{1}{n}\sum_{i=1}^n \ell(y_i, f(x_i; \theta))$ of a neural network, the gradient descent algorithm updates the parameters as
+    $$
+    \theta^{(t+1)} = \theta^{(t)} - \eta \nabla J(\theta^{(t)}),
+    $$
+    where $\eta$ is the learning rate.
+-   The gradient $\nabla J(\theta)$ can be computed using the back-propagation algorithm.
+-   The learning rate $\eta$ is a hyperparameter that needs to be tuned:
+    -   If $\eta$ is too small, the convergence is slow.
+    -   If $\eta$ is too large, the algorithm may diverge.
+-   We will discuss some strategies to make the vanilla GD algorithm more efficient and friendly to deep networks:
+    -   minibatch updates (using only a portion of the data to compute the gradient)
+    -   momentum (accelerating the convergence)
+    -   adaptive learning rate (adjusting the learning rate during training)
+
+
+## Stochastic Gradient Descent
+
+-   In most cases, the loss function is of the form $J(\theta) = \frac{1}{n}\sum_{i=1}^n \ell(y_i, f(x_i; \theta))$,
+    where $n$ is the number of samples and hence the gradient is
+    $$
+    \nabla J(\theta) = \frac{1}{n}\sum_{i=1}^n \nabla \ell(y_i, f(x_i; \theta)).
+    $$
+-   The **stochastic gradient descent (SGD)** algorithm updates the parameters using only one sample, i.e.,
+    $$
+    \theta^{(t+1)} = \theta^{(t)} - \eta \nabla \ell(y_i, f(x_i; \theta^{(t)}).
+    $$
+-   If the sample is drawn uniformly from the training samples, i.e., $I \sim \text{uniform}(\{1,2,\ldots, n\})$, the stochastic gradient is an unbiased estimate of the true gradient
+$$
+\E_I \left[\nabla \ell(y_I, f(x_I; \theta^{(t)})\right] = \sum_{i=1}^n \P(I = i)\nabla \ell(y_i, f(x_i; \theta)) = \frac{1}{n}\sum_{i=1}^n \nabla \ell(y_i, f(x_i; \theta)) = \nabla J(\theta^{(t)})
+$$
+where the expectation is taking with respect to the sample index $I$.
+
+
+## Minibatch Stochastic Gradient Descent
+
+-   In practice, we randomly split the samples into minibatches (or simply batches) $\mathcal{B}_1, \ldots, \mathcal{B}_k$ each with size $m$.
+-   The SGD upadtes the parameters when it sees a new batch and an **epoch** is completed when the algorithm has seen all the batches, i.e.,
+    -   for $t = 1, \ldots, \text{num. of epoch}$:
+        -   for $b = 1, \ldots, k$:
+            -   $\boldsymbol{\theta} \leftarrow \boldsymbol{\theta} - \eta \cdot \frac{1}{m}\sum_{i\in \mathcal{B}_b} \nabla \ell(y_i, f(x_i; \boldsymbol{\theta}))$.
+
+## Benefits of Using SGD
+
+-   There are some benefits of using SGD:
+    -   computational efficiency: the gradient is computed using a small batch of data (more frequent updates)
+    -   The algorithm can potentially escape from local minima more easily since the gradient is noisier.
+-   The SGD also introduces **implicit bias** since it is not moving towards the optimal direction (true gradient direction).
+    -   Smaller batch size leads to more implicit bias.
+-   This implicit bias is also related to the generalization performance [^SGDbias].
+
+[^SGDbias]: 
+Peleg, A. &amp; Hein, M.. (2024). Bias of Stochastic Gradient Descent or the Architecture: Disentangling the Effects of Overparameterization of Neural Networks. *ICML*.
+
+## Determining the Batch size
+
+-   Larger batches provide a more accurate estimate of the gradient.
+-   Computational limitations:
+    -    Use smaller batch sizes if the model is large.
+-   Small batches can oﬀer a regularizing eﬀect, due to the noise they add to the learning process.
+-   However, training with such a small batch
+size might require a small learning rate to maintain stability because of the high variance in the estimate of the gradient. 
+-   Hence using smaller batch sizes can be computationally expensive.
+-   Typically, the batch size is chosen to be a power of 2, e.g., 32, 64, 128, 256, etc.
+
+## Variants of SGD
+
+-   Due to the high dimensionality and non-convexity of the loss function, the vanilla SGD algorithm may not be efficient.
+-   There are many variants of SGD that are designed to accelerate the convergence.
+-   We will introduce three commonly used strategies:
+    -   Learning Rate Schedules (gradually decreasing the learning rate)
+    -   Momentum (accelerating the convergence)
+    -   Adaptive Learning Rates (choosing the learning rate adaptively for each parameter)
+-   These strategies often introduce additional hyperparameters that need to be tuned and can be combined with each other.
+-   **Good**: we now have more optimization strategies to choose from.
+-   **Bad**: there is no best optimization algorithm and we now have more hyperparameters to tune.
+-   Typically, there will be some recommended default values for these hyperparameters.
+
+## Learning Rate Schedules
+
+-   The learning rate $\eta$ is a hyperparameter that needs to be tuned and it greatly affects the convergence of the algorithm.
+-   In practice, we often use a **learning rate schedule** to adjust the learning rate during training.
+-   For example, in SGD, we use $\eta_t$ for the $t$-th epoch
+
+![](images/lec05/sgd.png){fig-align="center" width=80%}
+
+## Learning Rate Schedules
+
+-   A suﬃcient condition to guarantee convergence of SGD is that
+$$
+\sum_{t=1}^{\infty} \eta_t = \infty, \quad \text{and} \quad \sum_{t=1}^{\infty} \eta_t^2 < \infty.
+$$
+-   In practice, it is common to decay the learning rate linearly until iteration $\tau$:
+$$
+\eta_t = (1 − \alpha) \eta_0 + \eta_{\tau}
+$$
+with $\alpha = \frac{t}{\tau}$. After iteration $\tau$, it is common to leave constant.
+-   The learning rate may be chosen by trial and error, but it is usually best to choose it by monitoring learning curves that plot the objective function as a function of time.
+
+## Momentum-based Learning 
+
+-   The method of momentum is designed to accelerate learning, especially in the face of high curvature, small but consistent gradients, or noisy gradients.
+
+![](images/lec05/momentum.png){fig-align="center" width=70%}
+
+::: aside 
+Image source: Figure 4.10 of Aggarwal (2023) Neural Networks and Deep Learning.
+:::
+
+## Standard Momentum
+
+-   The standard momentum algorithm introduces a variable $\boldsymbol{v}$ that plays the role of velocity --- it is the direction and speed at which the parameters move through parameter space:
+\begin{align*}
+\boldsymbol{v} & \leftarrow \alpha \boldsymbol{v} - \eta \nabla_{\boldsymbol{\theta}}\left(\frac{1}{m} \sum_{i \in \mathcal{B}} \ell\left(f\left(x_i ; \boldsymbol{\theta}\right), y_i\right)\right) \\ 
+\boldsymbol{\theta} &\leftarrow \boldsymbol{\theta} + \boldsymbol{v}
+\end{align*}
+-   Note that if the previous velocity is in the same direction as the current gradient, the update will be faster and vice versa.
+-   Common values of $\alpha$ used in practice include 0.5, 0.9, and 0.99. Like the learning rate, $\alpha$ may also be adapted over time. 
+-   Typically it begins with a small value and is later raised. Adapting $\alpha$ over time is less important than shrinking $\eta$ over time.
+
+## Nesterov Momentum
+
+-   The Nesterov momentum algorithm is a modification of the original momentum algorithm:
+\begin{align*}
+\boldsymbol{v} & \leftarrow \alpha \boldsymbol{v} - \eta \nabla_{\boldsymbol{\theta}}\left(\frac{1}{m} \sum_{i \in \mathcal{B}} \ell\left(f\left(x_i ; \boldsymbol{\theta} + \alpha \boldsymbol{v}\right), y_i\right)\right) \\ 
+\boldsymbol{\theta} &\leftarrow \boldsymbol{\theta} + \boldsymbol{v}
+\end{align*}
+-   The key difference is that the gradient is evaluated at the point $\boldsymbol{\theta} + \alpha \boldsymbol{v}$ rather than at $\boldsymbol{\theta}$.
+-   It can be shown that for gradient descent case, Nesterov momentum converges faster than the original momentum algorithm.
+
+
+## Adaptive Learning Rates
+
+-   The learning rate is one of the most diﬃcult to set hyperparameters because it significantly aﬀects model performance.
+-   The loss is often highly sensitive to some directions in parameter space and insensitive to others.
+-   Hence we can cause a separate learning rate for each
+parameter and automatically adapt these learning rates throughout the course of learning.
+-   The idea is simple: in the directions where the gradient is consistently small, we want to take larger steps and in the directions where the gradient is larger, we want to take smaller steps.
+-   We will discuss some popular adaptive learning rate algorithms:
+    -   AdaGrad
+    -   RMSprop
+    -   Adam
+
+## AdaGrad
+
+The AdaGrad algorithm individually adapts the learning
+rates of all model parameters by scaling them inversely proportional to the square root of the sum of all the historical squared values of the gradient.
+
+![](images/lec05/adagrad.png){fig-align="center" width=80%}
+
+
+## RMSprop
+
+The RMSProp algorithm modifies AdaGrad to perform better in
+the nonconvex setting by changing the gradient accumulation into an *exponentially weighted moving average*.
+
+![](images/lec05/rmsprop.png){fig-align="center" width=80%}
+
+## Adam 
+
+-   Adam = RMSProp + Momentum + Bias Correction
+
+![](images/lec05/adam.png){fig-align="center" width=80%}
+
+## Bias Correction
+
+-   The velocity $\boldsymbol{v}$ is actually an estimate of the first moment of the gradient:
+\begin{align*}
+\boldsymbol{v}_t & = \rho_1 \boldsymbol{v}_{t-1} + (1-\rho_1)\boldsymbol{g}_{t} \\
+& = \rho_1 \left(\rho_1 \boldsymbol{v}_{t-2} + (1-\rho_1)\boldsymbol{g}_{t-1}\right) + (1-\rho_1)\boldsymbol{g}_{t} \\
+& = \rho_1^t \boldsymbol{v}_0 + (1-\rho_1)\sum_{i=1}^{t} \rho_1^{t-i}\boldsymbol{g}_i.
+\end{align*}
+-   Assuming $\boldsymbol{v}_0 = 0$ and taking the expectation, we have
+\begin{align*}
+\E[\boldsymbol{v}_t] & = (1-\rho_1)\sum_{i=1}^t\rho_1^{t-i}\E[\boldsymbol{g}_i] \stackrel{\textcolor{red}{(*)}}{=} (1-\rho_1)\cdot \frac{1-\rho_1^t}{1-\rho_1}\E[\boldsymbol{g}_t] = (1-\rho_1^t) \E[\boldsymbol{g}_t].\\
+\end{align*}
+-   The expectation is taken with respect to the randomness in the gradient, i.e., we view $\boldsymbol{g}_1, \ldots, \boldsymbol{g}_t \sim F$ as random vectors. The equality $\textcolor{red}{(*)}$ holds if the stochastic process $\boldsymbol{g}_1, \boldsymbol{g}_2, \ldots$ is stationary.
+-   Hence the velocity is a biased estimate for $\E[\boldsymbol{g}_t]$ and an unbiased estimate for $\E[\boldsymbol{g}_t]$ is $\frac{\boldsymbol{v}_t}{1-\rho_1^t}$. 
+-   The same argument applies to the second moment $\boldsymbol{r}_t$.
+
+
+
+
+## Practical Recommendations
+
+-   Training a deep neural network requires you to 
+    -   choose a good architecture
+    -   choose a good optimization algorithm
+-   Both choices have many hyperparameters that need to be tuned and there is no one-fit-all solution.
+-   For optimization algorithms, it is recommended to start with Adam or RMSProp using the default hyperparameters (for the momentum or decay rate).
+-   If the model is not converging, try to reduce the learning rate or use a learning rate schedule.
+-   All the algorithms have been implemented in popular deep learning libraries, such as PyTorch and TensorFlow, and you can use them directly without worrying about the details.
+-   Next time, we will discuss some regularization techniques to improve the generalization performance of deep networks.
+

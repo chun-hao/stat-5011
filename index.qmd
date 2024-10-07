@@ -11,8 +11,8 @@ title: "Statistical Deep Learning (Fall 2024)"
 | 3 | 9/17 | No class (Mid-Autumn Festival) |  |  |
 | 4 | 9/24 | Machine Learning Basics | [Slide](slides/03-ml_basics.qmd) | DL Ch. 5 |
 | 5 | 10/1 | Multilayer Perceptron | [Slide](slides/04-mlp.qmd) | D2L Ch. 5 & DL Ch. 6 |
-| 6 | 10/8 | Regularization for Deep Learning |  | DL Ch. 7 |
-| 7 | 10/15 | Optimization for DL Models |  | D2L Ch. 12 & DL Ch. 8 |
+| 6 | 10/8 | Optimization for DL Models | [Slide](slides/05-optimization.qmd) | D2L Ch. 12 & DL Ch. 8 |
+| 7 | 10/15 | Regularization for Deep Learning |  | DL Ch. 7 |
 | 8 | 10/22 | Project Proposal |  |  |
 | 9 | 10/29 | Implementation of DL Models |  | D2L Ch. 6 |
 | 10 | 11/5 | Convolutional Networks |  | D2L Ch. 7, 8 & DL Ch. 9 |

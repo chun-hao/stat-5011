@@ -1,0 +1,104 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{xcolor}
+
+\usepackage[linesnumbered,ruled,lined]{algorithm2e}
+
+\begin{document}
+
+\begin{algorithm}[H]
+    \SetKwInOut{Input}{input}
+    \SetKwInOut{Output}{output}
+
+	\Input{Initial value $\boldsymbol{\theta}^{(0)}$, Batch size $m$, Number of epochs $T$, Learning rate schedule $\eta_1, \eta_2, \ldots, \eta_T$}
+	\Output{minimizer $\boldsymbol{\theta}^{(T)}$}
+
+    \For{$t=1$ \KwTo $T$}
+    {   
+        Split the data into $n/m$ minibatches $\{\mathcal{B}_1, \mathcal{B}_2, \ldots, \mathcal{B}_{n/m}\}$\\
+        \For{$b=0$ \KwTo $n/m-1$}
+        {
+            $\boldsymbol{\theta}^{(t, b+1)} \coloneqq \boldsymbol{\theta}^{(t, b)} - \eta_t \cdot \frac{1}{m} \sum_{i \in \mathcal{B}_b} \nabla \ell(y_i, f(x_i; \boldsymbol{\theta}^{(t, b)})$\\
+        }
+        $\boldsymbol{\theta}^{(t+1, 0)} \coloneqq \boldsymbol{\theta}^{(t, n/m-1)}$\\
+    }
+
+	% TODO short caption
+	\caption{The Minibatch Stochastic Gradient Descent Algorithm.}
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \SetKwInOut{Input}{input}
+    \SetKwInOut{Output}{output}
+
+	\Input{Initial value $\boldsymbol{\theta}^{(0)}$, Batch size $m$, Number of epochs $T$, Global learning rate $\eta$}
+	\Output{minimizer $\boldsymbol{\theta}^{(T)}$}
+
+    \For{$t=1$ \KwTo $T$}
+    {   
+        Split the data into $n/m$ minibatches $\{\mathcal{B}_1, \mathcal{B}_2, \ldots, \mathcal{B}_{n/m}\}$\\
+        \For{$b=0$ \KwTo $n/m-1$}
+        {
+            Let $\boldsymbol{g} = \frac{1}{m} \sum_{i \in \mathcal{B}_b} \nabla \ell(y_i, f(x_i; \theta^{(t, b)})$.\\
+            \textcolor{red}{Accumulate squared gradient: $\boldsymbol{r} \leftarrow \boldsymbol{r} + \boldsymbol{g} \odot \boldsymbol{g}$}\\
+            Compute update: $\boldsymbol{\theta}^{(t, b+1)} := \boldsymbol{\theta}^{(t, b)} - \frac{\eta}{\sqrt{\boldsymbol{r} + \epsilon}} \odot \boldsymbol{g}$ (Division and square root applied element-wise; $\epsilon$ is a small number for numerical stability)\\
+        }
+        $\boldsymbol{\theta}^{(t+1, 0)} \coloneqq \boldsymbol{\theta}^{(t, n/m-1)}$\\
+    }
+
+	% TODO short caption
+	\caption{The AdaGrad Algorithm.}
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \SetKwInOut{Input}{input}
+    \SetKwInOut{Output}{output}
+
+	\Input{Initial value $\boldsymbol{\theta}^{(0)}$, Batch size $m$, Number of epochs $T$, Global learning rate $\eta$, \textcolor{red}{Decay rate $\rho$}}
+	\Output{minimizer $\boldsymbol{\theta}^{(T)}$}
+
+    \For{$t=1$ \KwTo $T$}
+    {   
+        Split the data into $n/m$ minibatches $\{\mathcal{B}_1, \mathcal{B}_2, \ldots, \mathcal{B}_{n/m}\}$\\
+        \For{$b=0$ \KwTo $n/m-1$}
+        {
+            Let $\boldsymbol{g} = \frac{1}{m} \sum_{i \in \mathcal{B}_b} \nabla \ell(y_i, f(x_i; \theta^{(t, b)})$.\\
+            \textcolor{red}{Accumulate squared gradient: $\boldsymbol{r} \leftarrow \rho \boldsymbol{r} + (1-\rho)\boldsymbol{g} \odot \boldsymbol{g}$}\\
+            Compute update: $\boldsymbol{\theta}^{(t, b+1)} := \boldsymbol{\theta}^{(t, b)} - \frac{\eta}{\sqrt{\boldsymbol{r} + \epsilon}} \odot \boldsymbol{g}$ (Division and square root applied element-wise; $\epsilon$ is a small number for numerical stability)\\
+        }
+        $\boldsymbol{\theta}^{(t+1, 0)} \coloneqq \boldsymbol{\theta}^{(t, n/m-1)}$\\
+    }
+
+	% TODO short caption
+	\caption{The RMSProp Algorithm.}
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \SetKwInOut{Input}{input}
+    \SetKwInOut{Output}{output}
+
+	\Input{Initial value $\boldsymbol{\theta}^{(0)}$, Batch size $m$, Number of epochs $T$, Global learning rate $\eta$, \textcolor{red}{Decay rate $\rho_1, \rho_2$}}
+	\Output{minimizer $\boldsymbol{\theta}^{(T)}$}
+
+    \For{$t=1$ \KwTo $T$}
+    {   
+        Split the data into $n/m$ minibatches $\{\mathcal{B}_1, \mathcal{B}_2, \ldots, \mathcal{B}_{n/m}\}$\\
+        \For{$b=0$ \KwTo $n/m-1$}
+        {
+            Let $\boldsymbol{g} = \frac{1}{m} \sum_{i \in \mathcal{B}_b} \nabla \ell(y_i, f(x_i; \theta^{(t, b)})$.\\
+            \textcolor{red}{Update biased 1st moment estimate: $\boldsymbol{v} \leftarrow \rho_1\boldsymbol{v} + (1 - \rho_1)\boldsymbol{g}$}\\
+            \textcolor{red}{Update biased 2nd moment estimate: $\boldsymbol{r} \leftarrow \rho_2\boldsymbol{r} + (1 - \rho_2)\boldsymbol{g} \odot \boldsymbol{g}$}\\
+            \textcolor{red}{Correct bias in 1st moment: $\hat{\boldsymbol{v}} \leftarrow \frac{\boldsymbol{v}}{1 - \rho_1^t}$}\\
+            \textcolor{red}{Correct bias in 2nd moment: $\hat{\boldsymbol{r}} \leftarrow \frac{\boldsymbol{r}}{1 - \rho_2^t}$}\\
+            Compute update: $\boldsymbol{\theta}^{(t, b+1)} := \boldsymbol{\theta}^{(t, b)} - \frac{\eta}{\sqrt{\hat{\boldsymbol{r}} + \epsilon}} \odot \hat{\boldsymbol{v}}$\\
+        }
+        $\boldsymbol{\theta}^{(t+1, 0)} \coloneqq \boldsymbol{\theta}^{(t, n/m-1)}$\\
+    }
+
+	% TODO short caption
+	\caption{The Adam Algorithm.}
+\end{algorithm}
+
+\end{document}
