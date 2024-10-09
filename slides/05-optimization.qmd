@@ -224,7 +224,7 @@ Image source: Li, H., Xu, Z., Taylor, G., Studer, C., & Goldstein, T. (2018). [V
 
 -   Batch normalization (BN) is a method to address the vanishing and exploding gradient problems.
 -   The idea is simple: we normalize the output of a unit $i$ over a batch of training samples (substract the mean and divide by the standard deviation) and then scale and shift the result.
--   More specifically, let $x_{ij}$ be the output of $j$the sample in the $i$th unit. Then the BN layer computes
+-   More specifically, let $x_{ij}$ be the output of $j$th sample in the $i$th unit. Then the BN layer computes
 \begin{align*}
 \mu_i & = \frac{1}{m}\sum_{j=1}^m x_{ij}, \quad \sigma_i^2 = \frac{1}{m}\sum_{j=1}^m (x_{ij} - \mu_i)^2, \\
 \tilde{x}_{ij} & = \frac{x_{ij} - \mu_i}{\sigma_i}, \quad y_{ij} = \gamma_i \tilde{x}_{ij} + \beta_i
