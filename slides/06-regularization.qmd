@@ -165,7 +165,7 @@ $$
 
 ## Bagging (Bootstrap Aggregating)
 
-![](images/lec06/Ensemble_Bagging.svg){fig-align="center" width="90%"}
+![](images/lec06/Ensemble_Bagging.png){fig-align="center" width="90%"}
 
 ::: aside
 Image source: [Wikipedia](https://en.wikipedia.org/wiki/Bootstrap_aggregating)
