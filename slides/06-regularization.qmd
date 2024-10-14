@@ -1,0 +1,337 @@
+---
+title: "Regularization for deep learning"
+---
+
+## What is Regularization?
+
+{{< include macro.qmd >}}
+
+-  Regularization is a technique designed to **reduce the test error (generalization error)**, possibly at the expense of increased training error.
+-  In this lecture, we will discuss several regularization techniques.
+-  Some are used for general machine learning models, while others are specific to deep learning models.
+-  Principle of regularization:
+   -  encode specific prior knowledge
+   -  express a preference for a simpler model class
+   -  make an underdetermined problem determined
+   -  combine multiple hypotheses (models) that explain the training data
+-  Typically, regularization techniques trade increased bias for reduced variance.
+
+## Outline
+
+-   Penalty-Based Regularization
+    -   $L_2$ Regularization
+    -   $L_1$ Regularization
+-   Ensemble Methods
+    -   Bagging
+    -   Dropout
+    -   Data Perturbation Ensemble
+-   Other Regularization Techniques
+    -   Early Stopping
+    -   Data Augmentation
+    -   Parameter Sharing
+
+## Penalty-Based Regularization 
+
+-   Recall that the generic objective function for training a neural network is
+$$
+J(\boldsymbol{\theta}; \{\boldsymbol{x}_i, y_i\}) = \frac{1}{n} \sum_{i=1}^n \ell(y_i, f(\boldsymbol{x}_i, \boldsymbol{\theta})).
+$$
+-   To add a regularization term to the objective function, we modify it as follows:
+$$
+J_{\alpha}(\boldsymbol{\theta}; \{\boldsymbol{x}_i, y_i\}) = \frac{1}{n} \sum_{i=1}^n \ell(y_i, f(\boldsymbol{x}_i, \boldsymbol{\theta})) + \alpha \Omega(\boldsymbol{\theta}) = J(\boldsymbol{\theta}; \{\boldsymbol{x}_i, y_i\}) + \alpha \Omega(\boldsymbol{\theta}),
+$$
+where $\alpha$ is a hyperparameter that controls the strength of the regularization term.
+-   Typically, the regularization term $\Omega(\boldsymbol{\theta})$ is a **norm** of the parameter vector $\boldsymbol{\theta}$.
+-   A norm expresses the concept of the length of a vector in a vector space, i.e., the distance from the origin.
+-   When we minimize the regularized objective function, we are looking for a model that fits the training data well and whose parameter is not far from zero.
+
+## $L_2$ Regularization
+
+-   Note that in a neural network model, we have **weights** and **biases** as parameters, and we don't regularize the biases.
+-   We write the parameter $\boldsymbol{\theta}$ as $\boldsymbol{\theta} = (\boldsymbol{w}, \boldsymbol{b})$, where $\boldsymbol{w}$ is the weight vector and $\boldsymbol{b}$ is the bias vector.
+-   The most common form of regularization is $L_2$ regularization, 
+$$
+\Omega(\boldsymbol{\theta}) = \frac{1}{2}\|\boldsymbol{w}\|_2^2 = \frac{1}{2}\boldsymbol{w}^T\boldsymbol{w} = \frac{1}{2}\sum_{j=1}^d w_{j}^2.
+$$
+-   Hence the objective function becomes
+$$
+J_{\alpha}(\boldsymbol{\theta}; \{\boldsymbol{x}_i, y_i\}) = \frac{\alpha}{2}\boldsymbol{w}^T\boldsymbol{w} + J(\boldsymbol{\theta}; \{\boldsymbol{x}_i, y_i\}).
+$$
+-   The corresponding gradient is 
+$$
+\nabla_{\boldsymbol{w}} J_{\alpha}(\boldsymbol{\theta}; \{\boldsymbol{x}_i, y_i\}) = \alpha\boldsymbol{w} + \nabla_{\boldsymbol{w}}J(\boldsymbol{\theta}; \{\boldsymbol{x}_i, y_i\}).
+$$
+-   The update rule for the weight vector is
+$$
+\boldsymbol{w} \leftarrow \boldsymbol{w} - \eta \left(\alpha\boldsymbol{w} + \nabla_{\boldsymbol{w}}J(\boldsymbol{\theta}; \{\boldsymbol{x}_i, y_i\})\right) = (1 - \eta\alpha)\boldsymbol{w} - \eta\nabla_{\boldsymbol{w}}J(\boldsymbol{\theta}; \{\boldsymbol{x}_i, y_i\}).
+$$
+
+## Weight Decay
+
+-   The $L_2$ regularization is also known as **weight decay** since in the updating rule the weight vector is multiplied by a factor less than 1.
+-   Denote $\boldsymbol{w}^* = \argmin_{\boldsymbol{w}} J(\boldsymbol{\theta}; \{\boldsymbol{x}_i, y_i\})$ as the optimal weight vector without regularization and $\tilde{\boldsymbol{w}} = \argmin_{\boldsymbol{w}} J_{\alpha}(\boldsymbol{\theta}; \{\boldsymbol{x}_i, y_i\})$ as the optimal weight vector with regularization.
+-   Consider the second-order approximation of $J$ around $\boldsymbol{w}^*$: (ignore the bias term for simplicity)
+$$
+\hat{J}(\boldsymbol{w}) = J(\boldsymbol{w}^*) + \frac{1}{2}(\boldsymbol{w} - \boldsymbol{w}^*)^T\boldsymbol{H}(\boldsymbol{w} - \boldsymbol{w}^*).
+$$
+-   Hence the minimum of $\hat{J}(\boldsymbol{w})$ occurs the its gradient is zero $\nabla_{\boldsymbol{w}}\hat{J}(\boldsymbol{w}) = \boldsymbol{H}(\boldsymbol{w} - \boldsymbol{w}^*) = 0$.
+-   To study the effect of weight decay, we add the weight decay gradient, i.e.,
+$$
+\alpha\tilde{\boldsymbol{w}} + \boldsymbol{H}(\tilde{\boldsymbol{w}} - \boldsymbol{w}^*) = 0 \quad \Rightarrow \quad \tilde{\boldsymbol{w}} = (\boldsymbol{H} + \alpha\boldsymbol{I})^{-1}\boldsymbol{H}\boldsymbol{w}^*.
+$$
+-   Consider the eigen-decomposition $\boldsymbol{H} = \boldsymbol{Q}\boldsymbol{\Lambda}\boldsymbol{Q}^T$, then
+$$
+\tilde{\boldsymbol{w}} = \left(\boldsymbol{Q} \boldsymbol{\Lambda} \boldsymbol{Q}^{\top}+\alpha \boldsymbol{I}\right)^{-1} \boldsymbol{Q} \boldsymbol{\Lambda} \boldsymbol{Q}^{\top} \boldsymbol{w}^* = \boldsymbol{Q}(\boldsymbol{\Lambda} + \alpha\boldsymbol{I})^{-1}\boldsymbol{\Lambda}\boldsymbol{Q}^T\boldsymbol{w}^*,
+$$
+that is, the weight decay shrinks the $\boldsymbol{w}^*$ along the eigenvectors of $\boldsymbol{H}$.
+
+## Noise Injection
+
+-   Another interpretation of weight decay is that it adds perturbation to the data.
+-   Consider the single training data $\{\boldsymbol{x}, y\}$ and a linear regression model $y = \boldsymbol{w}^T\boldsymbol{x}$.
+-   We add a random noise vector $\boldsymbol{\epsilon}$ to the training data, i.e., $\tilde{\boldsymbol{x}} = \boldsymbol{x} + \sqrt{\alpha}\boldsymbol{\epsilon}$.
+-   Use the perturbed data to predict $y$ as 
+$$
+\hat{y} = \boldsymbol{w}^T\tilde{\boldsymbol{x}} = \boldsymbol{w}^T\boldsymbol{x} + \sqrt{\alpha}\boldsymbol{w}^T\boldsymbol{\epsilon}.
+$$
+-   Compute the **expected value** of the loss $L = (y - \hat{y})^2$ as 
+\begin{align*}
+\E[L] & = \E[(y - \hat{y})^2] = \E[(y - \boldsymbol{w}^T\boldsymbol{x} + \sqrt{\alpha}\boldsymbol{w}^T\boldsymbol{\epsilon})^2]\\
+& = (y - \boldsymbol{w}^T\boldsymbol{x})^2 + \sqrt{\alpha}(y - \boldsymbol{w}^T\boldsymbol{x})\E(\boldsymbol{w}^T\boldsymbol{\epsilon}) + \alpha\E\left[(\boldsymbol{w}^T\boldsymbol{\epsilon})^2\right]
+\end{align*}
+-   Assuming $\E(\boldsymbol{\epsilon}) = 0$ and $\E(\boldsymbol{\epsilon}\boldsymbol{\epsilon}^T) = \boldsymbol{I}$, we have $\E(\boldsymbol{w}^T\boldsymbol{\epsilon})$ and $\E\left[(\boldsymbol{w}^T\boldsymbol{\epsilon})^2\right] = \sum_{j=1}^d w_j^2$. Therefore,
+$$
+\E[L] = (y - \boldsymbol{w}^T\boldsymbol{x})^2 + \alpha\sum_{j=1}^d w_j^2
+$$
+which is the same as the $L_2$ regularized loss.
+
+
+
+## $L_1$ Regularization
+
+-   The $L_1$ regularization is defined as 
+$$
+\Omega(\boldsymbol{\theta}) = \|\boldsymbol{w}\|_1 = \sum_{j=1}^d |w_j|.
+$$
+-   Hence the objective function and its gradient are
+\begin{align*}
+J_{\alpha}(\boldsymbol{\theta}; \{\boldsymbol{x}_i, y_i\}) & = \alpha\|\boldsymbol{w}\|_1 + J(\boldsymbol{\theta}; \{\boldsymbol{x}_i, y_i\}),\\
+\nabla_{\boldsymbol{w}} J_{\alpha}(\boldsymbol{\theta}; \{\boldsymbol{x}_i, y_i\}) & = \alpha\text{sign}(\boldsymbol{w}) + \nabla_{\boldsymbol{w}}J(\boldsymbol{\theta}; \{\boldsymbol{x}_i, y_i\}).
+\end{align*}
+-   The update rule for the weight vector is
+$$
+\boldsymbol{w} \leftarrow \boldsymbol{w} - \eta \left(\alpha\text{sign}(\boldsymbol{w}) + \nabla_{\boldsymbol{w}}J(\boldsymbol{\theta}; \{\boldsymbol{x}_i, y_i\})\right).
+$$
+-   Note that when $w_j = 0$, the gradient is not defined. In practice, we can use the **subgradient** method in which the gradient at $w_j=0$ is set stochastically to a value in $[−1,+1]$.
+
+## $L_1$ vs. $L_2$ Regularization
+
+-   From an accuracy point of view, $L_2$-regularization usually outperforms $L_1$-regularization.
+-   However, $L_1$-regularization does have specific applications from an interpretability point
+of view. 
+-   An interesting property of $L_1$-regularization is that it creates sparse solutions in which the vast majority of the values of $w_i$ are 0s, i.e., $L_1$-regularization gives a **sparse neural network**. 
+
+## Ensemble Methods
+
+-   Ensemble method is a general strategy of regularization in machine learning that combines multiple models to improve the generalization performance.
+-   It is also known as **model averaging**.
+-   Examples include:
+    -   Bagging (Bootstrap Aggregating)
+    -   Boosting
+    -   Dropout, and many others.
+-   The reason that model averaging works is that diﬀerent models will usually not make all the same errors on the test set.
+ 
+## Why ensemble methods work?
+
+-   Consider for example a set of $k$ regression models. Suppose that each model makes an error $\epsilon_i$ on each example. 
+-   Assume the errors are from a zero-mean multivariate normal distribution with variances $\mathbb{E}\left[\epsilon_i^2\right]=v$ and covariances $\mathbb{E}\left[\epsilon_i \epsilon_j\right]=c$. 
+-   Then the error made by the average prediction of all the ensemble models is $\frac{1}{k} \sum_i \epsilon_i$. The expected squared error of the ensemble predictor is
+$$
+\E\left[\left(\frac{1}{k} \sum_i \epsilon_i\right)^2\right] =\frac{1}{k^2} \E\left[\sum_i\left(\epsilon_i^2+\sum_{j \neq i} \epsilon_i \epsilon_j\right)\right]
+=\frac{1}{k} v+\frac{k-1}{k} c
+$$
+    -   If the errors are perfectly correlated and $c = v$, the mean squared error reduces to $v$, so the model averaging does not help at all.
+    -   If the errors are perfectly uncorrelated and $c = 0$, the expected squared error of the ensemble is only $\frac{1}{k}v$.
+
+## Construct an Ensemble
+
+-   Typically, but not necessarily, we combine multiple weak learners to form a strong learner.
+-   There are many ways to construct multiple models:
+    -   Different datasets (e.g., bagging)
+    -   Different architectures (e.g., dropout)
+    -   Different hyperparameters and initializations 
+    -   Different training algorithms
+-   The models to be ensembled should be as diverse as possible; otherwise the ensemble will not be effective. 
+
+## Bagging (Bootstrap Aggregating)
+
+![](images/lec06/Ensemble_Bagging.svg){fig-align="center" width="90%"}
+
+::: aside
+Image source: [Wikipedia](https://en.wikipedia.org/wiki/Bootstrap_aggregating)
+:::
+
+## Bagging (Bootstrap Aggregating)
+
+-   The bootstrap stage constructs $k$ diﬀerent datasets. Each dataset has the same number of examples as the original dataset, but each dataset is constructed by **sampling with replacement** from the original dataset.
+-   For each dataset, we train a model (usually the same model) and then average the predictions of all the models.
+-   However, this seems impractical when each model is a large neural network, since training and evaluating such networks is costly in terms of runtime and memory.
+-   Typically, bagging is used with simpler models, such as decision trees or linear models.
+
+
+## Dropout
+
+-   Dropout is a method that uses node sampling to create a neural network ensemble. 
+-   The idea is to randomly set a fraction of the nodes to zero during each training iteration. 
+
+![](images/lec06/dropout.png){fig-align="center" width="100%"}
+
+## Dropout as an Ensemble Method
+
+That is, dropout is equivalent to training an ensemble of $2^d$ models, where $d$ is the number of nodes in the network.
+
+![](images/lec06/dropout_ensemble.png){fig-align="center" width="50%"}
+
+::: aside
+Image source: Figure 7.6 of DL.
+:::
+
+## Forward Propagation with Dropout
+
+:::: {.columns}
+
+::: {.column width="50%"}
+1.  Load an example into a minibatch.
+2.  Sample a binary mask $\boldsymbol{\mu}$ from a Bernoulli distribution with probability $p$.
+3.  Compute the loss $J(\boldsymbol{\theta}, \boldsymbol{\mu})$
+of the model defined by parameters $\boldsymbol{\theta}$ and mask $\boldsymbol{\mu}$.
+4.  Minimize the expected loss over the mask $\E_{\boldsymbol{\mu}}J(\boldsymbol{\theta}, \boldsymbol{\mu})$.
+
+Typically, an input unit is included with probability 0.8, and a hidden unit is included with probability 0.5.
+:::
+
+::: {.column width="50%"}
+
+![](images/lec06/forward_dropout.png){fig-align="center" width="100%"}
+
+:::
+
+::::
+
+::: aside
+Image source: Figure 7.7 of DL.
+:::
+
+## Dropout vs. Bagging
+
+There are some differences between dropout and bagging:
+
+1. In bagging, the models are all independent, while in dropout, the models **share parameters**.
+2. In the case of bagging, each model is trained to convergence on its respective training set. In dropout, subnetworks are each trained for a single step, and the parameter sharing causes the remaining subnetworks to arrive at good settings of the parameters.
+
+## Inference (prediction) with Dropout
+
+-   In the case of bagging, each model $i$ produces a probability distribution $p^{(i)}(y \mid \boldsymbol{x})$. 
+-   The prediction of the ensemble is given by the arithmetic mean of all these distributions,
+\begin{align*}
+\frac{1}{k} \sum_{i=1}^k p^{(i)}(y \mid \boldsymbol{x}).
+\end{align*}
+-   In the case of dropout, each submodel defined by mask vector $\boldsymbol{\mu}$ defines a probability distribution $p(y \mid \boldsymbol{x}, \boldsymbol{\mu})$. 
+-   The arithmetic mean over all masks is given by
+\begin{align*}
+\sum_{\boldsymbol{\mu}} p(\boldsymbol{\mu}) p(y \mid \boldsymbol{x}, \boldsymbol{\mu})
+\end{align*}
+where $p(\boldsymbol{\mu})$ is the probability distribution that was used to sample $\boldsymbol{\mu}$ at training time.
+-   In practice, we can approximate the inference with sampling, by averaging together the output from many masks (10-20 would be enough).
+
+
+## Weight Scaling Inference Rule
+
+-   Another approach to aggregating the predictions of the submodels is to use the geometric mean instead of the arithmetic mean, i.e.,
+$$
+p_{\text{ensemble}}(y \mid \boldsymbol{x}) = \left(\prod_{i=1}^k p(y \mid \boldsymbol{x}, \boldsymbol{\mu}^{(i)})\right)^{1/k}.
+$$
+-   However, the geometric mean is not guaranteed to be a proper distribution and hence normalization is needed
+$$
+p_{\text{ensemble}}(y \mid \boldsymbol{x}) \leftarrow \frac{p_{\text{ensemble}}(y \mid \boldsymbol{x})}{\sum_{y^{\prime}} p_{\text{ensemble}}\left(y^{\prime} \mid \boldsymbol{x}\right)}.
+$$
+-   This can be approximated by the **weight scaling rule**:
+    -   use a single neural net at test time without dropout
+    -   replace the weights by their expected values, i.e., $\tilde{w}_j = p w_j$ where $p$ is the dropout probability
+
+## Monte Carlo Dropout (MC Dropout)
+
+-   Gal and Ghahramani (2016)[^mcdropout] showed that the dropout training process is mathematically equivalent to approximate Bayesian inference in a deep Gaussian process.
+-   This observation makes dropout the simplest and easiest way to perform approximate Bayesian inference in a deep model.
+-   An immediate consequence of this equivalence is that we can use dropout at test (inference) time to obtain **model uncertainty estimates**.
+-   This is known as **Monte Carlo dropout (MC dropout)** estimate of model uncertainty.
+-   The uncertainty information is crucial for many applications:
+    -   with high uncertainty, the model should not be trusted and human intervention is needed.
+    -   with low uncertainty, the model can be trusted and used directly for decision-making.
+
+
+[^mcdropout]: Gal, Y., & Ghahramani, Z. (2016). Dropout as a bayesian approximation: Representing model uncertainty in deep learning. In *ICML*.
+
+## Pros and Cons of Dropout
+
+**Pros**:
+
+-   Efficiency: low memory and computation cost.
+-   Regularization: better than weight decay.
+-   Prevent *feature co-adaptation*.
+-   More robust: redundancy between the features.
+
+**Cons**:
+
+-   It might take longer to train (due to the stochastic nature).
+-   Works better only for larger models since it reduces the eﬀective capacity of a model.
+
+## Data Perturbation Ensemble
+
+-   Dropout can ne seen as a form of data perturbation ensemble, as it implicitly adds random noise to the input data.
+-   We can also explicitly add noise to the input data to create an ensemble, e.g., in SGD, we add noise to the input data $\boldsymbol{x}$ as $\tilde{\boldsymbol{x}} = \boldsymbol{x} + \boldsymbol{\epsilon}$ before updating the model parameters.
+-   However, the noise distribution should be carefully calibrated:
+    -   adding too much noise destroys the data
+    -   adding too little noise does not help with generalization
+
+## Early Stopping
+
+-   Executing gradient descent to convergence optimizes the loss on the training data, but not necessarily on the out-of-sample test data.
+-   A natural solution to this dilemma is to use **early stopping**:
+    -   A portion of the training data is held out as a validation set.
+    -   Stop training when the validation loss increases for a certain number of steps.
+-   Why early stopping works?
+    -   Restricting the number of steps is eﬀectively restricting the
+distance of the final solution from the initialization point
+
+
+---
+
+![](images/lec06/early_stopping.png){fig-align="center" width="60%"}
+
+## Data Augmentation
+
+-   The best way to make a machine learning model generalize better is to train it on more data.
+-   One way is to create fake data and add it to the training set.
+-   The generation of fake data is problem dependent. It is important that the fake data is **realistic** and does not introduce bias.
+-   For example, in object detection tasks, we can flip the image horizontally, rotate it, or change the brightness.
+
+![](images/lec06/data_augmentation.jpg){fig-align="center" width="70%"}
+
+## Parameter Sharing
+
+-   A natural form of regularization that reduces the parameter footprint of the model is the sharing of parameters across diﬀerent connections. 
+-   Often, this type of parameter sharing is enabled by domain-specific insights. 
+-   The main insight required to share parameters is that the function computed at two nodes should be related in some way.
+-   Important examples of parameter sharing include:
+    -   Convolutional layers
+    -   Recurrent neural networks: assumes each time step uses the same parameters
+
+## Guidelines for Regularization
+
+-   We have only introduced some general regularization techniques.
+-   In practice, the choice of regularization technique depends on the specific problem and the model architecture.
+-   Start with a simple model:
+    -   underfitting $\Rightarrow$ increase model capacity
+    -   overfitting $\Rightarrow$ add regularization
+-   Always monitor the training and validation loss to diagnose the model performance.
