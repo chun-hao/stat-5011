@@ -163,3 +163,7 @@ cython_debug/
 
 /.quarto/
 .DS_Store
+
+# Tensorboard logs
+runs/
+slides/.DS_Store

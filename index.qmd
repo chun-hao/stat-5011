@@ -14,7 +14,7 @@ title: "Statistical Deep Learning (Fall 2024)"
 | 6 | 10/8 | Optimization for DL Models | [Slide](slides/05-optimization.qmd) | D2L Ch. 12 & DL Ch. 8 |
 | 7 | 10/15 | Regularization for Deep Learning | [Slide](slides/06-regularization.qmd) | DL Ch. 7 |
 | 8 | 10/22 | Project Proposal |  |  |
-| 9 | 10/29 | Implementation of DL Models |  | D2L Ch. 6 |
+| 9 | 10/29 | Implementation of DL Models | [Slide](slides/07-implementation.qmd) [Colab](https://colab.research.google.com/drive/1W8qPFQ48jAlKFRt1G16nCN0s0KiKLzLl?authuser=1#scrollTo=pn69KjwB6hw2) | D2L Ch. 6 |
 | 10 | 11/5 | Convolutional Networks |  | D2L Ch. 7, 8 & DL Ch. 9 |
 | 11 | 11/12 | Recurrent Networks |  | D2L Ch. 9, 10 & DL Ch. 10 |
 | 12 | 11/19 | Hyperparameter Optimization and Tuning |  | D2L Ch. 19 & DL Ch. 11 |

@@ -1,0 +1,653 @@
+---
+title: "Introduction to PyTorch"
+execute:
+    echo: true
+    cache: false
+    freeze: false
+highlight-style: atom-one
+---
+
+
+
+
+## Popular Deep Learning Frameworks
+
+-   There are several deep learning frameworks:
+    -   `TensorFlow` (2015): Developed by Google Brain Team.
+    -   `PyTorch` (2016): Developed by Facebook AI Research Lab. 
+    -   `JAX` (2018): Developed by Google Brain Team.
+    -   `MXNet` (2015): Developed by Apache Software Foundation. 
+    -   `Keras` (2015): A high-level API that can run on top of JAX, TensorFlow, or PyTorch.
+-   PyTorch and TensorFlow/Keras are the most popular deep learning frameworks:
+    -   PyTorch is more widely used in the research community.
+    -   TensorFlow is more widely used in the industry.
+-   In today's lecture, we will focus on PyTorch.
+
+## Outline
+
+-   Basic concepts of PyTorch
+    -   Tensor
+    -   Autograd
+-   Main loop for training models
+    -   Loading Data and data preparation
+    -   Building a Neural Network
+    -   Training and Validation Loop
+-   Tensorboard Visualization 
+    -   Tracking the training process
+    -   Visualizing the network architecture
+
+# PyTorch Basics
+
+## Tensor
+
+-   Tensors are multi-dimensional arrays. 
+    -   0-dim array is called scalar.
+    -   1-dim array is called vector.
+    -   2-dim array is called matrix.
+-   In PyTorch, everything is a tensor: data, paremeter, gradient, etc. A tensor can be created from a Python list or sequence with the `torch.tensor()` function.
+
+```{python}
+import torch
+
+a = torch.tensor([1]) # scalar
+b = torch.tensor([1, 2, 3]) # vector
+c = torch.tensor([[1, 2], [3, 4]]) # matrix
+d = torch.tensor([[[1, 2], [3, 4]], 
+                  [[5, 6], [7, 8]]]) # 3D tensor
+```
+
+-   The `shape` attribute is used to get the shape of a tensor
+```{python}
+print(d.shape)
+```
+
+## Tensor vs. Numpy array
+
+-   PyTorch tensors are very similar to Numpy arrays.
+-   The two main differences are 
+    -   PyTorch tensors can run on GPUs
+    -   PyTorch tensors are better integrated with PyTorch's autograd.
+-   The `required_grad` attribute is used to track the gradient of the tensor.
+    -   If `required_grad=True`, the gradient of the tensor will be computed during the backpropagation.
+-   We can easily convert a PyTorch tensor to a Numpy array and vice versa using
+    -   `torch.tensor.numpy()`
+    -   `torch.tensor.from_numpy()`
+
+## Autograd
+
+-   When creating tensors with `requires_grad=True`, it signals to autograd that every operation on them should be tracked.
+-   We call the function `.backward()` on the final tensor to compute the gradient.
+```{python}
+#| echo: true
+x = torch.tensor([3.0], requires_grad=True)
+y = x**2
+y.backward()
+print(x.grad.item()) # dy/dx = 2x and when x = 3, dy/dx = 6
+```
+
+-   It also works for general multi-dimensional tensors and matrix operations.
+
+```{python}
+#| echo: true
+x = torch.tensor([[1.0, 2.0], [3.0, 4.0]], requires_grad=True)
+y = torch.trace(torch.matmul(x.t(), x))
+y.backward()
+print(x.grad) 
+```
+$$
+y = \operatorname{tr}(X^TX) \Rightarrow \frac{\partial y}{\partial X} = 2X
+$$
+
+## Object-oriented programming (OOP) in Python
+
+-   A **class** is a prototype of objects.
+```{python}
+class person:
+    def __init__(self, name, age): # instance constructor
+        self.name = name # attribute
+        self.age = age
+    def get_name(self): # method
+        return self.name
+
+john = person("John", 20) # john is an instance of the class 'person'
+```
+-   A class contains `attributes` (name and age) and `methods` (get_name).
+-   We can define a subclass that inherits from a parent class.
+```{python}
+class student(person):
+    def __init__(self, name, age, major): 
+        super().__init__(name, age) # call the parent class constructor
+        self.major = major
+    def get_major(self):
+        return self.major
+
+john = student("John", 20, "Stat")
+print(f"{john.get_name()} is majoring in {john.get_major()}.")
+```
+
+# Data Preparation
+
+## Data Preparation
+
+-   In the data preparation stage, we need to do the following:
+
+    -   Split the data into training, validation, and test sets
+    -   Split the data into mini-batches
+-   A dataset is stored in a `Dataset` class. Inside the dataset calss, we can
+    -   download/load the data
+    -   preprocess the data (standardization, transformation, etc.)
+-   To feed the dataset to our model, we need the `DataLoader` class, which
+    -   shuffles the data indices
+    -   splits the data into mini-batches
+
+## Dataset
+
+
+```{python}
+from torch.utils.data import Dataset
+
+class MyDataset(Dataset):
+    def __init__(self, x, y):
+        self.x = torch.tensor(x).float()
+        self.y = torch.tensor(y).float()
+        
+    def __len__(self):
+        return len(self.x)
+    
+    def __getitem__(self, idx):
+        return self.x[idx], self.y[idx]
+```
+
+You need to implement three methods in the `Dataset` class:
+
+-   **\_\_init\_\_**: Read data and preprocess
+-   **\_\_getitem\_\_**: Return one sample at a time.
+-   **\_\_len\_\_**: Return the size of the dataset.
+
+## Example
+
+```{python}
+import numpy as np
+
+rng = np.random.default_rng(20241029)
+n = 30
+p = 2
+
+# Generate x_1, x_2, ..., x_30 from a normal distribution
+x = rng.normal(loc=0.0, scale=1.0, size=(n, p))
+
+# Generate y from the linear model y = 2 - x_1 + 3*x_2
+beta = np.array([-1, 3])
+y = 2 + x.dot(beta).reshape(-1,1) + rng.normal(loc=0.0, scale=0.1, size=(n, 1))
+
+training_data = MyDataset(x, y)
+print("The number fo samples is", training_data.__len__())
+print("The first sample is (x_1, x_2, y) =", training_data.__getitem__(0))
+```
+
+## DataLoader
+
+-   The `DataLoader` class will:
+    -   shuffle the data indices (if `shuffle=True`)
+    -   split the data into mini-batches (if `batch_size` is specified)
+
+```{python}
+from torch.utils.data import DataLoader
+
+train_loader = DataLoader(training_data, batch_size=10, shuffle=True)
+```
+
+-   The `DataLoader` is an iterable. After we iterate over all batches, the data will be shuffled again.
+
+```{python}
+x_batch, y_batch = next(iter(train_loader))
+print(f"Batch size is {len(x_batch)}")
+print(f"Batch mean of x is {x_batch.mean(axis = 0)}")
+print(f"Batch mean of y is {y_batch.mean(axis = 0)}")
+```
+
+# Model building and training
+
+## Layers
+
+-   A neural network model is built by stacking layers.
+-   PyTorch provides many predefined layers that can be used to build a neural network.
+-   For example, `torch.nn.Linear` is a fully connected layer.
+
+```{python}
+lin = torch.nn.Linear(2, 3) # 2 input features and 3 output features
+```
+
+-   The parameters of the layer can be accessed using the `state_dict()` method or directly accessing the attributes
+```{python}
+print(lin.state_dict())
+```
+
+```{python}
+print(lin.weight)
+```
+
+## Available Layers
+
+See <https://pytorch.org/docs/stable/nn.html>
+
+![](images/lec07/torch_layers.png){fig-align="center" width=70%}
+
+## Building a Neural Network
+
+-   The `torch.nn.Module` class is the base class for all neural network modules.
+-   The `torch.nn.Sequential` class is a **subclass** of `torch.nn.Module` that is used to sequentially stack layers.
+-   The following example defines a simple neural network with one hidden layer and ReLU activation function
+```{python}
+#| eval: false
+model = nn.Sequential(
+    nn.Linear(input_dim, hidden_dim),
+    nn.ReLU(), # activation function
+    nn.Linear(hidden_dim, output_dim)
+)
+```
+
+-   However, not all neural networks can be defined using `torch.nn.Sequential`, for example, ResNet, recurrent networks, etc.
+-   We can also define a custom neural network by subclassing `torch.nn.Module`.
+
+## nn.Module
+
+A basic `nn.Module` subclass is as follows:
+
+```{python}
+#| eval: false
+class model(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # Define the layers
+        self.linear1 = nn.Linear(input_dim, hidden_dim)
+        self.relu = nn.ReLU()
+        self.linear2 = nn.Linear(hidden_dim, output_dim)
+
+    def forward(self, x):
+        # Define the forward pass, i.e., how to compute the output from the input
+        x = self.linear1(x)
+        x = self.relu(x)
+        y = self.linear2(x)
+        return y
+
+```
+
+-   This model is exactly the same as the previous one.
+-   In the `__init__` method, we define the layers that will be used by the model.
+-   In the `forward` method, we define how the output $y$ is obtained from the input $x$.
+
+
+## Example: Residual Layer
+
+-   Recall that a residual layer is defined as $y = x + f(x)$.
+-   The $f(x)$ can be defined with different number/type of layers, activation functions, etc.
+-   So you won't find a predefined residual layer in PyTorch.
+
+![](images/lec07/skip_connection.png){fig-align="center" width=80%}
+
+
+---
+
+The following code defines a residual block with three FC layers and ReLU activation function.
+
+```{python}
+import torch.nn as nn
+
+class MyResBlock(nn.Module):
+    def __init__(self, input_dim):
+        super().__init__()
+        self.model = nn.Sequential(
+            nn.Linear(input_dim, 2*input_dim),
+            nn.ReLU(),
+            nn.Linear(2*input_dim, 2*input_dim),
+            nn.ReLU(),
+            nn.Linear(2*input_dim, input_dim)
+        )
+        
+    def forward(self, x):
+        y = x + self.model(x)
+        return y
+
+```
+
+---
+
+We can use `MyResBlock` to build a deep neural network.
+
+```{python}
+input_dim = 2
+output_dim = 1
+
+model = nn.Sequential(
+    MyResBlock(input_dim),
+    nn.ReLU(),
+    MyResBlock(input_dim),
+    nn.ReLU(),
+    nn.Linear(input_dim, output_dim)
+)
+```
+
+## Loss Function
+
+-   After defining the model and the data, we need to define the loss function.
+-   There are many loss functions available in PyTorch:
+    -   `torch.nn.MSELoss`: Mean Squared Error
+    -   `torch.nn.CrossEntropyLoss`: Cross Entropy
+    -   `torch.nn.L1Loss`: L1 Loss
+    -   `torch.nn.PoissonNLLLoss`: Poisson Negative Log Likelihood
+-   See <https://pytorch.org/docs/stable/nn.html#loss-functions>
+-   You can also define your own loss function. For example, 
+```{python}
+#| eval: false
+def my_MSE(output, target):
+    loss = torch.mean((output - target)**2)
+    return loss
+```
+
+## Optimizer
+
+-   The optimizer is used to update the parameters of the model.
+-   There are many optimizers available in PyTorch:
+    -   `torch.optim.SGD`: Stochastic Gradient Descent
+    -   `torch.optim.Adam`: Adam
+-   See <https://pytorch.org/docs/stable/optim.html>
+-   There are some important methods in the optimizer:
+    -   `zero_grad()`: Clear the gradient stored in the optimizer
+    -   `step()`: Update the parameters
+
+```{python}
+#| eval: false
+optim = torch.optim.SGD(model.parameters(), lr=0.05)
+# Compute the gradient 
+...
+# Update the parameters
+optim.step()
+# Clear the gradient
+optim.zero_grad()
+```
+
+## Training Loop
+
+Hence a standard training loop looks like this:
+```{python}
+def training_loop(dataloader, model, loss_fn, optimizer, n_epochs):
+    for epoch in range(n_epochs):
+        for x_batch, y_batch in dataloader:
+
+            # Compute prediction and loss
+            y_pred = model(x_batch)
+            loss = loss_fn(y_pred, y_batch)
+
+            # Backpropagation
+            loss.backward() # compute the gradient
+            optimizer.step() # update the parameters
+            optimizer.zero_grad() # clear the gradient stored in the optimizer
+
+        # print the training progress
+        if epoch % 10 == 0:
+            print(f"Epoch {epoch+1}, Loss = {loss.item():.3f}") 
+```
+
+## Example
+
+We now have all the components (data, model, loss, and optimizer) to train the model.
+
+```{python}
+loss_fn = nn.MSELoss()
+optimizer = torch.optim.SGD(model.parameters(), lr=0.05)
+
+training_loop(train_loader, model, loss_fn, optimizer, 100)
+```
+
+
+## Quick Summary
+
+-   With `PyTorch`, we train a model using the following steps:
+    -   Define the model using `torch.nn.Module`
+    -   Define the loss function (choose from `torch.nn` or define your own)
+    -   Define the optimizer (choose from `torch.optim`)
+    -   Write a training loop
+-   We can also write a validation loop to evaluate the model on the validation set.
+-   The validation loop is similar to the training loop, but we don't need to compute the gradient and update the parameters.
+
+# Monitor the training process
+
+## TensorBoard
+
+TensorBoard is a visualization tool provided by TensorFlow, but it can also be used with PyTorch.
+
+![](images/lec07/tensorboard.gif){fig-align="center" width=70%}
+
+
+## Tracking the training/validation loss
+
+-   Use the `torch.utils.tensorboard.SummaryWriter` class to log the training process.
+-   The `add_scalar` method is used to log the scalar value.
+
+```{python}
+#| echo: false
+model = nn.Sequential(
+    MyResBlock(input_dim),
+    nn.ReLU(),
+    MyResBlock(input_dim),
+    nn.ReLU(),
+    nn.Linear(input_dim, output_dim)
+)
+optimizer = torch.optim.SGD(model.parameters(), lr=0.05) 
+loss_fn = nn.MSELoss()
+```
+```{python}
+from torch.utils.tensorboard import SummaryWriter
+
+writer = SummaryWriter('runs/example')
+
+for epoch in range(100):
+    running_loss = 0.0
+    for x_batch, y_batch in train_loader:
+        # Compute prediction and loss
+        y_pred = model(x_batch)
+        loss = loss_fn(y_pred, y_batch)
+        # Backpropagation
+        loss.backward() # compute the gradient
+        optimizer.step() # update the parameters
+        optimizer.zero_grad() # clear the gradient stored in the optimizer
+
+        running_loss += loss.item()
+    
+    avg_loss = running_loss / len(train_loader)
+    writer.add_scalar('Loss/Train', avg_loss, epoch + 1)
+    writer.flush()
+```
+
+---
+
+![](images/lec07/loss.png){fig-align="center" width=90%}
+
+
+## View the network architecture
+
+Use `add_graph` to visualize the network architecture.
+
+```{python}
+dataiter = iter(train_loader)
+x, y= next(dataiter)
+
+writer.add_graph(model, x)
+writer.flush()
+```
+
+---
+
+![](images/lec07/graph.png){fig-align="center" width=90%}
+
+
+# Using Existing Models
+
+## Save and Load Models
+
+-   The model information is stored in the `state_dict` attribute. 
+```{python}
+model.state_dict()
+```
+
+-   We can save the model to a file and load it back.
+```{python}
+#| eval: false
+torch.save(model.state_dict(), "my_model.pth")
+```
+
+
+## Some available models
+
+-   If we want to use the ResNet model structure for image classification and the image size is 200x200, we can use the following code to get the model structure.
+-   Note that this model is defined for ImageNet, which has 1000 classes. If you want to use it for a different number of classes, you need to change the last layer.
+
+```{python}
+import torchvision.models as models
+from torchsummary import summary
+
+resnet = models.resnet18(weights=None) # No weights - random initialization
+summary(resnet, (3, 200, 200))
+```
+
+## Pre-trained weights
+
+-   We can also use the weights that are trained on the ImageNet dataset.
+
+```{python}
+resnet = models.resnet18(weights="IMAGENET1K_V1")
+```
+
+-   This can be useful when you have a small dataset and you want to use the pre-trained weights to improve the performance.
+
+
+## Fine tuning
+
+-   The last layer of ResNet18 is the fully connected layer with 512 input features and 1000 output features
+```{python}
+resnet.fc
+```
+
+-   If we want to use it for a 10-class classification problem, we need to change the last layer.
+```{python}
+resnet.fc = nn.Linear(512, 10)
+resnet.fc
+```
+
+-   For efficiency, we can freeze the weights of the previous layers and only train the last layer.
+```{python}
+# freeze all layers by setting the requires_grad attribute to False
+for param in resnet.parameters():
+    param.requires_grad = False
+
+# unfreeze the last layer
+for param in resnet.fc.parameters():
+    param.requires_grad = True
+```
+
+# Lightning
+
+## PyTorch Lightning
+
+-   PyTorch offers a lot of flexibility, but it can be cumbersome to write the training loop, validation loop, etc.
+-   `Lightning` is a lightweight PyTorch wrapper.
+-   The Lightning class (`LightningModule`) is exactly the same as the PyTorch, except that the `LightningModule` provides a structure for the research code.
+-   More specifically, there are two main classes in Lightning: `LightningModule` and `LightningDataModule`.
+
+---
+
+The basic structure of a `LightningDataModule` is as follows:
+
+```{python}
+import pytorch_lightning as pl
+
+class MyDataModule(pl.LightningDataModule):
+    def __init__(self):
+        pass
+
+    def prepare_data(self):
+        # download, IO, etc. Useful with shared filesystems
+        pass
+
+    def setup(self, stage):
+        # make assignments here (val/train/test split)
+        dataset = RandomDataset(1, 100)
+        self.train, self.val, self.test = data.random_split(
+            dataset, [80, 10, 10], generator=torch.Generator().manual_seed(42)
+        )
+
+    def train_dataloader(self):
+        return data.DataLoader(self.train)
+
+    def val_dataloader(self):
+        return data.DataLoader(self.val)
+
+    def test_dataloader(self):
+        return data.DataLoader(self.test)
+
+```
+
+---
+
+The basic structure of a `LightningModule` is as follows:
+
+```{python}
+class MyModel(pl.LightningModule):
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, x):
+        return x
+
+    def loss(self, pred, label):
+        pass
+
+    def training_step(self, train_batch, batch_idx):
+        x, y = train_batch
+        pred = self.forward(x)
+        loss = self.loss(pred, y)
+        self.log('train_loss', loss)
+        return loss
+
+    def validation_step(self, val_batch, batch_idx):
+        x, y = val_batch
+        pred = self.forward(x)
+        loss = self.loss(pred, y)
+        self.log('val_loss', loss)
+
+    def configure_optimizers(self):
+        optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
+        return optimizer
+```
+
+---
+
+Training a model in `Lightning` is as simple as follows:
+
+```{python}
+#| eval: false
+
+model = MyModel()
+data_module = MyDataModule()
+trainer = pl.Trainer()
+
+trainer.fit(model, data_module)
+```
+
+## Lightning vs. PyTorch
+
+-   Lightning provides a more structured way to write PyTorch code.
+-   The Lightning `Trainer` automates many things, such as:
+    -   Epoch and batch iteration
+    -   `optimizer.step()`, `loss.backward()`, `optimizer.zero_grad()` calls
+    -   Calling of `model.eval()`, enabling/disabling grads during evaluation
+    -   Checkpoint Saving and Loading
+    -   Tensorboard (see loggers options)
+
+
+## References
+
+-   PyTorch: <https://pytorch.org>
+-   TensorBoard: <https://www.tensorflow.org/tensorboard>
+-   Lightning: <https://www.lightning.ai>
