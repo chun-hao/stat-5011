@@ -1,0 +1,623 @@
+---
+title: "Convolutional Neural Networks"
+execute:
+    echo: true
+    cache: false
+    freeze: false
+highlight-style: atom-one
+---
+
+## Outline
+
+{{< include macro.qmd >}}
+
+-   Convolution
+    -   Gaussian Filter
+    -   Cross-Correlation and Auto-Correlation
+    -   Edge Detection
+-   Basic CNN Architecture
+    -   Padding and Stride
+    -   Pooling
+    -   AlexNet
+-   Applications
+    -   Object Detection
+    -   Image Segmentation
+
+## Convolutional Networks
+
+-   Convolutional networks, also known as **convolutional neural networks**, or **CNN**s, are a specialized kind of neural network for processing data that has a known **grid-like topology**.
+-   Examples:
+    -   time-series data: 1-D grid taking samples at regular time intervals
+    -   images: 2-D grid of pixels
+    -   3-D images: 3-D grid of voxels
+    -   video: 3-D grid = 2-D of pixels + 1-D of time
+-   Convolutional networks are simply neural networks that use **convolution** in place of general matrix multiplication in at least one of their layers.
+
+## Convolution Operation
+
+-   Given two functions $f(t)$ and $g(t)$, the convolution of $f$ and $g$ is defined as:
+    $$
+    (f * g)(t) = \int_{-\infty}^{\infty} f(\tau)g(t-\tau)d\tau.
+    $$
+-   One way to think about convolution is as a weighted average of the function $f$ at time $t$ where the weights are given by the function $g$.
+-   In practice, we work with discrete data. That is, we only observe $f(t)$ for a finite set of values of $t$, e.g., $t \in \mathbb{Z}$.
+-   In this case, the convolution is defined as:
+    $$
+    (f * g)(t) = \sum_{\tau=-\infty}^{\infty} f(\tau)g(t-\tau).
+    $$
+-   The function $f$ is often called the **input** and the function $g$ is called the **kernel** or **filter**.
+
+## Example
+
+-   Let $f(t) = [1, 2, 3, 4]$ and $g(t) = [1, 1, 1]$. That is,
+    -   $f(0) = 1, f(1) = 2, f(2) = 3, f(3) = 4$, and $f(t) = 0$ for all other values of $t$
+    -   $g(0) = 1, g(1) = 1, g(2) = 1$, and $g(t) = 0$ for all other values of $t$.
+-   The convolution of $f$ and $g$ is:
+    \begin{align*}
+    (f * g)(t) & = \sum_{\tau=-\infty}^{\infty} f(\tau)g(t-\tau) = f(0)g(t) + f(1)g(t-1) + f(2)g(t-2) + f(3)g(t-3).
+    \end{align*}
+-   Therefore
+      \begin{align*}
+      (f * g)(0) & = f(0)g(0) + f(1)g(-1) + f(2)g(-2) + f(3)g(-3)
+      = 1 \times 1 + 2 \times 0 + 3 \times 0 + 4 \times 0 = 1\\
+      (f * g)(1) & = f(0)g(1) + f(1)g(0) + f(2)g(-1) + f(3)g(-2)
+      = 1 \times 1 + 2 \times 1 + 3 \times 0 + 4 \times 0 = 3\\
+      (f * g)(2) & = f(0)g(2) + f(1)g(1) + f(2)g(0) + f(3)g(-1)
+      = 1 \times 1 + 2 \times 1 + 3 \times 1 + 4 \times 0 = 6
+      \end{align*}
+-   That is, $(f * g)(t) = [1, 3, 6, 9, 7, 4]$.
+-   If we convolve again with $g$, we get $((f * g) * g)(t) = [1, 4, 10, 18, 22, 20, 11, 4]$.
+
+## Gaussian Filter
+
+-   A Gaussian filter is the convolution with $g(t) = \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{t^2}{2\sigma^2}}$.
+-   Roughly speaking, the Gaussian filter smooths the function $f$ by computing the weighted average the values of $f$ in a neighborhood of $t$.
+-   The parameter $\sigma$ controls the width of the Gaussian filter and hence the smoothness of the output.
+
+```{python}
+#| echo: false
+#| fig-align: center 
+from scipy.ndimage import gaussian_filter1d
+import numpy as np
+import matplotlib.pyplot as plt
+rng = np.random.default_rng(20241105)
+x = rng.standard_normal(101).cumsum()
+y3 = gaussian_filter1d(x, 3)
+y10 = gaussian_filter1d(x, 10)
+plt.plot(x, 'k', label='original data f(t)')
+plt.plot(y3, 'red', label='filtered, sigma=3', linewidth=2)
+plt.plot(y10, 'green', label='filtered, sigma=10', linewidth=2)
+plt.legend()
+plt.grid()
+plt.show()
+```
+
+
+## Cross-Correlation and Auto-Correlation
+
+-   The **cross-correlation** of $f$ and $g$ is similar to convolution.  It is defined as:
+    $$
+    (f \star g)(t) = \int_{-\infty}^{\infty} f(\tau)g(t+\tau)d\tau.
+    $$
+-   It is used to measure the similarity between two signals.
+-   The **autocorrelation** of a function $f$ is the cross-correlation of $f$ with itself:
+    $$
+    (f \star f)(t) = \int_{-\infty}^{\infty} f(\tau)f(t+\tau)d\tau.
+    $$
+-   The autocorrelation of a function is a measure of how similar the function is to a shifted version of itself.
+
+
+## Applications of convolution
+
+-   In signal processing, convolution is used to filter signals, extract features, and analyze time or frequency characteristics.
+-   Examples include:
+    -   **Noise Reduction**: Removes unwanted components from signals.
+    -   **Image Sharpening**: Enhances edges and detail.
+    -   **Feature Detection**: Identifies patterns like edges in images or specific frequencies in audio.
+
+-   In statistics, convolution is used to model probability distributions and smooth data.
+-   Examples::
+    -   The density of the sum of two independent random variables is the convolution of the two density functions.
+    -   **Kernel Density Estimation**: Smooths data to estimate probability densities.
+
+## Multi-dimensional Convolution
+
+-   In higher dimensions, the convolution of two functions $f: \R^d \to \R$ and $g: \R^d \to \R$ is defined as:
+    $$
+    (f * g)(\boldsymbol{t}) = \int_{\R^d} f(\boldsymbol{\tau})g(\boldsymbol{t}-\boldsymbol{\tau})d\boldsymbol{\tau}.
+    $$
+-   For discrete observations (e.g., images), the convolution is defined as:
+    $$
+    (f * g)(\boldsymbol{t}) = \sum_{\boldsymbol{\tau} \in \mathbb{Z}^d} f(\boldsymbol{\tau})g(\boldsymbol{t}-\boldsymbol{\tau}).
+    $$
+-   For $d = 2$, 
+    $$
+    (f * g)(t_1, t_2) = \sum_{\tau_1=-\infty}^{\infty}\sum_{\tau_2=-\infty}^{\infty} f(\tau_1, \tau_2)g(t_1-\tau_1, t_2-\tau_2).
+    $$
+-   The cross-correlation and autocorrelation are defined similarly.
+
+## 2-D Convolution
+
+-   For images, the input $I$ is a 2D grid of pixel values.
+-   The convolutional kernel $K$ is a 2D grid of weights.
+-   The kernel size is typically $3 \times 3$ or $5\times 5$.
+    -   Smaller kernels are computationally efficient and can capture fine details.
+
+![](images/lec08/conv.png){fig-align="center" width=80%}
+
+## Image size after convolution
+
+-   Suppose the size of the input image is $H_{\text{in}} \times W_{\text{in}}$ and the size of the kernel is $k_h \times k_w$.
+-   The **stride** (i.e., the step size) is $(s_h, s_w)$.
+-   The size of the output image is:
+    $$
+    H_{\text{out}} = \left\lfloor \frac{H_{\text{in}} - k_h}{s_h} + 1 \right\rfloor, \quad W_{\text{out}} = \left\lfloor \frac{W_{\text{in}} - k_w}{s_w} + 1 \right\rfloor.
+    $$
+-   In the previous example, the input image is $7 \times 7$ and the kernel size is $3 \times 3$ with stride $(1, 1)$. Therefore the output image is $5 \times 5$.
+-   The image size can be preserved by using **padding**, i.e., adding zeros around the input image.
+
+![](images/lec08/conv_padding.png){fig-align="center" width=50%}
+
+## 2-D Gaussian Filter
+
+Apply a 2D Gaussian filter to an image to smooth it. The filter is defined as:
+
+```{python}
+from scipy import datasets
+from scipy.ndimage import gaussian_filter
+
+orig = datasets.ascent()
+
+# Apply Gaussian filters
+result1 = gaussian_filter(orig, sigma=3)
+result2 = gaussian_filter(orig, sigma=10)
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+#| fig-width: 100% 
+import matplotlib.pyplot as plt
+fig = plt.figure()
+plt.gray()  # show the filtered result in grayscale
+ax1 = fig.add_subplot(131)  # left side
+ax2 = fig.add_subplot(132)  # middle
+ax3 = fig.add_subplot(133)  # right side
+
+ax1.imshow(orig)
+ax1.set_title("Original")
+ax1.axis('off')
+ax2.imshow(result1)
+ax2.set_title("Filtered, sigma=3")
+ax2.axis('off')
+ax3.imshow(result2)
+ax3.set_title("Filtered, sigma=10")
+ax3.axis('off')
+plt.show()
+```
+
+## Filter for edge detection
+
+-   We can also use convolution for edge detection: $k_h$ is for detecting horizontal edges and $k_v$ is for detecting vertical edges
+$$
+k_{h} = \begin{bmatrix} -1 \\ 0\\ 1 \end{bmatrix}, \quad k_{v} = \begin{bmatrix} -1 & 0 & 1 \end{bmatrix}
+$$
+-   In fact, the filter compute the approximate gradient of the image in the horizontal and vertical directions:
+\begin{align*}
+\frac{\partial}{\partial x} I(x, y) &\approx \frac{1}{2}\left[I(x+1, y) - I(x-1, y)\right] = \frac{1}{2}[-1, 0, 1] \cdot [I(x-1, y), I(x, y), I(x+1, y)] \\
+\frac{\partial}{\partial y} I(x, y) &\approx \frac{1}{2}\left[I(x, y+1) - I(x, y-1)\right] = \frac{1}{2}\begin{bmatrix} -1 \\ 0\\ 1 \end{bmatrix} \cdot \begin{bmatrix} I(x, y-1) \\ I(x, y) \\ I(x, y+1) \end{bmatrix}.
+\end{align*}
+
+--- 
+
+```{python}
+from scipy import ndimage, datasets
+import numpy as np
+
+# Define the horizontal and vertical edge detection filters
+k_v = np.array([[-1, 0, 1]])
+k_h = np.array([[-1], [0], [1]])
+
+orig = datasets.ascent().astype('int32')
+
+# Apply the filters to the image
+edge_h = ndimage.convolve(orig, k_h)
+edge_v = ndimage.convolve(orig, k_v)
+
+# Compute the magnitude of the gradient
+magnitude = np.sqrt(edge_h**2 + edge_v**2)
+magnitude *= 255.0 / np.max(magnitude)
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+#| fig-width: 100%
+import matplotlib.pyplot as plt 
+fig, axs = plt.subplots(1, 4, figsize=(15, 60))
+plt.gray()  # show the filtered result in grayscale
+axs[0].imshow(orig)
+axs[1].imshow(edge_h)
+axs[2].imshow(edge_v)
+axs[3].imshow(magnitude)
+titles = ["original", "horizontal", "vertical", "magnitude"]
+for i, ax in enumerate(axs.ravel()):
+    ax.set_title(titles[i])
+    ax.axis("off")
+plt.show()
+```
+
+## Sobel Filter
+
+-   The Sobel filter is a combination of gradient filters and smoothing filters,
+\begin{align*}
+k_{v} & = \begin{bmatrix} 1 \\ 2\\ 1 \end{bmatrix} \begin{bmatrix} -1 & 0 & 1 \end{bmatrix} = \begin{bmatrix} -1 & 0 & 1 \\ -2 & 0 & 2 \\ -1 & 0 & 1 \end{bmatrix}\\
+k_h & = \begin{bmatrix} -1 \\ 0\\ 1 \end{bmatrix} \begin{bmatrix} 1 & 2 & 1 \end{bmatrix} = \begin{bmatrix} -1 & -2 & -1 \\ 0 & 0 & 0 \\ 1 & 2 & 1 \end{bmatrix}\\
+\end{align*}
+-   That is, if we want to find vertical edges, we add a vertical smoothing filter and vice versa.
+
+---
+
+```{python}
+from scipy import ndimage, datasets
+import numpy as np
+ascent = datasets.ascent().astype('int32')
+sobel_h = ndimage.sobel(ascent, 0)  # horizontal gradient
+sobel_v = ndimage.sobel(ascent, 1)  # vertical gradient
+magnitude = np.sqrt(sobel_h**2 + sobel_v**2)
+magnitude *= 255.0 / np.max(magnitude)  # normalization
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+#| fig-width: 100% 
+import matplotlib.pyplot as plt
+fig, axs = plt.subplots(1,4, figsize=(15, 60))
+plt.gray()  # show the filtered result in grayscale
+axs[0].imshow(ascent)
+axs[1].imshow(sobel_h)
+axs[2].imshow(sobel_v)
+axs[3].imshow(magnitude)
+titles = ["original", "horizontal", "vertical", "magnitude"]
+for i, ax in enumerate(axs.ravel()):
+    ax.set_title(titles[i])
+    ax.axis("off")
+plt.show()
+```
+
+## High-pass filter and low-pass filter
+
+-   We can roughly classify filters into two categories:
+    -   **High-pass filters**: remove low-frequency components and preserve high-frequency components.
+    -   **Low-pass filters**: remove high-frequency components and preserve low-frequency components.
+-   High-pass filters keep fine details and sharpen images, e.g., the Sobel filter.
+-   Low-pass filters smooth images and remove noise, e.g., the Gaussian filter.
+-   Filter size (kernel size) also affects the filter's behavior:
+    -   Small filters capture fine details but are sensitive to noise.
+    -   Large filters smooth images but may blur fine details.
+
+## Quick Summary
+
+-   In image processing, convolution is the operation of applying a filter to an image.
+-   Filters are used to:
+    -   **Blur**: Smooth images by averaging pixel values.
+    -   **Sharpen**: Enhance edges and detail.
+    -   **Edge Detection**: Identify edges in images.
+    -   **Noise Reduction**: Remove unwanted noise from images.
+    -   **Feature Extraction**: Detect specific patterns or features in images.
+-   Therefore, we can choose different filters to achieve different effects.
+
+
+## Motivation of convolution
+
+There are several reasons to used convolution operations in neural networks:
+
+-   **Ease of Interpretation**: convolutional has long been used in signal processing and image processing.
+-   **Taking account of spatial structure**: Convolutional networks are designed to take advantage of the spatial structure of images.
+-   **Parameter Sharing**: A feature detector (e.g., edge detector) that's useful in one part of the image is likely useful in another part.
+-   **Sparsity of Connections**: In each layer, each output value depends only on a small number of inputs.
+-   **Translation Invariance**: A feature learned in one part of the image can be applied to other parts.
+-   **Efficient Computation**: Convolution can be implemented efficiently using matrix multiplication.
+
+## Convolution layer
+
+:::: columns
+
+::: {.column width=60%}
+In PyTorch, the convolutional layer is defined as `torch.nn.Conv2d` and it requires the following parameters:
+
+-   `in_channels`: number of input channels (e.g., 3 for RGB images).
+-   `out_channels`: number of output channels (i.e., number of filters).
+-   `kernel_size`: size of the convolutional kernel (e.g., 3 for a $3 \times 3$ kernel).
+-   `stride`: step size for the kernel.
+-   `padding`: number of zeros to add around the input image.
+-   `bias`: whether to include a bias term.
+-   `dilation`: spacing between kernel elements ($\text{default} = 1$ means no dilation).
+
+:::
+
+::: {.column width=40%}
+
+![](images/lec08/dilation.gif){fig-align="center" width=100%}
+
+:::
+
+::::
+
+::: aside
+Image sourse: <https://github.com/vdumoulin/conv_arithmetic/tree/master>
+:::
+
+---
+
+```{python}
+import torch
+import torch.nn as nn
+m = nn.Conv2d(in_channels=3, out_channels=5, kernel_size=3, stride=1, padding=1)
+
+print("Size of the weight parameter", m.weight.shape)
+print("Size of the bias parameter", m.bias.shape)
+```
+
+The number of parameters of a convolutional layer is:
+    $$
+    \text{\# parameters} = \text{in\_channels} \times \text{out\_channels} \times \text{kernel\_size}^2 + \text{out\_channels}.
+    $$
+
+
+
+## Pooling
+
+-   Pooling layer is another important layer in CNNs.
+-   It has several benefits:
+    -   **Downsampling**: Reduces the spatial dimensions of the feature map.
+    -   **Reduces Overfitting**: By summarizing the features, it reduces the number of parameters.
+    -   **Translation Invariance**: Makes the network more robust to small translations in the input.
+-   The most common pooling operation are **max pooling** and **average pooling**.
+
+
+## Max Pooling and Average Pooling
+
+-   Max pooling takes the maximum value in a patch.
+
+```{python}
+m = nn.MaxPool2d(kernel_size = 2, stride = 1)
+input = torch.randn(1, 4, 4)
+print(input)
+output = m(input)
+print(output)
+```
+
+-   Similarly, average pooling takes the average value in a patch.
+
+## Adaptive Pooling
+
+In PyTorch, adaptive pooling (`AdaptiveAvgPool` or `AdaptiveMaxPool`) allows you to specify the output size instead of the kernel size.
+
+-    `AdaptiveAvgPool1d`
+```{python}
+m = nn.AdaptiveAvgPool1d(output_size=8)
+x = torch.tensor([[1,2,3]], dtype = torch.float32)
+m(x)
+```
+
+-   `AdaptiveMaxPool1d`
+```{python}
+m = nn.AdaptiveMaxPool1d(output_size=10)
+x = torch.tensor([[1,2,3]], dtype = torch.float32)
+m(x)
+```
+-   This layer presents us from hard-coding the feature sizes.
+
+## How does it work? (for 1-D case)
+
+-   The output size for a convolution/pooling layer is:
+    $$
+    L_{\text{out}} = \left\lfloor \frac{L_{\text{in}} + 2\times\text{padding} - \text{dilation} \times (\text{kernel size} - 1) - 1}{\text{stride}} + 1\right\rfloor.
+    $$
+
+-   If $L_{\text{out}} \leq L_{\text{in}}$, define
+    -   $\text{padding} = 0$, $\text{dilation} = 1$
+    -   $\text{stride} = \left\lfloor \frac{L_{\text{in}} - L_{\text{out}}}{L_{\text{out}}} + 1\right\rfloor$
+    -   $\text{kernel size} = L_{\text{in}} - (L_{\text{out}} - 1)\times\text{stride}$
+-   If $L_{\text{out}} > L_{\text{in}}$, **upsample** the input by the factor $\left\lceil \frac{L_{\text{out}}}{L_{\text{in}}}\right\rceil$, e.g., if $L_{\text{in}} = 3$ and $L_{\text{out}} = 5$, upsample the input by a factor of $2$:
+$$
+[1,2,3] \Rightarrow [1,1,2,2,3,3]
+$$
+and then apply the previous case.
+
+
+
+## CNN Architecture
+
+A typical CNN architecture consists of two parts:
+    
+-   **Feature Extraction**: Consists of convolutional layers and activation functions.
+    -   **Convolutional Layers**: Extract features from the input image.
+    -   **Activation Function**: Introduce non-linearity into the model.
+    -   **Pooling Layers**: Downsample the feature maps.
+-   **Classification** (or regression): Consists of fully connected layers.
+    -   **Fully Connected Layers**: Perform classification based on the features.
+    -   **Activation Function**
+    -   **Dropout**: Regularize the model to prevent overfitting.
+    -   **Output Layer**: softmax layer for classification or linear layer for regression.
+
+## Example
+
+```{python}
+class MyConvNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.feature = nn.Sequential(
+            nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2),
+            nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.AdaptiveMaxPool2d(output_size=(4, 4)),
+            nn.Flatten()
+        )
+        self.classifier = nn.Sequential(
+            nn.Linear(32 * 4 * 4, 128),
+            nn.ReLU(),
+            nn.Linear(128, 10)
+        )   
+    def forward(self, x):
+        x = self.feature(x)
+        x = self.classifier(x)
+        return x
+```
+  
+## AlexNet
+
+-   AlexNet[^alexnet] is a popular CNN architecture that won the ImageNet Large Scale Visual Recognition Challenge (ILSVRC) in 2012.
+-   It consists of 5 convolutional layers and 3 fully connected layers.
+
+![](images/lec08/alexnet.png){fig-align="center" width=100%}
+
+[^alexnet]: Krizhevsky, A., Sutskever, I., & Hinton, G. E. (2012). Imagenet classification with deep convolutional neural networks. *Advances in Neural Information Processing Systems (NeurIPS)*, 25.
+
+---
+
+```{python}
+#| echo: false
+#| output: asis
+import torchvision.models as models
+alexnet = models.alexnet(pretrained=True)
+alexnet
+```
+
+
+# Applications
+
+## Computer Vision
+
+-   Computer Vision is a field of computer science that works on enabling computers to see, identify, and process images in the same way that human vision does, and then provide appropriate output.
+-   Typical tasks in computer vision include:
+    -   Image/video Classification
+    -   Object Detection
+    -   Segmentation
+    -   Reconstruction
+    -   Pose estimation, etc.
+
+---
+
+![](images/lec08/object.png){fig-align="center" width=100%}
+
+
+## Classical CV vs. DL
+
+-   Classical CV requires hand-crafted features:
+```{mermaid}
+%%| echo: false
+%%| fig-align: center
+flowchart LR
+  A(Image) --->|Feature Extraction| B(Feature Vector) --->|Classifier| C(Output)
+```
+-   For example, we can use the Scale-invariant feature transform (SIFT) algorithm to extract features from an image and use a classifier (e.g., SVM or random forest) to classify the image.
+-   Usually, the feature extraction step depends on the problem.
+-   In contrast, DL solves problems in an **end-to-end** manner, that is, it uses one model to simultaneously learn the feature extraction and classification steps.
+```{mermaid}
+%%| echo: false
+%%| fig-align: center
+flowchart LR
+  A(Image) --->|DL Models| B(Output)
+```
+-   Of course, the model architecture depends on the problem and compare to classical CV, DL approaches requires more data.
+
+## ImageNet Database
+
+-   ImageNet is a large-scale hierarchical image database containing over 14 million images hand-annotated with 20,000 categories. 
+-   The dataset is used in ImageNet Large Scale Visual Recognition Challenge (ILSVRC). 
+
+![](images/lec08/ImageNet.png){fig-align="center" width=100%}
+
+::: aside
+Image Source: Deng, J., Dong, W., Socher, R., Li, L. J., Li, K., & Fei-Fei, L. (2009, June). Imagenet: A large-scale hierarchical image database. In *2009 IEEE Conference on Computer Vision and Pattern Recognition* (pp. 248-255).
+:::
+
+## ImageNet Database
+
+-   It is developed to support visual recognition tasks in computer vision.
+    -   **Model Development**: Most models in `torchvision` are pretrained on ImageNet.
+    -   **Transfer Learning**: Use the pretrained models to solve other tasks, e.g., object detection, segmentation, etc.
+
+
+
+## Other public datasets
+
+-   Image classification:
+    -   **[CIFAR-10 and CIFAR-100](https://www.cs.toronto.edu/~kriz/cifar.html)**: Small-scale datasets for image classification with 10 or 100 categories; popular for educational purposes.
+    -   **[MNIST](http://yann.lecun.com/exdb/mnist/)**: Handwritten digits (0-9) dataset; ideal for simple classification and neural network testing.
+-   Object detection/segmentation:
+    -   **[COCO (Common Objects in Context)](https://cocodataset.org/)**: Over 330,000 images with 80 object categories; supports object detection, segmentation, and keypoint detection.
+    -   **[Open Images v7](https://storage.googleapis.com/openimages/web/index.html)**: Large dataset with 9 million images and bounding boxes for 600 categories; supports object detection and visual relationship detection.
+
+
+##  Other public datasets
+
+-   For autonomous driving:
+    -   **[Cityscapes](https://www.cityscapes-dataset.com/)**: Urban scene dataset with high-quality pixel annotations for 30 classes, used for autonomous driving.
+    -   **[CamVid](http://mi.eng.cam.ac.uk/research/projects/VideoRec/CamVid/)**: Road scene dataset with pixel-level annotations, commonly used in autonomous vehicle research.
+    -   **[KITTI](http://www.cvlibs.net/datasets/kitti/)**: Dataset for autonomous driving with images, lidar, and GPS data; supports object detection, tracking, and stereo vision.
+
+
+
+
+
+## Object Localization
+
+-   The goal is to identify and classify objects in an image by drawing **bounding boxes** around them.
+-   Define bounding box with four values:
+    -   Top-left corner coordinates $(x, y)$
+    -   Box width and height $(w, h)$
+-   It can be treated as a regression task:
+    -   **Input**: Image
+    -   **Output**: Bounding box coordinates $(x, y, w, h)$. 
+-   If we have multiple objects in an image, we can predict multiple bounding boxes with class labels.
+
+
+## Region-based CNNs
+
+-   The region-based CNNs (R-CNN)[^rcnn] family of models are used for object detection and localization.
+-   The key idea is to use a region proposal algorithm to generate candidate regions in an image and then use a CNN to classify the regions.
+-   The Faster R-CNN[^faster_rcnn] model improves the speed of R-CNN by sharing computation between the region proposal and classification.
+
+![](images/lec08/R-CNN.png){fig-align="center" width=70%}
+
+
+
+[^rcnn]: Girshick, R., Donahue, J., Darrell, T., & Malik, J. (2015). Region-based convolutional networks for accurate object detection and segmentation. *IEEE Transactions on Pattern Analysis and Machine Intelligence, 38(1), 142-158.
+
+[^faster_rcnn]: Ren, S., He, K., Girshick, R., & Sun, J. (2016). Faster R-CNN: Towards real-time object detection with region proposal networks. *IEEE Transactions on Pattern Analysis and Machine Intelligence*, 39(6), 1137-1149.
+
+
+## Image Segmentation
+
+-   Image segmentation is the process of partitioning an image into multiple segments (sets of pixels) to simplify the representation of an image.
+-   It can be achieved using both **unsupervised** and **supervised** methods.
+-   **Unsupervised Segmentation**: cluster pixels based on color, intensity, or texture.
+-   **Supervised Segmentation**: use labeled data to train a model to segment images.
+
+
+## U-Net[^unet]
+
+![](images/lec08/unet.png){fig-align="center" width=70%}
+
+[^unet]: Ronneberger, O., Fischer, P., & Brox, T. (2015). U-net: Convolutional networks for biomedical image segmentation. In *MICCAI*.
+
+## Model zoos
+
+-   You can find a huge collection of model architectures and pretrained models, for example,
+    -   **[torchvision](https://github.com/pytorch/vision)**: PyTorch's official model zoo with pretrained models for image classification, object detection, segmentation, etc.
+    -   **[timm](https://github.com/huggingface/pytorch-image-models)**: PyTorch Image Models (timm) library with various model architectures and pretrained models.
+-   Network backbone vs. head:
+    -   **Backbone**: Convolutional layers for feature extraction.
+    -   **Head**: Final few layers for classification, detection, or segmentation.
+-   Strategies: 
+    -   use a pretrained backbone and add your custom head for specific tasks
+    -   fine-tune the entire model (backbone and head)
+-   Depending on the size of your new dataset, you can choose the strategy that best fits your needs.
+
+
