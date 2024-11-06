@@ -5,10 +5,18 @@ title: "Resources"
 
 ## References 
 
+### Deep Learning
 -  Goodfellow et al. (2016) [Deep Learning](https://www.deeplearningbook.org)
 -  Zhang et al. (2023) [Dive into Deep Learning](https://d2l.ai)
--  T. Hastie, R. Tibshirani, and J. Friedman (2009). [The Elements of Statistical Learning.](https://link.springer.com/book/10.1007/978-0-387-84858-7)
--  C. M. Bishop (2006). [Pattern Recognition and Machine Learning.](https://www.microsoft.com/en-us/research/uploads/prod/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf)
--  S. Shalev-Shwartz and S. Ben-David (2014). [Understanding Machine Learning: From Theory to Algorithms.](https://www.cs.huji.ac.il/~shais/UnderstandingMachineLearning/index.html)
--  V. Vapnik (2000). [The Nature of Statistical Learning Theory](https://link.springer.com/book/10.1007/978-1-4757-3264-1)
 -  C. C. Aggarwal (2023). [Neural Networks and Deep Learning](https://link.springer.com/book/10.1007/978-3-031-29642-0)  
+
+### Statistical Learning and Machine Learning
+
+-  V. Vapnik (2000). [The Nature of Statistical Learning Theory](https://link.springer.com/book/10.1007/978-1-4757-3264-1)
+-  C. M. Bishop (2006). [Pattern Recognition and Machine Learning.](https://www.microsoft.com/en-us/research/uploads/prod/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf)
+-  T. Hastie, R. Tibshirani, and J. Friedman (2009). [The Elements of Statistical Learning.](https://link.springer.com/book/10.1007/978-0-387-84858-7)
+-  S. Shalev-Shwartz and S. Ben-David (2014). [Understanding Machine Learning: From Theory to Algorithms.](https://www.cs.huji.ac.il/~shais/UnderstandingMachineLearning/index.html)
+
+### Articles
+
+-   Nalisnick, E., Smyth, P., & Tran, D. (2023). [A brief tour of deep learning from a statistical perspective](https://www.annualreviews.org/content/journals/10.1146/annurev-statistics-032921-013738). *Annual Review of Statistics and Its Application*, 10(1), 219-246.
