@@ -1,0 +1,446 @@
+---
+title: "Recurrent Neural Networks"
+execute:
+    echo: true
+    cache: false
+    freeze: false
+highlight-style: atom-one
+---
+
+## Outline
+
+{{< include macro.qmd >}}
+
+-   Sequential Data and Modeling
+    -   Autoregressive Moving Average (ARMA) Models
+    -   State Space Models
+-   Deep Learning for Sequential Data
+    -   Recurrent Neural Networks
+    -   Long-Short Term Memory (LSTM)
+    -   Gated Recurrent Unit (GRU)
+-   Applications
+    -   Time Series Forecasting
+    -   Natural Language Processing
+
+
+## Dependent samples
+
+-   For a typical regression problem, we have a set of pairs of input and output data, $\{(x_1, y_1), (x_2, y_2), \ldots, (x_n, y_n)\}$, and we usually assumes that the pairs are **independent and identically distributed (i.i.d.)**.
+-   Two of the most common types of **dependent** data are
+    -   **sequential data** (time series, text, speech, etc.): $x^{(1)}, x^{(2)}, \ldots, x^{(t)}, \ldots$, where the order of the data points matters.
+    -   **spatial data** (data that includes spatial information): samples that are close to each other in space are more likely to be similar than samples that are far apart. 
+-   To apply (deep) neural networks to model these types of data, we need to use models that can capture the dependencies between the data points:
+    -   **Recurrent Neural Networks (RNNs)**: for sequential data.
+    -   **Graph Neural Networks (GNNs)**: for spatial data.
+
+## Sequential Data 
+
+-   The simplest case of sequential data is **time series data**, where the data points are collected at regular time intervals.
+-   Examples include:
+    -   financial data (stock prices, exchange rates, coorporate earnings, etc.)
+    -   environmental data (temperature, humidity, earthquake, etc.)
+    -   physiological data (heart rate, blood pressure, etc.)
+    -   speech data and text data
+-   Denote the time series data as $\{x^{(1)}, x^{(2)}, \ldots, x^{(t)}, \ldots\}$, where $x^{(t)}$ is the data point at time $t$.
+-   The sample at time $t$ can be a scalar, a vector, or a tensor, depending on the application.
+
+## Statistical Models for Sequential Data
+
+-   For time series data, there are several questions we may want to answer:
+    -   **Descriptive**: How are the data points related to each other?
+    -   **Modeling**: What is the underlying process that generates the data? How can we model the data?
+    -   **Forcasting**: Given $x^{(1)}, x^{(2)}, \ldots, x^{(t)}$, how can we predict $x^{(t+1)}$?
+    -   **Classification**: Given $\{x_i^{(1)}, x_i^{(2)}, \ldots, x_i^{(t)}, y_i\}_{i=1}^n$, $y_i \in \{0, 1\}$, how can we predict $y_i$ based on $x_i^{(1)}, x_i^{(2)}, \ldots, x_i^{(t)}$?
+-   Commonly used statistical models for time series data include:
+    -   Autoregressive Moving Average (ARMA) models
+    -   State Space models
+
+## Autoregressive Models
+
+-   For univariate time series data, the simplest model for time series data is the **autoregressive (AR) model**.
+-   The AR model of order $p$ is defined as
+    $$
+    x^{(t)} = \phi_1 x^{(t-1)} + \phi_2 x^{(t-2)} + \ldots + \phi_p x^{(t-p)} + \epsilon^{(t)}
+    $$
+    where $\phi_1, \phi_2, \ldots, \phi_p$ are the parameters of the model, and $\epsilon^{(t)} \sim N(0, \sigma^2)$ is the noise term.
+-   For vector-valued time series data, we can use the **vector autoregressive (VAR) model**, which is defined as 
+    $$
+    \boldsymbol{x}^{(t)} = \Phi_1 \boldsymbol{x}^{(t-1)} + \Phi_2 \boldsymbol{x}^{(t-2)} + \ldots + \Phi_p \boldsymbol{x}^{(t-p)} + \boldsymbol{\epsilon}^{(t)}
+    $$
+    where $\Phi_1, \Phi_2, \ldots, \Phi_p$ are matrices, and $\boldsymbol{\epsilon}^{(t)} \sim N_d(\boldsymbol{0}, \Sigma)$ is the noise term.
+-   The model parameters can be estimated by MLE or other methods, e.g., the Yule-Walker equations. See Ch. 3 of Shumway and Stoffer (2017)[^tsa] for more details.
+
+[^tsa]: Shumway, R. H., & Stoffer, D. S. (2017). Time series analysis and its applications: With R examples. Springer.
+
+## Remarks
+
+-   The AR/VAR models assume linear relationships between the data at different time points.
+-   The time lag parameter $p$ can be determined by
+    -   prior data analysis (e.g., autocorrelation function),
+    -   information criteria (AIC, BIC), or
+    -   cross-validation.
+-   Large $p$ leads to a more complicated model, which is harder to interpret and may lead to overfitting.
+-   The linear assumption may not be sufficent for complex time series data.
+
+## State Space Model
+
+-   State space models are a more general class of probabilistic models for time series data.
+-   The state space model can be written as
+    \begin{align*}
+    \textbf{State}: & \quad  h^{(t)} = \Phi h^{(t-1)} + \epsilon^{(t)} \\
+    \textbf{Observation}: & \quad y^{(t)} = \Psi h^{(t)} + \eta^{(t)}
+    \end{align*}
+    where
+    -   $h^{(t)} \in \R^p$ is the *latent state* at time $t$ ([unknown]{style="color:red;"}),
+    -   $y^{(t)} \in \R^q$ is the *observed data* at time $t$ ([observed]{style="color:blue;"}),
+    -   $\Phi \in \R^{p\times p}$ is the *state transition matrix* ([unknown]{style="color:red;"}),
+    -   $\Psi \in \R^{q \times p}$ is the *observation matrix* ([unknown]{style="color:red;"}),
+    -   $\epsilon^{(t)}$ and $\eta^{(t)}$ are the state noise and observation noise, respectively.
+-   The main difference between this model and the AR model is that the state space model includes the measurement noice $\eta^{(t)}$.
+-   If the observation noise $\eta^{(t)}$ is zero, the state space model reduces to an autoregressive model.
+
+---
+
+-   Diagram of a state space model:
+
+![](images/lec09/models-0.png){fig-align="center" width="70%"}
+
+-   The gray nodes are latent states (not observed), the white nodes are observed data, and the arrows represent the relationships between the nodes.
+
+## Exogenous Variables
+
+-   In some cases, we may have exogenous variables entering the states and the observations.
+-   That is, given the (observed) exogenous variables $x^{(t)} \in \R^r$, the state space model can be written as
+    \begin{align*}
+    \textbf{State}: & \quad  h^{(t)} = \Phi h^{(t-1)} + \Gamma x^{(t)} + \epsilon^{(t)} \\
+    \textbf{Observation}: & \quad y^{(t)} = \Psi h^{(t)} + \Xi x^{(t)} + \eta^{(t)}
+    \end{align*}
+    where $\Gamma \in \R^{p \times r}$ and $\Xi \in \R^{q \times r}$ are matrices.
+
+
+--- 
+
+-   The diagram becomes
+
+![](images/lec09/models-1.png){fig-align="center" width="70%"}
+
+## Motivation
+
+-   The state space models were first proposed for tracking problems in engineering by Rudolf E. Kálmán in the 1960s.
+-   For example, 
+    -   the latent state $h^{(t)}$ is the actual position and velocity of an object, 
+    -   the observed data $y^{(t)}$ can be the noisy measurements (e.g., by the GPS) of the object's position and velocity.
+-   Usually we assume Gaussian noises $\epsilon^{(t)} \sim N_p(0, \Sigma)$ and $\eta^{(t)} \sim N_q(0, \Lambda)$.
+-   In this case, we might be interested in
+    -   estimating the actual position $h^{(t)}$ of the object at each time step given $y^{(t)}$,
+    -   estimating the observation noise $\Lambda$ to know how far the observed position can be from the actual position.
+-   We will now briefly introduce one special case of state space models: the **Kalman filter**. 
+
+## Kalman Filter
+
+-   Consider the model:
+    \begin{align*}
+    h^{(t)} & = \Phi h^{(t-1)} + \Gamma x^{(t)} + \epsilon^{(t)}, \qquad \epsilon^{(t)} \sim N_p(0, \Sigma_h) \\
+    y^{(t)} & = \Psi h^{(t)} + \Xi x^{(t)} + \eta^{(t)}, \qquad \eta^{(t)} \sim N_q(0, \Sigma_{\text{obs}})
+    \end{align*}
+-   The goal is to estimate the hidden state $h^{(t)}$ given the observed data $y^{(1:s)} = \{y^{(1)}, y^{(2)}, \ldots, y^{(s)}\}$ and the exogenous variables $x^{(1:s)} = \{x^{(1)}, x^{(2)}, \ldots, x^{(s)}\}$, where $s < t$.
+-   Denote 
+    \begin{align*}
+    \textbf{Estimated State}: & \quad \hat{h}_s^{(t)} = \E\left(h^{(t)} \mid y^{(1:s)}, x^{(1:s)}\right)\\
+    \textbf{Esitmated Covariance}: & \quad P_s^{(t_1,t_2)} = \E\left[(h^{(t_1)} - \hat{h}_s^{(t_1)})(h^{(t_2)} - \hat{h}_s^{(t_2)})^T \mid y^{(1:s)}, x^{(1:s)}\right]
+    \end{align*}
+-   For simplicity, we write $P_s^{(t,t)} = P_s^{(t)}$.
+-   Under the Gaussian assumptions for $\epsilon^{(t)}$ and $\eta^{(t)}$, the conditional distribution of $h^{(t)}$ given $y^{(1:t-1)}$ and $x^{(1:t-1)}$ is also Gaussian. 
+-   We can derive the **Kalman filter** algorithm to compute $\hat{h}_{t-1}^{(t)}$ and $P_{t-1}^{(t)}$. 
+
+---  
+
+-   The **Kalman filter** algorithm proceeds as follows: 
+\begin{align*}
+\textbf{(Prediction)}: & \quad \hat{h}_{t-1}^{(t)} = \Phi \hat{h}_{t-1}^{(t-1)} + \Gamma x^{(t)}\\
+& \quad P_{t-1}^{(t)} =\Phi P_{t-1}^{(t-1)} \Phi^T + \Sigma_h\\
+\textbf{(Update)}: & \quad \hat{h}_t^{(t)} = \hat{h}_{t-1}^{(t)}+K_t\left(y^{(t)}-\Psi \hat{h}_{t-1}^{(t)}-\Xi x^{(t)}\right)\\
+& \quad P_t^{(t)}=\left[I-K_t \Psi\right] P_{t-1}^{(t)}\\
+\textbf{(Gain)}: & \quad K_t = P_{t-1}^{(t)} \Psi^T\left[\Psi P_{t-1}^{(t)} \Psi^{\prime}+\Sigma_{\text{obs}}\right]^{-1}
+\end{align*}
+    -   The first two equations are the **prediction** steps: predict the state and its covariance at time $t$ **without** the observation at time $t$.
+    -   The third and fourth equations are the **update** steps: update the prediction based on the observed data at time $t$.
+    -   The matrix $K_t$ is called the **Kalman gain**, which determines how much the observed data at time $t$ should be used to update the prediction.
+-   The iteration starts with some inital values $\hat{h}_0^{(0)}$ and $P_0^{(0)}$. For example, $\hat{h}_0^{(0)} = 0$ and $P_0^{(0)} = I$.
+
+## Remarks
+
+-   The Kalman filter is a linear filter since all the prediction and updates are linear.
+-   The estimation of the model parameters $\Phi, \Gamma, \Psi, \Xi, \Sigma_h, \Sigma_{\text{obs}}$ can be done by maximum likelihood estimation.
+-   The likelihood function is quite complicated and one can use the **Expectation-Maximization (EM)** algorithm to estimate the parameters.
+-   The Kalman filter can also serve as a smoothing algorithm: the hidden states are smooth versions of the observed data since the observation noise is removed.
+-   We can also use **time-varying** parameters $\Phi_t, \Gamma_t, \Psi_t, \Xi_t$ to model the dynamics of the system. 
+
+
+# Deep Learning for Sequential Data
+
+## Recurrent Neural Networks
+
+-   Recurrent neural networks, or RNNs, are a family of neural networks for processing sequential data.
+-   The main difference between RNNs and feedforward neural networks is that RNNs have connections between the neurons in the same layer, forming a directed cycle.
+-   These connection allow the model to capture the dependencies between the data points in the sequence.
+
+## A simple RNN
+
+:::: {.columns}
+
+::: {.column width="70%"}
+
+-   The simplest RNN can be constructed as follows:
+\begin{align*}
+\boldsymbol{h}^{(t)} & = \sigma(\boldsymbol{W} \boldsymbol{h}^{(t-1)} + \boldsymbol{U} \boldsymbol{x}^{(t)} + \boldsymbol{b})\\
+\boldsymbol{y}^{(t)} & = \boldsymbol{V} \boldsymbol{h}^{(t)} + \boldsymbol{c}
+\end{align*}
+where $\boldsymbol{h}^{(t)}$ is the hidden state at time $t$, $\boldsymbol{x}^{(t)}$ is the input, and $\boldsymbol{y}^{(t)}$ is the output.
+-   The parameters are $\boldsymbol{W}, \boldsymbol{U}, \boldsymbol{V}, \boldsymbol{b}, \boldsymbol{c}$, and $\sigma$ is the activation function.
+-   In other words, an RNN is a nonlinear state space model. 
+
+:::
+
+::: {.column width="30%"}
+
+![](images/lec09/models-2.png){fig-align="center" width="80%"}
+
+:::
+
+::::
+
+## Unfolding the graph
+
+![](images/lec09/models-3.png){fig-align="center" width="90%"}
+
+## Computing the Gradient
+
+-   Computing the gradient for the RNN is through backpropogation similar to the feedforward neural network.
+-   However, for RNNs, we need to also back-propagate through time (BPTT) to compute the gradient of the loss function with respect to the parameter $\boldsymbol{W}$.
+-   Hence if we have a long sequence even with only one hidden layer, we still face the vanishing/exlpoding gradient problem.
+-   This problem prevents the RNN from capturing long-term dependencies in the data.
+-   In practice, gradient-based algorithms (e.g., SGD) are not able to train RNNs with sequences longer than 10-20.
+-   Strategies:
+    -   Gradient clipping
+    -   Adding skip connections through time
+    -   Using **gates** to control the information flow in the network.
+
+## Gated RNNs
+
+-   The main idea of gated RNNs is to use **gates** to control the flow of information in the network, i.e., to decide whether we need to keep the information or forget it.
+-   A gate is a number between 0 and 1. We multiply the gate by the input to get the output:
+    $$
+    \text{output} = \text{gate} \times \text{input}
+    $$
+-   If the gate is 0, we completely forget the input; if the gate is 1, we keep the input as it is.
+-   The gate is also parametrized as a neural network, and the parameters are learned during training.
+-   The most famous gated RNNs are **Long-Short Term Memory (LSTM)** and **Gated Recurrent Unit (GRU)**.
+
+
+## Long-Short Term Memory (LSTM)
+
+-   States:
+    -   **Cell state**: the memory of the network.
+    -   **Hidden state**: the output of the network.
+
+-   Three gates:
+    -   **Forget gate**: decide what information to forget from the cell state.
+    -   **Input gate**: decide what information to store in the cell state.
+    -   **Output gate**: decide what information to output from the cell state.
+-   At time $t$, we have 
+    -   the cell state $\boldsymbol{c}^{(t-1)}$, 
+    -   the hidden state $\boldsymbol{h}^{(t-1)}$, and
+    -   the input $\boldsymbol{x}^{(t)}$.
+
+## Gates
+
+-   The **forget gate** at time $t$ is defined as 
+    $$
+    \boldsymbol{F}^{(t)} = \sigma(\boldsymbol{W}_F \boldsymbol{h}^{(t-1)} + \boldsymbol{U}_F \boldsymbol{x}^{(t)} + \boldsymbol{b}_F).
+    $$
+-   The **input gate** at time $t$ is defined as
+    $$
+    \boldsymbol{I}^{(t)} = \sigma(\boldsymbol{W}_I \boldsymbol{h}^{(t-1)} + \boldsymbol{U}_I \boldsymbol{x}^{(t)} + \boldsymbol{b}_I).
+    $$
+-   The **output gate** at time $t$ is defined as
+    $$
+    \boldsymbol{O}^{(t)} = \sigma(\boldsymbol{W}_O \boldsymbol{h}^{(t-1)} + \boldsymbol{U}_O \boldsymbol{x}^{(t)} + \boldsymbol{b}_O).
+    $$
+-   The gate parameters $\boldsymbol{W}_F, \boldsymbol{U}_F, \boldsymbol{b}_F, \boldsymbol{W}_I, \boldsymbol{U}_I, \boldsymbol{b}_I, \boldsymbol{W}_O, \boldsymbol{U}_O, \boldsymbol{b}_O$ are learned during training.
+-   The activation function $\sigma$ is usually the sigmoid function to keep the gate values in $[0,1]$.
+
+## Updating the States
+
+With the gates, we can update the cell state and the hidden state as follows.
+
+1.  Compute the candidate cell state:
+    $$
+    \tilde{\boldsymbol{c}}^{(t)} = \tanh(\boldsymbol{W}_C \boldsymbol{h}^{(t-1)} + \boldsymbol{U}_C \boldsymbol{x}^{(t)} + \boldsymbol{b}_C).
+    $$
+    This encodes the new information that we want to store in the cell state. The parameters $\boldsymbol{W}_C, \boldsymbol{U}_C, \boldsymbol{b}_C$ are also learned during training.
+2.  Update the cell state:
+    $$
+    \boldsymbol{c}^{(t)} = \boldsymbol{F}^{(t)} \odot \boldsymbol{c}^{(t-1)} + \boldsymbol{I}^{(t)} \odot \tilde{\boldsymbol{c}}^{(t)}.
+    $$
+    This step forgets some information from the previous cell state and adds new information to the current cell state.
+3.  Update the hidden state:
+    $$
+    \boldsymbol{h}^{(t)} = \boldsymbol{O}^{(t)} \odot \tanh(\boldsymbol{c}^{(t)}).
+    $$
+    The hidden state at time $t$ will be further used to compute the output and hence we use the output gate to control the information flow.
+
+## LSTM Module
+
+![](images/lec09/models-4.png){fig-align="center" width="100%"}  
+
+## Parameters of the LSTM module
+
+-   The LSTM module has the following parameters:
+    -   $\boldsymbol{W}_F, \boldsymbol{U}_F, \boldsymbol{b}_F$: forget gate parameters.
+    -   $\boldsymbol{W}_I, \boldsymbol{U}_I, \boldsymbol{b}_I$: input gate parameters.
+    -   $\boldsymbol{W}_O, \boldsymbol{U}_O, \boldsymbol{b}_O$: output gate parameters.
+    -   $\boldsymbol{W}_C, \boldsymbol{U}_C, \boldsymbol{b}_C$: candidate cell state parameters.
+-   Assume the dimension of the input $\boldsymbol{x}^{(t)}$ is $p$ and the dimension of the hidden state $\boldsymbol{h}^{(t)}$ is $q$. Then the dimensions of the parameters are
+    -   $\boldsymbol{W}_F, \boldsymbol{W}_I, \boldsymbol{W}_O, \boldsymbol{W}_C \in \R^{q \times q}$,
+    -   $\boldsymbol{U}_F, \boldsymbol{U}_I, \boldsymbol{U}_O, \boldsymbol{U}_C \in \R^{q \times p}$,
+    -   $\boldsymbol{b}_F, \boldsymbol{b}_I, \boldsymbol{b}_O, \boldsymbol{b}_C \in \R^q$. 
+-   Hence the total number of parameters in the LSTM module is $4q^2 + 4pq + 4q = 4q(p+q+1)$.
+
+## Issues with LSTM
+
+The inclusion of the three gates and the memory cell has some pros and cons:
+
+-   **Pros**:
+    -   **Handling long sequences**: LSTMs are specifically designed to remember information for long periods.
+    -   **Mitigating vanishing gradient problem**: LSTMs address the vanishing gradient problem commonly encountered in traditional RNNs.
+-   **Cons**:
+    -   **Complexity and computational cost**: LSTMs are more complex than standard RNNs due to large number of parameters.
+    -   **Overfitting**: LSTMs can be prone to overfitting.
+
+-   Are all the gates necessary? Can we simplify the LSTM module?
+
+## Gated Recurrent Unit (GRU)
+
+-   In contrast to LSTM, the GRU has only two gates: the **update gate** and the **reset gate**, which are defined as follows:
+    \begin{align*}
+    \boldsymbol{Z}^{(t)} & = \sigma(\boldsymbol{W}_Z \boldsymbol{h}^{(t-1)} + \boldsymbol{U}_Z \boldsymbol{x}^{(t)} + \boldsymbol{b}_Z)\\
+    \boldsymbol{R}^{(t)} & = \sigma(\boldsymbol{W}_R \boldsymbol{h}^{(t-1)} + \boldsymbol{U}_R \boldsymbol{x}^{(t)} + \boldsymbol{b}_R).
+    \end{align*}
+-   The hidden state at time $t$ is updated as follows:
+    1.  Compute the candidate hidden state:
+    $$
+    \tilde{\boldsymbol{h}}^{(t)} = \tanh(\boldsymbol{W}_H \left(\boldsymbol{R}^{(t)} \odot \boldsymbol{h}^{(t-1)}\right) + \boldsymbol{U}_H \boldsymbol{x}^{(t)} + \boldsymbol{b}_H).
+    $$
+    This step uses the reset gate to control the information flow from the previous hidden state.
+    2.  Update the hidden state:
+    $$
+    \boldsymbol{h}^{(t)} = \boldsymbol{Z}^{(t)} \odot \boldsymbol{h}^{(t-1)} + (1-\boldsymbol{Z}^{(t)}) \odot \tilde{\boldsymbol{h}}^{(t)}.
+    $$
+    This step uses the update gate to control the information flow from the previous hidden state and the candidate hidden state.
+
+## Quick Summary
+
+-   The main difference between the Kalman filter, RNNs, and LSTM/GRU is the way they model the hidden states:
+    -   Kalman filter: $\boldsymbol{h}^{(t)} = \boldsymbol{W} \boldsymbol{h}^{(t-1)} + \boldsymbol{U} \boldsymbol{x}^{(t)} + \boldsymbol{b}$.
+    -   RNN: $\boldsymbol{h}^{(t)} = \sigma(\boldsymbol{W} \boldsymbol{h}^{(t-1)} + \boldsymbol{U} \boldsymbol{x}^{(t)} + \boldsymbol{b})$.
+    -   LSTM: $\boldsymbol{h}^{(t)} = \text{LSTM}( \boldsymbol{h}^{(t-1)}, \boldsymbol{x}^{(t)}, \text{parameters})$.
+    -   GRU: $\boldsymbol{h}^{(t)} = \text{GRU}( \boldsymbol{h}^{(t-1)}, \boldsymbol{x}^{(t)}, \text{parameters})$.
+-   The output depends on the prediction target: 
+    -   **Real-valued output**: $\boldsymbol{y}^{(t)} = \boldsymbol{V} \boldsymbol{h}^{(t)} + \boldsymbol{c}$.
+    -   **Binary output**: $\boldsymbol{y}^{(t)} = \text{sigmoid}(\boldsymbol{V} \boldsymbol{h}^{(t)} + \boldsymbol{c})$.
+    -   **Multiclass output**: $\boldsymbol{y}^{(t)} = \text{softmax}(\boldsymbol{V} \boldsymbol{h}^{(t)} + \boldsymbol{c})$.
+
+## Deep RNN
+
+We can also increase the depth of the RNN by stacking multiple hidden layers on top of each other:
+
+![](images/lec09/models-5.png){fig-align="center" width="100%"}
+
+
+
+# Applications
+
+## Applications of RNNs
+
+-   RNNs are designed for sequential data:
+    -   Time series forecasting: predict the future values of a time series.
+    -   Biological signal processing: fMRI, EEG, ECG, etc.
+-   In particular, they are widely used in Natural Language Processing (NLP):
+    -   **Sentiment analysis**: classify the sentiment of a text as positive, negative, or neutral.
+    -   **Text generation**: generate text based on a given prompt.
+    -   **Machine translation**: translate text from one language to another.
+    -   **Speech recognition**: convert spoken language into text.
+
+## Word Embedding
+
+-   To process text data, we need to convert the text into numerical data. This step is called **word embedding**.
+-   The simplest way to do word embedding is to use the **one-hot encoding**:
+    -   Each word is represented as a vector of zeros with a single 1 at the index of the word in the vocabulary.
+    -   The dimension of the one-hot vector is the size of the vocabulary.
+-   However, one-hot encoding has some drawbacks:
+    -   The vectors are sparse and high-dimensional.
+    -   The vectors do not capture the semantic relationships between the words.
+-   A more practical approach is to ues word embedding models, e.g., 
+    -   Word2Vec
+    -   GloVe (Global Vectors for Word Representation)
+    -   BERT (Bidirectional Encoder Representations from Transformers)
+-   These models learn dense, low-dimensional vectors that capture the semantic relationships between the words.
+
+
+## Variants of RNNs
+
+Depending on the application/task, there are several variants of RNNs:
+
+-   **Many-to-one**: for sentiment analysis, text classification, etc.
+-   **One-to-many**: for music generation, image captioning, etc.
+-   **Many-to-many (sequence-to-sequence)**: for machine translation, speech recognition, etc.
+
+## Image Captioning
+
+![](images/lec09/image_captioning.png){fig-align="center" width="100%"}
+
+::: aside
+Image source: Figure 8.9 of Aggarwal (2023).
+:::
+
+## Machine Translation
+
+![](images/lec09/machine_translation.png){fig-align="center" width="100%"}
+
+::: aside
+Image source: Figure 8.10 of Aggarwal (2023).
+:::
+
+## Sentence Classification
+
+![](images/lec09/sentence_classification.png){fig-align="center" width="100%"}
+
+::: aside
+Image source: Figure 8.11 of Aggarwal (2023).
+:::
+
+## Token-level Classification
+
+![](images/lec09/token_classification.png){fig-align="center" width="100%"}
+
+::: aside
+Image source: Figure 8.12 of Aggarwal (2023).
+:::
+
+## Temporal Recommender Systems
+
+![](images/lec09/temporal_recommender_system.png){fig-align="center" width="100%"}
+
+::: aside
+Image source: Figure 8.13 of Aggarwal (2023).
+:::
+
+## More Examples
+
+The official PyTorch documentation and `d2l.ai` provide several examples of RNNs and LSTMs:
+
+-    LSTM: <https://pytorch.org/tutorials/beginner/nlp/sequence_models_tutorial.html>
+-    NLP from scratch: <https://pytorch.org/tutorials/intermediate/nlp_from_scratch_index.html>
+-    Bidirectional Recurrent Neural Networks: <https://d2l.ai/chapter_recurrent-modern/bi-rnn.html>
+-    Machine translation example: <https://d2l.ai/chapter_recurrent-modern/machine-translation-and-dataset.html>
