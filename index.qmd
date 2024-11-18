@@ -17,8 +17,8 @@ title: "Statistical Deep Learning (Fall 2024)"
 | 9 | 10/29 | Implementation of DL Models | [Slide](slides/07-implementation.qmd) [Colab](https://colab.research.google.com/drive/1W8qPFQ48jAlKFRt1G16nCN0s0KiKLzLl?authuser=1#scrollTo=pn69KjwB6hw2) | D2L Ch. 6 |
 | 10 | 11/5 | Convolutional Networks | [Slide](slides/08-cnn.qmd)  | D2L Ch. 7, 8 & DL Ch. 9 |
 | 11 | 11/12 | Recurrent Networks | [Slide](slides/09-rnn.qmd) | D2L Ch. 9, 10 & DL Ch. 10 |
-| 12 | 11/19 | Hyperparameter Optimization and Tuning |  | D2L Ch. 19 & DL Ch. 11 |
-| 13 | 11/26 | Generative Models: Autoencoders, GAN, Diffusion models |  | D2L Ch. 20 & DL Ch. 14 |
+| 12 | 11/19 | Generative Models: Autoencoder | [Slide](slides/10-generative_model.qmd) | DL Ch. 13, 14 |
+| 13 | 11/26 | Generative Models: GAN, Diffusion models |  | D2L Ch. 20 & DL Ch. 14 |
 | 14 | 12/3 | Additional Topics: Attention Mechanisms and Gaussian Process |  | D2L Ch. 11, 18 |
 | 15-16 | 12/10-17 | Final Project Presentation |  |  | 
 
