@@ -461,7 +461,7 @@ Image source: Figure 4 in Doersch's "Tutorial on Variational Autoencoders".
 
 ## Estimating the marginal likelihood
 
--   The marginal log-likelihood $\log p_{\boldsymbol{x}}$ can be estimated using an *importance sampling* technique:
+-   The marginal log-likelihood $\log p_{\boldsymbol{\theta}}(\boldsymbol{x})$ can be estimated using an *importance sampling* technique:
     $$
     \begin{aligned}
     \log p_{\boldsymbol{\theta}}(\boldsymbol{x})=\log \E_{q_{\boldsymbol{\phi}}(\boldsymbol{z} \mid \boldsymbol{x})}\left[\frac{p_{\boldsymbol{\theta}}(\boldsymbol{x}, \boldsymbol{z})}{q_{\boldsymbol{\phi}}(\boldsymbol{z} \mid \boldsymbol{x})}\right]
@@ -500,7 +500,7 @@ Generated samples from a VAE trained on MNIST dataset:
 ![](images/lec10/generative-overview.png){fig-align="center" width="70%"}
 
 ::: aside
-Image sourec: <https://lilianweng.github.io/posts/2021-07-11-diffusion-models/>
+Image source: <https://lilianweng.github.io/posts/2021-07-11-diffusion-models/>
 :::
 
 
