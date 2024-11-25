@@ -1,0 +1,534 @@
+---
+title: "Generative Models"
+subtitle: "GAN, Flow-based models, Diffusion models"
+execute:
+    echo: true
+    cache: false
+    freeze: false
+highlight-style: atom-one
+---
+
+## Outline
+
+{{< include macro.qmd >}}
+
+-   Generative Adversarial Networks (GAN)
+    -   Loss function of GAN
+    -   Jensen–Shannon Divergence
+    -   Wasserstein GAN (WGAN)
+-   Flow-based Generative Models
+    -   Change of Variable
+    -   Normalizing Flow (NF)
+    -   Coupling Layers
+-   Diffusion Model
+    -   Denoising Diffusion Probabilistic Model (DDPM)
+
+
+## Generative Adversarial Networks (GAN)
+
+-   A **discriminator** estimates the probability of a given sample coming from the real dataset. 
+-   A **generator** generates synthetic samples given a noise variable input. 
+
+![](images/lec11/GAN.png){fig-align="center" width=80%}
+
+::: aside
+Image source: <https://www.kdnuggets.com/2017/01/generative-adversarial-networks-hot-topic-machine-learning.html>
+:::
+
+## Training Objective of GAN
+
+-   The discriminator $D$ tries to **maximize** the probability of correctly classifying the generated samples.
+-   The generator $G$ tries to **minimize** the probability of the discriminator correctly classifying the generated samples.
+-   These two models try to compete with each other, leading to a **minimax** game.
+-   Notations:
+    -   $p_{\text{data}}(\boldsymbol{x})$: the distribution of real data $\boldsymbol{x} \in \R^d$
+    -   $p_{g}(\boldsymbol{x})$: the distribution of generated data.
+    -   $p_{\boldsymbol{z}}(\boldsymbol{z})$: the distribution of noise variable $\boldsymbol{z} \in \R^k$.
+    -   $D(\boldsymbol{x})$: the discriminator, i.e., the probability of $\boldsymbol{x}$ being real ($D: \R^d \to [0,1]$)
+    -   $G(\boldsymbol{z})$: the generator ($G: \R^k \to \R^d$).
+
+## Training Objective of GAN
+
+-   We train $D$ to maximize the probability of assigning the correct label to both training examples and samples from $G$. 
+-   We simultaneously train $G$ to minimize $\log(1−D(G(\boldsymbol{z})))$. 
+-   In other words, $D$ and $G$ play the following two-player minimax game with value function $V(G,D)$:
+    $$
+    V(G, D)=\E_{\boldsymbol{x} \sim p_{\text {data }}(\boldsymbol{x})}[\log D(\boldsymbol{x})]+\E_{\boldsymbol{z} \sim p_{\boldsymbol{z}}(\boldsymbol{z})}[\log (1-D(G(\boldsymbol{z})))].
+    $$
+-   The goal is to maximize $V(G, D)$ with respect to $D$ and then minimize it with respect to $G$, i.e., 
+    $$
+    \min_{G} \max_{D} V(G, D).
+    $$
+-   The discriminator and the generator are both parametrized by deep neural networks: $D(\boldsymbol{x}) = D(\boldsymbol{x}, \theta_D)$ and $G(\boldsymbol{z}) = G(\boldsymbol{z}, \theta_G)$.
+-   Hence the minimization and maximization are with respect to $\theta_G$ and $\theta_D$ respectively.
+
+
+## Global Optimality of $D$
+
+**Proposition** (Goodfellow et al., 2014) For $G$ fixed, the optimal discriminator $D$ is
+\begin{align*}
+D_G^*(\boldsymbol{x})=\frac{p_{\text {data }}(\boldsymbol{x})}{p_{\text {data }}(\boldsymbol{x})+p_g(\boldsymbol{x})}
+\end{align*}
+
+**Proof**: The training criterion for the discriminator $D$, given any generator $G$, is to maximize the quantity $V(G, D)$
+
+\begin{align*}
+\begin{aligned}
+V(G, D) & =\int_{\boldsymbol{x}} p_{\text {data }}(\boldsymbol{x}) \log (D(\boldsymbol{x})) d x+\int_{\boldsymbol{z}} p_{\boldsymbol{z}}(\boldsymbol{z}) \log (1-D(g(\boldsymbol{z}))) d z \\
+& =\int_{\boldsymbol{x}} p_{\text {data }}(\boldsymbol{x}) \log (D(\boldsymbol{x}))+p_g(\boldsymbol{x}) \log (1-D(\boldsymbol{x})) d x
+\end{aligned}
+\end{align*}
+
+For any $(a, b) \in \mathbb{R}^2 \backslash\{0,0\}$, the function $y \rightarrow a \log (y)+b \log (1-y)$ achieves its maximum in $[0,1]$ at $\frac{a}{a+b}$.
+
+## Remarks
+
+-   Note that the training objective for $D$ can be interpreted as maximizing the log-likelihood for estimating the conditional probability $\P(Y= y \mid \boldsymbol{x})$, where $Y$ indicates whether x comes from $p_{\text{data}}$ (with $y= 1$) or from $p_g$ (with $y= 0$).
+-   When the generator is trained to optimal, $p_g$ gets closer to $p_{\text{data}}$, and thus $D^*_G(\boldsymbol{x}) \approx \frac{1}{2}$.
+-   The cost of $G$ in the minimax game can be formulated as 
+    $$
+    \begin{aligned}
+    C(G) & =\max _D V(G, D) \\ 
+    & =\E_{\boldsymbol{x} \sim p_{\text {data }}}\left[\log D_G^*(\boldsymbol{x})\right]+\E_{\boldsymbol{z} \sim p_{\boldsymbol{z}}}\left[\log \left(1-D_G^*(G(\boldsymbol{z}))\right)\right] \\ 
+    & =\E_{\boldsymbol{x} \sim p_{\text {data }}}\left[\log D_G^*(\boldsymbol{x})\right]+\E_{\boldsymbol{x} \sim p_g}\left[\log \left(1-D_G^*(\boldsymbol{x})\right)\right] \\ 
+    & =\E_{\boldsymbol{x} \sim p_{\text {data }}}\left[\log \frac{p_{\text {data }}(\boldsymbol{x})}{P_{\text {data }}(\boldsymbol{x})+p_g(\boldsymbol{x})}\right]+\E_{\boldsymbol{x} \sim p_g}\left[\log \frac{p_g(\boldsymbol{x})}{p_{\text {data }}(\boldsymbol{x})+p_g(\boldsymbol{x})}\right]
+    \end{aligned}
+    $$
+-   The goal is to minimize the cost function $C(G)$, which is equivalent to minimizing the **Jensen-Shannon divergence** between $p_{\text{data}}$ and $p_g$.
+
+## Jensen–Shannon Divergence
+
+-   Recall that the KL divergence is 
+    $$
+    D_{\text{KL}}(p \| q) = \int_{\boldsymbol{x}} p(\boldsymbol{x}) \log \frac{p(\boldsymbol{x})}{q(\boldsymbol{x})} d \boldsymbol{x} = \E_{\boldsymbol{x} \sim p} \left[ \log \frac{p(\boldsymbol{x})}{q(\boldsymbol{x})} \right].
+    $$
+-   One of the main issues with KL divergence is that it is asymmetric, i.e., $D_{\text{KL}}(p \| q) \neq D_{\text{KL}}(q \| p)$.
+-   The **Jensen–Shannon divergence** is a symmetrized version of KL divergence, which is defined as
+    $$
+    D_{\text{JS}}(p \| q) = \frac{1}{2} D_{\text{KL}}\left(p \bigg\| \frac{p+q}{2}\right) + \frac{1}{2} D_{\text{KL}}\left(q \bigg\| \frac{p+q}{2}\right).
+    $$
+
+## The JSD loss for $G$
+
+-   The JS divergence between $p_{\text{data}}$ and $p_g$ is 
+    $$
+    \begin{aligned}
+    D_{\text{JS}}(p_{\text{data}} \| p_g) &= \frac{1}{2} D_{\text{KL}}\left(p_{\text{data}} \bigg\| \frac{p_{\text{data}}+p_g}{2}\right) + \frac{1}{2} D_{\text{KL}}\left(p_g \bigg\| \frac{p_{\text{data}}+p_g}{2}\right) \\
+    & = \frac{1}{2}\E_{\boldsymbol{x} \sim p_{\text{data}}} \left[ \log \frac{2p_{\text{data}}(\boldsymbol{x})}{p_{\text{data}}(\boldsymbol{x})+p_g(\boldsymbol{x})} \right] + \frac{1}{2}\E_{\boldsymbol{x} \sim p_g} \left[ \log \frac{2p_g(\boldsymbol{x})}{p_{\text{data}}(\boldsymbol{x})+p_g(\boldsymbol{x})} \right] \\
+    & = \log 2 + \frac{1}{2} C(G).
+    \end{aligned}
+    $$
+-   Therefore $C(G) = 2D_{\text{JS}}(p_{\text{data}} \| p_g) - 2\log 2$ and $C(G)$ attains its minimum of $-2\log 2$ when $p_{\text{data}} = p_g$.
+
+## Algorithm
+
+![](images/lec11/GAN_algorithm.png){fig-align="center" width=80%}
+
+::: aside
+Source: *Generative Adversarial Nets* by Goodfellow et al. (2014)
+:::
+
+## Problems in GANs
+
+-   Theoretically, the training objective of GANs has a global optimum (also called the *Nash equilibrium*): $G(\boldsymbol{z})$ is such that $p_g = p_{\text{data}}$ and $D(\boldsymbol{x}) = 1/2$.
+-   That is, the synthetic data generated by $G$ is indistinguishable from the real data.
+-   In practice, training GANs using gradient-based optimization is challenging due to the following reasons:
+    -   **Low dimensional support**: The support of the real data distribution is usually low-dimensional, making the JS divergence numerically unstable. 
+    -   **Mode collapse**: The generator always produces the same outputs.
+    -   **Vanishing gradients**: When the discriminator is too good, the gradients of the generator vanish.
+-   There are many ways to improve the training of GANs, e.g., Salimans et al. (2016) and Bottou and Arjovsky (2017).
+-   We discuss one of the most popular improvements, the Wasserstein GAN (WGAN).
+
+::: aside
+1.  Salimans et al. (2016). [*Improved Techniques for Training GANs*](https://proceedings.neurips.cc/paper_files/paper/2016/hash/8a3363abe792db2d8761d6403605aeb7-Abstract.html). In *NeurIPS*.
+2.  Bottou and Arjovsky (2017). [*Towards Principled Methods for Training Generative Adversarial Networks*](https://arxiv.org/abs/1701.04862).
+:::
+
+
+## Wasserstein Distance
+
+-   The **Wasserstein distance** between two distributions $p$ and $q$ is defined as
+    $$
+    W_r(p, q) = \inf_{\gamma \in \Pi(p, q)} \Big(\E_{(\boldsymbol{x}, \boldsymbol{y}) \sim \gamma} \left[ \| \boldsymbol{x} - \boldsymbol{y} \|^r \right]\Big)^{1/r},
+    $$
+    where $\Pi(p, q)$ is the set of all joint distributions $\gamma(\boldsymbol{x}, \boldsymbol{y})$ whose marginals are $p$ and $q$.
+-   For $r = 1$, the Wasserstein distance is called the **Earth Mover's distance**.
+-   For $r = 1$, we also have the **Kantorovich-Rubinstein duality**: The Wasserstein distance can be expressed as
+    $$
+    W_1(p, q) = \sup_{\| f \|_L \leq 1} \E_{\boldsymbol{x} \sim p} [f(\boldsymbol{x})] - \E_{\boldsymbol{y} \sim q} [f(\boldsymbol{y})],
+    $$
+    where the supremum is taken over all 1-Lipschitz functions $f$.
+-   Note: a function $f$ is $k$-Lipschitz if $|f(\boldsymbol{x}) - f(\boldsymbol{y})| \leq k \| \boldsymbol{x} - \boldsymbol{y} \|$ for all $\boldsymbol{x}, \boldsymbol{y}$.
+
+## Wasserstein distance vs. JS/KL divergence
+
+-   The KL divergence is motivated from Information theory while the Wasserstein distance is motivated from the optimal transport problem.
+-   The main disadvantage of KL divergence is that it is not symmetric and is not defined when the support of $p$ is not contained in the support of $q$.
+-   The asymmetry of KL divergence can be solved by the JS divergence.
+-   However the support problem still exists in JS divergence and is the reason for numerical instability in GAN.
+-   The Wasserstein distance is symmetric and is defined even when the supports of $p$ and $q$ are disjoint.
+-   The disjoint support issue is common in high-dimensional data, as in those cases, the samples are usually concentrated on a low-dimensional manifold.
+
+
+## Wasserstein GAN (WGAN)
+
+-   In the standard GAN, the generator $G$ is trained to minimize the cost
+    $$
+    \begin{aligned}
+    C(G) & =\max _D V(G, D) \\ 
+    & =\E_{\boldsymbol{x} \sim p_{\text{data}}}\left[\log \frac{p_{\text {data }}(\boldsymbol{x})}{P_{\text{data}}(\boldsymbol{x})+p_g(\boldsymbol{x})}\right]+\E_{\boldsymbol{x} \sim p_g}\left[\log \frac{p_g(\boldsymbol{x})}{p_{\text{data}}(\boldsymbol{x})+p_g(\boldsymbol{x})}\right]\\
+    & = 2D_{\text{JS}}(p_{\text{data}} \| p_g) - 2\log 2.
+    \end{aligned}
+    $$
+-   In WGAN, the generator is trained to minimize the Wasserstein distance between $p_{\text{data}}$ and $p_g$, i.e.,
+    $$
+    \begin{aligned}
+    C_W(G) & = \max _{w \in \mc{W}} \E_{\boldsymbol{x} \sim p_{\text{data}}}\left[f_w(x)\right]-\E_{\boldsymbol{z} \sim p_{\boldsymbol{z}}}\left[f_w\left(G(\boldsymbol{z})\right)\right] \\
+    & = \max _{w \in \mc{W}} \E_{\boldsymbol{x} \sim p_{\text{data}}}\left[f_w(x)\right]-\E_{\boldsymbol{x} \sim p_g}\left[f_w(\boldsymbol{x})\right]\\
+    & \approx W_1(p_{\text{data}}, p_g),
+    \end{aligned}
+    $$
+    where $\{f_w\}_{w \in \mc{W}}$ is a family of 1-Lipschitz functions.
+-   In WGAN, the function $f_w$ serves as the critic (analogous to the discriminator in GAN).
+
+---
+
+![](images/lec11/WGAN_algorithm.png){fig-align="center" width=90%}
+
+::: aside
+Arjovsky, Chintala, and Bottou (2017). [*Wasserstein Generative Adversarial Networks*](https://proceedings.mlr.press/v70/arjovsky17a.html). In *ICML*.
+:::
+
+## Synthetic Example
+
+Using GAN/WGAN to learn a mixture of 8 Gaussians spread in a circle
+
+![](images/lec11/WGAN_exp.png){fig-align="center" width=80%}
+
+::: aside
+The Unrolled GAN is proposed by Metz et al. (2017) in [*Unrolled Generative Adversarial Networks*](https://arxiv.org/abs/1611.02163).
+:::
+
+# Flow-based Generative Models
+
+
+## Flow-based Generative Models
+
+-   A flow-based generative model is constructed by a sequence of **invertible transformations**. 
+-   GAN: $p(\boldsymbol{x})$ is learned implicitly by a minimax game between the generator and the discriminator.
+-   VAE: $p(\boldsymbol{x})$ is learned implicitly by maximizing the ELBO in the encoder-decoder model.
+-   Unlike other two, the model explicitly learns the data distribution  and therefore the loss function is simply the negative log-likelihood.
+
+![](images/lec11/normalizing_flow.png){fig-align="center" width=90%}
+
+## Change of Variable
+
+-   Let $\boldsymbol{z} \sim p(\boldsymbol{z})$ be a random vector and $\boldsymbol{x} = f(\boldsymbol{z})$, where $f: \R^d \to \R^d$ is an invertible function.
+-   Then $\boldsymbol{z} = f^{-1}(\boldsymbol{x})$ and the probability density of $\boldsymbol{x}$ is given by
+    $$
+    \begin{aligned}
+    p_x(\boldsymbol{x}) = p(\boldsymbol{z})\left|\det \frac{d \boldsymbol{z}}{d\boldsymbol{x}}\right|=p\left(f^{-1}(\boldsymbol{x})\right)\left|\det \frac{d f^{-1}}{d \boldsymbol{x}}\right|.
+    \end{aligned}
+    $$
+-   The matrix $\frac{d f}{d \boldsymbol{z}}$ is called the **Jacobian matrix** of $f$, denoted by $J_f$
+    $$
+    J_f(\boldsymbol{z}) = \frac{d f}{d \boldsymbol{z}} = 
+    \begin{bmatrix}
+    \frac{\partial f_1}{\partial z_1} & \cdots & \frac{\partial f_1}{\partial z_d} \\
+    \vdots & \ddots & \vdots \\
+    \frac{\partial f_d}{\partial z_1} & \cdots & \frac{\partial f_d}{\partial z_d}
+    \end{bmatrix}.
+    $$
+-   Hence, 
+    $$
+    \begin{aligned}
+    p_x(\boldsymbol{x}) & = p\left(f^{-1}(\boldsymbol{x})\right)\left|\det J_{f^{-1}}(\boldsymbol{x})\right| = p(f^{-1}(\boldsymbol{x})) \left| \det J_f^{-1}(f^{-1}(\boldsymbol{x}))\right|\\
+    & = p(f^{-1}(\boldsymbol{x})) \left| \det J_f(f^{-1}(\boldsymbol{x}))\right|^{-1}.
+    \end{aligned}
+    $$ 
+
+## Normalizing Flows
+
+- A **normalizing flow** transforms a simple distribution into a complex one by applying a sequence of **invertible** transformations.
+- The **change of variable** formula is used to compute the probability density of the transformed distribution.
+-   Let $\boldsymbol{z}_0$ be a random variable with distribution $p_0(\boldsymbol{z}_0)$, usually a simple distribution like Gaussian.
+-   Let $\boldsymbol{z}_i = f_i(\boldsymbol{z}_{i-1})$ be the transformed variable after applying the $i$-th transformation and $p_i(\boldsymbol{z}_i)$ be the distribution of $\boldsymbol{z}_i$.
+-   Let $\boldsymbol{x} = \boldsymbol{z}_k = f_k \circ \cdots \circ f_1(\boldsymbol{z}_0)$. The log-likelihood of $x$ is given by
+    $$
+    \begin{aligned}
+    \log p(\boldsymbol{x}) &= \log p_k(\boldsymbol{z}_k)\\ 
+    & = \log p_{k-1}(f_k^{-1}(\boldsymbol{z}_k)) - \log \left| \det J_{f_k}(f_k^{-1}(\boldsymbol{z}_k))\right|\\
+    & = \log p_{k-1}(\boldsymbol{z}_{k-1}) - \log \left| \det J_{f_k}(\boldsymbol{z}_{k-1}) \right| \\
+    & = \log p_0(\boldsymbol{z}_0) - \sum_{i=1}^k \log \left| \det J_{f_i}(\boldsymbol{z}_{i-1}) \right|.
+    \end{aligned}
+    $$
+
+## Normalizing Flows
+
+-   To maximize the log-likelihood $\log p(\boldsymbol{x})$, we need to maximize $- \sum_{i=1}^k \log \left| \det J_{f_i}(\boldsymbol{z}_{i-1}) \right|$, or equivalently,
+    $$
+    \min \sum_{i=1}^k \log \left| \det J_{f_i}(\boldsymbol{z}_{i-1}) \right|.
+    $$
+-   Requiring by the computation in the change of variable formula, the transformations $f_i$ should satisfy the two properties:
+    1. **Invertibility**: $f_i$ is easily invertible.
+    2. **Efficient Jacobian computation**: The determinant of the Jacobian matrix of $f_i$ can be computed efficiently.
+
+## General Coupling Layer
+
+-   A **coupling layer** is a type of invertible transformation that is commonly used in normalizing flows.
+-   Let $\boldsymbol{x} = (\boldsymbol{x}_1, \boldsymbol{x}_2) \in \R^d$ be a partition of the input variable $\boldsymbol{x}$, where $\boldsymbol{x}_1 \in \R^{d_1}$ and $\boldsymbol{x}_2 \in \R^{d_2}$ and $d_1 + d_2 = d$.
+-   Define the transformation $(\boldsymbol{x}_1, \boldsymbol{x}_2) \mapsto \boldsymbol{y} = (\boldsymbol{y_1}, \boldsymbol{y}_2) \in \R^d$ as
+    $$
+    \begin{aligned}
+    \boldsymbol{y}_1 &= \boldsymbol{x}_1,\\
+    \boldsymbol{y}_2 &= g(\boldsymbol{x}_2; m(\boldsymbol{x}_1)),
+    \end{aligned}
+    $$
+    where 
+    -   $m$ is a function on $\R^{d_1}$, 
+    -   $g$ is a function on $\R^{d_2} \times m(\R^{d_1})$.
+-   The function $g$ is called a **coupling law** and it needs to be an invertible map with respect to its first argument given the second.
+
+## Jacobian of Coupling Layer
+
+-   Tha main advantage of such mapping is that its Jacobian and inverse mapping are easy to compute. The Jacobian matrix of the coupling layer is given by
+    $$
+    J_{g,m}(\boldsymbol{x}_1, \boldsymbol{x}_2) = \frac{d \boldsymbol{y}}{d \boldsymbol{x}} =
+    \begin{bmatrix}
+    \boldsymbol{I}_{d_1} & 0 \\
+    \frac{d \boldsymbol{y}_2}{d \boldsymbol{x}_1} & \frac{d \boldsymbol{y}_2}{d \boldsymbol{x}_2}
+    \end{bmatrix}.
+    $$
+-   The determinant of the Jacobian matrix is given by
+    $$
+    \begin{aligned}
+    \det J_{g,m}(\boldsymbol{x}_1, \boldsymbol{x}_2)  = \det \frac{d \boldsymbol{y}_2}{d \boldsymbol{x}_2} 
+    = \det \frac{d g(\boldsymbol{x}_2; m(\boldsymbol{x}_1))}{d \boldsymbol{x}_2}.
+    \end{aligned}
+    $$
+-   Also we can invert the mapping using
+    $$
+    \begin{aligned}
+    \boldsymbol{x}_1 &= \boldsymbol{y}_1,\\
+    \boldsymbol{x}_2 &= g^{-1}(\boldsymbol{y}_2; m(\boldsymbol{y}_1)).
+    \end{aligned}
+    $$
+-   We call such a transformation a **coupling layer with coupling function $m$**. Note that we don't need any assumption on the coupling function $m$.
+
+## Additive Coupling Layer
+
+-   The simplest choice for $g$ is $g(a, b) = a + b$, and the corresponding coupling layer is called an **additive coupling layer**.
+-   Therefore the transformation is given by
+    $$
+    \boldsymbol{y}_1 = \boldsymbol{x}_1, \quad 
+    \boldsymbol{y}_2 = \boldsymbol{x}_2 + m(\boldsymbol{x}_1).
+    $$
+-   The Jacobian matrix of the additive coupling layer is given by
+    $$
+    J^{\text{add}}_{m}(\boldsymbol{x}_1, \boldsymbol{x}_2) = 
+    \begin{bmatrix}
+    \boldsymbol{I}_{d_1} & 0 \\
+    \frac{d \boldsymbol{y}_2}{d \boldsymbol{x}_1} & \boldsymbol{I}_{d_2}
+    \end{bmatrix},\; \text{and}\; \det J^{\text{add}}_{m}(\boldsymbol{x}_1, \boldsymbol{x}_2) = 1.
+    $$
+-   The inverse mapping is given by
+    $$
+    \boldsymbol{x}_1 = \boldsymbol{y}_1, \quad
+    \boldsymbol{x}_2 = \boldsymbol{y}_2 - m(\boldsymbol{y}_1).
+    $$
+-   The coupling function $m$ can be a neural network with $d_1$ input units and $d_2$ output units.
+-   This coupling layer is used in the Non-linear Independent Components Estimation (NICE) model[^nice].
+
+[^nice]: Dinh et al. (2015). [*NICE: Non-linear Independent Components Estimation*](https://arxiv.org/abs/1410.8516). In *ICLR* workshop.
+
+## Affine Coupling Layer
+
+-   Another choice for $g$ is the affine mapping:
+    $$
+    \boldsymbol{y}_1 = \boldsymbol{x}_1, \quad 
+    \boldsymbol{y}_2 = \boldsymbol{x}_2 \odot \exp(s(\boldsymbol{x}_1)) + t(\boldsymbol{x}_1),
+    $$
+    where $s$ and $t$ stand for scale and translation, and are functions from $\R^{d_1} \to \R^{d_2}$, and $\odot$ is the element-wise product.
+-   The Jacobian matrix and its determinant are given by
+    $$
+    J^{\text{aff}}_{s,t}(\boldsymbol{x}_1, \boldsymbol{x}_2) = 
+    \begin{bmatrix}
+    \boldsymbol{I}_{d_1} & 0 \\
+    \frac{d \boldsymbol{y}_2}{d \boldsymbol{x}_1} & \text{diag}(\exp(s(\boldsymbol{x}_1)))
+    \end{bmatrix}, \quad 
+    \det J^{\text{aff}}_{s,t}(\boldsymbol{x}_1, \boldsymbol{x}_2) = \exp\left(\sum_{i=1}^{d_2} s_i(\boldsymbol{x}_1)\right).
+    $$
+-   The inverse mapping is also easy to compute:
+    $$
+    \boldsymbol{x}_1 = \boldsymbol{y}_1, \quad
+    \boldsymbol{x}_2 = (\boldsymbol{y}_2 - t(\boldsymbol{y}_1)) \odot \exp(-s(\boldsymbol{y}_1)).
+    $$
+-   The functions $s$ and $t$ can be implemented by neural networks.
+-   The affine coupling layer is used in the Real-valued Non-Volume Preserving (Real NVP) model[^realnvp].
+
+[^realnvp]: Dinh et al. (2017). [*Density Estimation using Real NVP*](https://openreview.net/forum?id=HkpbnH9lx). In *ICLR*.
+
+## Combining Coupling Layers
+
+-   The coupling layers are used as the transformation $\boldsymbol{z}_{i-1} \mapsto \boldsymbol{z}_i$ in a normalizing flow model.
+-   We can compose several coupling layers to obtain a more complex layered transformation. 
+-   Since a coupling layer leaves part of its input unchanged, we need to exchange the role of the two subsets in the partition in alternating layers, so that the composition of two coupling layers modifies every dimension.  
+-   Examining the Jacobian, we observe that at least three coupling layers are necessary to allow all dimensions to influence one another. The original paper uses four.
+-   Note that the coupling layers introduced here are still quite general. If the goal is to generate images or sequential data, we can modify the coupling law using, for example, the convolution operation. 
+-   The main idea is to design the coupling law such that **the Jacobian matrix is easy to compute and invert**.
+
+## Example
+
+Real NVP learns an invertible, stable, mapping between a data distribution $\hat{p}_X$ and a latent distribution $p_Z$ (typically a Gaussian).
+
+![](images/lec11/RealNVP_exp.png){fig-align="center" width=80%}
+
+::: aside
+Image source: Dinh et al. (2017). [*Density Estimation using Real NVP*](https://openreview.net/forum?id=HkpbnH9lx). In *ICLR*.
+:::
+
+
+# Diffusion Model
+
+## Diffusion Model
+
+-   A **diffusion model** is a generative model that learns the data distribution by iteratively applying a diffusion process to a simple distribution.
+
+
+![](images/lec11/DDPM.png){fig-align="center" width=90%}
+
+::: aside
+Image source: [What are Diffusion Models?](https://lilianweng.github.io/posts/2021-07-11-diffusion-models/) by Lilian Weng
+:::
+
+## Forward Diffusion Process
+
+-   Let $\boldsymbol{x}_0$ be a sample from the data distribution $p_{\text{data}}(\boldsymbol{x})$.
+-   The forward diffusion process adds Gaussian noise to $\boldsymbol{x}_0$ at each step $t$:
+    $$
+    \boldsymbol{x}_t = \sqrt{\alpha_t}\boldsymbol{x}_{t-1} + \sqrt{1-\alpha_t} \boldsymbol{\epsilon}_t,
+    $$
+    where $\boldsymbol{\epsilon}_t \sim \mc{N}(0, \boldsymbol{I})$ is a standard Gaussian noise and $\sigma_t$ is positive.
+-   That is, $\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1} \sim \mc{N}(\sqrt{\alpha_t}\boldsymbol{x}_{t-1}, (1-\alpha_t)\boldsymbol{I})$.
+-   The choice of the scaling factor $\sqrt{\alpha_t}$ is to make sure that the variance magnitude is preserved so that it will not explode and vanish after many iterations[^scale].
+-   As $t$ increases, $\boldsymbol{x}_t$ becomes more and more noisy, and the distribution of $\boldsymbol{x}_t$ becomes more and more similar to an isotropic Gaussian.
+
+[^scale]: This choice is proposed by Ho et al. (2020) in [*Denosing Diffusion Probabilistic Models*](https://arxiv.org/abs/2006.11239). It can be shown that this choice is necessary for $\boldsymbol{x}_t$ to converge to a standard Gaussian, see Theorem 2.1 in Stanley Chan (2024).
+
+## Example
+
+-   Consider the Gaussian mixture model: 
+    $$
+    \boldsymbol{x}_0 \sim \pi_1 N(\mu_1, \sigma_1^2) + \pi_2 N(\mu_2, \sigma_2^2)
+    $$
+    where $\pi_1 = 0.3$, $\pi_2 = 0.7$, $\mu_1 = -2$, $\mu_2 = 2$, $\sigma_1 = 0.2$, and $\sigma_2 = 1$.
+-   Choose $\alpha_t = 0.97$ for all $t$. The probability distribution of $\boldsymbol{x}_t$ for different $t$ is shown below.
+
+![](images/lec11/diffusion_example.png){fig-align="center" width=90%}
+
+::: aside
+Example 2.1 in Stanley Chan (2024). [*Tutorial on Diffusion Models for Imaging and Vision*](https://arxiv.org/pdf/2403.18103)   
+:::
+
+## Conditional distribution of $\boldsymbol{x}_t \mid \boldsymbol{x}_0$
+
+-   The recursion gives us
+    $$
+    \begin{aligned} 
+    \boldsymbol{x}_t & =\sqrt{\alpha_t} \boldsymbol{x}_{t-1}+\sqrt{1-\alpha_t} \epsilon_{t-1} \\ 
+    & =\sqrt{\alpha_t}\left(\sqrt{\alpha_{t-1}} \boldsymbol{x}_{t-2}+\sqrt{1-\alpha_{t-1}} \boldsymbol{\epsilon}_{t-2}\right)+\sqrt{1-\alpha_t} \epsilon_{t-1} \\ 
+    & =\sqrt{\alpha_t \alpha_{t-1}} \boldsymbol{x}_{t-2}+\sqrt{\alpha_t} \sqrt{1-\alpha_{t-1}} \epsilon_{t-2}+\sqrt{1-\alpha_t} \epsilon_{t-1}\\
+    & = \sqrt{\alpha_t \alpha_{t-1}} \boldsymbol{x}_{t-2} + \sqrt{1-\alpha_t \alpha_{t-1}} \bar{\epsilon}_{t-2} 
+    \end{aligned}
+    $$
+    where $\bar{\epsilon}_{t-2} \sim N(0, \boldsymbol{I})$ since the sum of two Gaussians is still a Gaussian.
+-   Continuing this procedure, we have $\boldsymbol{x}_t \mid \boldsymbol{x}_0 \sim N(\sqrt{\bar{\alpha}_t}\boldsymbol{x}_0, (1- \bar{\alpha}_t)\boldsymbol{I})$, where $\bar{\alpha}_t = \prod_{i=1}^t \alpha_t$. 
+-   This distribution $q_\phi\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right)$ gives a one-shot forward diffusion step compared to the chain $\boldsymbol{x}_0 \rightarrow \boldsymbol{x}_1 \rightarrow \ldots \rightarrow \boldsymbol{x}_{T-1} \rightarrow \boldsymbol{x}_T$. 
+-   That is, given $\boldsymbol{x}_0$, we can obtain the distribution of $\boldsymbol{x}_t$ directly for any $t$.
+-   Usually, we can afford a larger update step when the sample gets noisier, so $1 > \alpha_1 > \alpha_2 > \cdots > \alpha_t$ and therefore $\bar{\alpha}_1 > \cdots > \bar{\alpha}_t$.
+
+## Reverse Diffusion Process
+
+-   If we can reverse the diffusion process, we can obtain $\boldsymbol{x}_0$ from $\boldsymbol{x}_t$.
+-   In other words, if we know $q(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t)$, we can get $\boldsymbol{x}_0 \sim p_{\text{data}}(\boldsymbol{x})$ from $\boldsymbol{x}_t \mathrel{\dot\sim} N(0, \boldsymbol{I})$.
+-   By Bayes theorem,
+    $$
+    q(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t) = \frac{q(\boldsymbol{x}_{t} \mid \boldsymbol{x}_{t-1}) p(\boldsymbol{x}_{t-1})}{p(\boldsymbol{x}_{t})},
+    $$
+    which can not be easily estimated since we don't know the marginal $p(\boldsymbol{x}_{t-1})$.
+-   Solution: use $p_{\theta}(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t) = N(\mu_{\theta}(\boldsymbol{x}_t), \Sigma_{\theta}(\boldsymbol{x}_t))$ to estimate $q(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t)$ by minimizing KL divergence (maximizing the ELBO). See Section 2.2~2.4 of Stanley Chan (2024) for the derivation. 
+-   This model is called the *denoising diffusion probabilistic model (DDPM)*, proposed by Ho et al. (2020).
+
+
+## Training the DDPM
+
+![](images/lec11/DDPM_training.png){fig-align="center" width=100%}
+
+::: aside
+Image source: Figure 16 in Stanley Chan (2024).
+:::
+
+## Inference of DDPM 
+
+![](images/lec11/DDPM_inference.png){fig-align="center" width=100%}
+
+::: aside
+Image source: Figure 17 in Stanley Chan (2024).
+:::
+
+## Images generated by DDPM
+
+The left panel is generated from the CelebA-HQ dataset, and the right panel is generated from the CIFAR-10 dataset.
+
+![](images/lec11/DDPM_example.png){fig-align="center" width=70%}
+
+::: aside
+Image source: Figure 1 in Ho et al. (2020).
+:::
+
+## Variants of Diffusion Models
+
+-   A diffusion model is mainly characterized by
+    -    the forward diffusion process $q(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1})$ (also called the transition distribution), and
+    -    the divergence used for approximating the reverse diffusion process.
+-   Hence we can construct different diffusion models by choosing different transition distribution and divergence.
+-   For example,
+    -   Song and Ermon (2019) use score-based divergence to construct generative models,
+    -   Song et al. (2023) use a different transition distribution to construct the denoising diffusion implicit models (DDIM).
+
+
+::: aside
+1.  Song and Ermon (2019). [Generative modeling by estimating gradients of the data distribution.](https://proceedings.neurips.cc/paper/2019/hash/3001ef257407d5a371a96dcd947c7d93-Abstract.html?ref=https://githubhelp.com) In *NeurIPS*.
+2.  Song et al. (2023). [Denoising diffusion implicit models.](https://openreview.net/forum?id=St1giarCHLP) In *ICLR*.
+
+:::
+
+
+## Summary
+
+![](images/lec11/generative-overview.png){fig-align="center" width=75%}
+
+::: aside
+Image source: [What are Diffusion Models?](https://lilianweng.github.io/posts/2021-07-11-diffusion-models/) by Lilian Weng
+:::
+
+
+## References
+
+### GAN
+
+-   [Generative Adversarial Nets](https://proceedings.neurips.cc/paper_files/paper/2014/file/5ca3e9b122f61f8f06494c97b1afccf3-Paper.pdf) by Goodfellow et al. (2014)
+-   [NIPS 2016 Tutorial on GAN](https://arxiv.org/pdf/1701.00160) by Goodfellow.
+-   [Generative adversarial networks: Introduction and outlook](https://doi.org/10.1109/JAS.2017.7510583) by Wang et al. (2017).
+-   [Generative adversarial networks: An overview](https://doi.org/10.1109/MSP.2017.2765202) by Creswell et al. (2018). 
+-   [From GAN to WGAN](https://lilianweng.github.io/posts/2017-08-20-gan/) by Lilian Weng (2017)
+
+### Normalizing Flows
+-   [Normalizing Flows: An Introduction and Review of Current Methods](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9089305) by Kobyzev et al. (2021)
+-   [Normalizing Flows for Probabilistic Modeling and Inference](https://jmlr.org/papers/volume22/19-1028/19-1028.pdf) by Papamakarios et al. (2021) 
+-   [Flow-based Deep Generative Models](https://lilianweng.github.io/posts/2018-10-13-flow-models/) by Lilian Weng (2018)
+
+### Diffusion Model
+
+-   [Tutorial on Diffusion Models for Imaging and Vision](https://arxiv.org/pdf/2403.18103) by Stanley Chan (2024)
+-   [What are Diffusion Models?](https://lilianweng.github.io/posts/2021-07-11-diffusion-models/) by Lilian Weng (2021)
