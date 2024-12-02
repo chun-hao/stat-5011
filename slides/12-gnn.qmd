@@ -1,0 +1,527 @@
+---
+title: "Attention and Graph Neural Networks"
+execute:
+    echo: true
+    cache: false
+    freeze: false
+highlight-style: atom-one
+---
+
+## Final Project
+
+The final project should include the following:
+
+-   A 25-min presentation (on 12/10 and 12/17):
+    -   Dataset and problem description
+    -   Model architecture
+    -   Results and analysis (comparison with a baseline model)
+    -   Conclusion
+-   A written report (due on 12/24):
+    -   Introduction
+    -   Related work
+    -   Models and methods
+    -   Results
+    -   Conclusion and References
+
+## Written report
+
+-   NeurIPS Template: <https://www.overleaf.com/latex/templates/neurips-2024/tpsbbrdqcmsh>
+-   Use `bibtex` to manage references.
+-   Should be 4-6 pages long (including references).
+-   **Important**:
+    -   Do not include code or output of the code in the report.
+    -   The code should be in a separate file.
+    -   Give citations whenever you use code/figures/tables from other sources.
+-   You should submit:
+    1.  A PDF file of the report.
+    2.  A ZIP file containing the code and other supplementary materials.
+  
+
+
+
+## Outline
+
+{{< include macro.qmd >}}
+
+-   Generative models for sequential data
+    -   Seq2Seq model
+    -   Attention mechanism
+    -   Self-attention and transformer
+-   Graph Neural Networks
+    -   Graph data
+    -   Graph convolution
+    -   Other GNN models
+
+## Autoencoder for sequential data
+
+-   Recall that an autoencoder contains an encoder and a decoder: 
+    -   The encoder $f$ maps the input data to a latent representation: $\boldsymbol{z} = f(\boldsymbol{x})$.
+    -   The decoder $g$ reconstructs the input data from the latent representation: $\hat{\boldsymbol{x}} = g(\boldsymbol{z})$.
+-   For sequential data, we can use an RNN-based encoder and decoder:
+    -   Encoder: $\boldsymbol{h}_t = f(\boldsymbol{h}_{t-1}, \boldsymbol{x}_t)$
+    -   Decoder: $\hat{\boldsymbol{x}}_t = g(\boldsymbol{h}_t)$
+    -   The encoder and the decoder can be LSTM or RNN units.
+-   The autoencoder is trained to minimize the reconstruction error: $\mathcal{L} = \sum_t \|\boldsymbol{x}_t - \hat{\boldsymbol{x}}_t\|^2$.    
+-   Similarly, we can design different generative models for sequential data, e.g., VAE, GAN.
+
+## Seq2Seq model
+
+-   The sequence-to-sequence (Seq2Seq) model aims to map an input sequence to an target sequence, e.g., machine translation and question answering.
+-   A seq2seq model normally has an encoder-decoder architecture:
+    -   The encoder processes the input sequence and summarize the information into a **context vector**
+    -   The decoder generates the output seq based on the context vector.
+-   For example, Sutskever et al. (2014)[^sutskever] used an LSTM-based seq2seq model for machine translation. 
+
+![](images/lec12/translation.png){fig-align="center" width=80%}
+
+
+
+[^sutskever]: Sutskever et al. (2014). [Sequence to Sequence Learning
+with Neural Networks.](https://arxiv.org/abs/1409.3215)
+
+
+## Attention Mechanism
+
+-   One of the main limitation of the LSTM/GRU based encoder is that the output of the encoder is a **fixed-length** context vector.
+-   A fixed-length context vector may not be able to capture all the information in a long input sequence.
+-   The **attention mechanism** was proposed to address this issue by allowing the decoder to focus on different parts of the input sequence at each decoding step.
+-   That is, at each decoding step, the model tries to align the input sequence with the output element as much as possible.
+
+## Additive Attention
+
+![](images/lec12/add_attention.png){fig-align="center" width=100%}
+
+::: aside
+Image source: Figure 4 in [Attention? Attention!](https://lilianweng.github.io/posts/2018-06-24-attention/) by Lilian Weng (2018)
+:::
+
+--- 
+
+-   Let $\boldsymbol{x} = [x_1, \ldots, x_n]$ be the input sequence (e.g., $n$ words) and $\boldsymbol{y} = [y_1, \ldots, y_m]$ be the output sequence.
+-   Let $\boldsymbol{h}_i = f(\boldsymbol{h}_{i-1}, x_i)$ be the hidden states of the encoder; for example, $f$ can be an LSTM unit.
+-   Let $\boldsymbol{s}_t = g(\boldsymbol{s}_{t-1}, y_{t-1}, \boldsymbol{c}_t)$ be the hidden states of the decoder where $\boldsymbol{c}_t$ is the context vector.
+-   The context vector $\boldsymbol{c}_t$ (for output $y_t$) is computed as a weighted sum of the encoder hidden states:
+    $$
+    \boldsymbol{c}_t = \sum_{i=1}^n \alpha_{t,i} \boldsymbol{h}_i
+    $$
+    where $\alpha_{t,i}$ is the **attention weight**.
+-   The attention weight $\alpha_{t,i}$ is computed as:
+    $$
+    \alpha_{t,i} = \text{align}(y_t, x_i) = \frac{\exp(\text{score}(\boldsymbol{s}_{t-1},\boldsymbol{h}_i))}{\sum_{j=1}^n \exp(\text{score}(\boldsymbol{s}_{t-1},\boldsymbol{h}_j))}
+    $$
+    where $\text{score}(\boldsymbol{s}_{t-1},\boldsymbol{h}_j)$ is the **alignment score** between $\boldsymbol{s}_{t-1}$ and $\boldsymbol{h}_i$.
+-   The score can be parametrized by a feed forward neural network:
+    $$
+    \text{score}(\boldsymbol{s}_{t-1},\boldsymbol{h}_i) = \boldsymbol{v}^\top \tanh(\boldsymbol{W}_1 \boldsymbol{s}_{t-1} + \boldsymbol{W}_2 \boldsymbol{h}_i).
+    $$
+
+## Different Alignment Scores
+
+| Name | Alignment Score function | Citation |
+|---------|:-----|------:|
+| Content-base attention     | $\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \frac{\boldsymbol{s}_t \cdot \boldsymbol{h}_i}{\|\boldsymbol{s}_t\| \|\boldsymbol{h}_i\|}$   |    Graves et al. (2014) |
+| Additive Attention     | $\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \boldsymbol{v}^\top \tanh(\boldsymbol{W}_1 \boldsymbol{s}_t + \boldsymbol{W}_2 \boldsymbol{h}_i)$   |    Bahdanau et al. (2015) |
+| Location-based Attention       | $\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \boldsymbol{W}\boldsymbol{s}_t$   |    Luong et al. (2015) |
+| General | $\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \boldsymbol{s}_t^\top \boldsymbol{W}\boldsymbol{h}_i$ | Luong et al. (2015) |
+| Dot-product | $\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \boldsymbol{s}_t^\top \boldsymbol{h}_i$ | Luong et al. (2015) |
+| Scaled Dot-product | $\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \frac{\boldsymbol{s}_t^\top \boldsymbol{h}_i}{\sqrt{n}}$ | Vaswani et al. (2017) |
+
+
+::: aside 
+Reproduced from the summary table in [Attention? Attention!](https://lilianweng.github.io/posts/2018-06-24-attention/) by Lilian Weng (2018).
+:::
+
+
+
+
+## Transformer
+
+-   [Attention is All you Need](https://arxiv.org/abs/1706.03762) by Vaswani et al. (2017) proposed the **transformer** model that is entirely built on the **self-attention** mechanisms. 
+-   The vanilla transformer model has an *encoder-decoder* architecture:
+    -   The encoder generates an attention-based representation.
+    -   The decoder is to retrieve information from the encoded representation. 
+-   Later simplified Transformer was shown to achieve great performance in language modeling tasks, like in encoder-only BERT[^bert] or decoder-only GPT[^gpt].
+  
+
+[^bert]: Delvin et al. (2019) [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/abs/1810.04805)
+[^gpt]: Radford et al. (2018) [Improving Language Understanding by Generative Pre-Training](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf)
+
+## Self-attention
+
+-   **Self-attention**, or the **intra-attention**, is an attention mechanism relating different positions of a single sequence to compute a representation of the sequence.
+-   It has been shown to be very useful in machine reading, abstractive summarization, or image description generation.
+-   Theoretically the self-attention can adopt any score functions mentioned before, but just replace the target sequence with the same input sequence.
+-   In the transformer model, the self-attention mechanism is used to compute the **query**, **key**, and **value** vectors from the input sequence:
+    -   a query is to represent the information of the current word,
+    -   a key is to represent information the other words in the sentence,
+    -   we use the key and the query to compute the attention weight,
+    -   the value is to represent the information that will be used to generate words.
+
+
+---
+
+-   Given an input sequence $\boldsymbol{x} = [x_1, \ldots, x_n]$, $x_i \in \R^p$,
+    -   the key vector $\boldsymbol{k}_i \in \R^{d_k}$ is computed as $\boldsymbol{k}_i = \boldsymbol{W}_k \boldsymbol{x}_i$, $\boldsymbol{W}_k \in \R^{d_k \times p}$,
+    -   the query vector $\boldsymbol{q}_i \in \R^{d_k}$ is computed as $\boldsymbol{q}_i = \boldsymbol{W}_q \boldsymbol{x}_i$, $\boldsymbol{W}_q \in \R^{d_k \times p}$,
+    -   the value vector $\boldsymbol{v}_i \in \R^{d_v}$ is computed as $\boldsymbol{v}_i = \boldsymbol{W}_v \boldsymbol{x}_i$, $\boldsymbol{W}_v \in \R^{d_v \times p}$.
+
+
+-   The matrices of key, query, and value are
+    -   $\boldsymbol{K} = [\boldsymbol{k}_1, \ldots, \boldsymbol{k}_n]^\top \in \R^{n \times d_k}$,
+    -   $\boldsymbol{Q} = [\boldsymbol{q}_1, \ldots, \boldsymbol{q}_n]^\top \in \R^{n \times d_k}$,
+    -   $\boldsymbol{V} = [\boldsymbol{v}_1, \ldots, \boldsymbol{v}_n]^\top \in \R^{n \times d_v}$.
+-   The **attention weight matrix** is an $n \times n$ matrix, computed based on the scaled dot-product:
+    $$
+    \alpha(\boldsymbol{Q}, \boldsymbol{K}) = \text{softmax}\left(\frac{\boldsymbol{Q}\boldsymbol{K}^\top}{\sqrt{n}}\right) \in \R^{n \times n}
+    $$
+    where the softmax is applied row-wise, i.e., each row sums to 1.
+-   The **output** of the self-attention is computed as a weighted sum of the value vectors:
+    $$
+    \text{Attention}(\boldsymbol{Q}, \boldsymbol{K}, \boldsymbol{V}) = \text{softmax}\left(\frac{\boldsymbol{Q}\boldsymbol{K}^\top}{\sqrt{n}}\right) \boldsymbol{V} \in \R^{n \times d_v}
+    $$
+
+## Multi-head attention
+
+![](images/lec12/multi-head_attention.png){fig-align="center" width=100%}
+
+::: aside
+Image source: Figure 2 in Vaswani et al. (2017).
+:::
+
+## Transformer model
+
+![](images/lec12/transformer.png){fig-align="center" width=40%}
+
+
+::: aside
+Image source: Figure 1 in Vaswani et al. (2017).
+:::
+
+
+
+## Local vs. Global Attention
+
+Instead of using the full attention matrix, we can use a **local** attention mechanism to compute the attention weight matrix:
+
+![](images/lec12/local_attention.png){fig-align="center" width=100%}
+
+::: aside
+Image source: Figure 2 and 3 in Luong et al. (2015) [Effective Approaches to Attention-based Neural Machine Translation](https://arxiv.org/abs/1508.04025).
+:::
+
+## Convolution and attention
+
+The attention mechanism can be applied to image data as well. In fact the convolution operation can be seen as a special case of the attention mechanism:
+
+![](images/lec12/MHSA.png){fig-align="center" width=100%}
+
+::: aside
+Image source: Figure 1 in Cordonnier et al. (2020) [On the relationship between self-attention and convolutional layers](https://arxiv.org/abs/1911.03584). In *ICLR*.
+:::
+
+# Graph Neural Networks
+
+## Graph
+
+-   A graph $G = (V, E)$ is a set of nodes $V = \{v_1, \ldots, v_n\}$ and edges $E = \{(v_i, v_j) \mid v_i, v_j \in V\}$.
+-   A graph is **undirected** if $(v_i, v_j) \in E$ implies $(v_j, v_i) \in E$.  
+
+:::: columns
+
+
+::: {.column width=50%}
+
+![](images/lec12/graphs-0.png){fig-align="center" width=80%}
+
+:::
+
+::: {.column width=50%}
+
+![](images/lec12/graphs-1.png){fig-align="center" width=80%}
+
+:::
+
+::::
+
+## Adjacency matrix
+
+
+:::: {.columns}
+
+::: {.column width=50%}
+
+-    The **adjacency matrix** $\boldsymbol{A} \in \R^{n \times n}$ of a graph is a binary matrix where $A_{ij} = 1$ if $(v_i, v_j) \in E$ and $A_{ij} = 0$ otherwise.
+-    A graph is undirected if and only if the adjacency matrix is symmetric.
+-    For example, the adjacency matrix of the graph on the right is:
+    $$
+    \boldsymbol{A} = \begin{bmatrix}
+    0 & 1 & 1 & 1 \\
+    1 & 0 & 1 & 0 \\
+    1 & 1 & 0 & 1 \\
+    1 & 0 & 1 & 0
+    \end{bmatrix}.
+    $$
+
+:::
+
+::: {.column width=50%}
+
+![](images/lec12/graphs-1.png){fig-align="center" width=80%}
+
+:::
+
+::::
+
+
+## Degree matrix and Graph Laplacian
+
+-   The **degree matrix** $\boldsymbol{D} \in \R^{n \times n}$ is a diagonal matrix where $D_{ii}$ is the number of edges connected to node $v_i$, also called the degree of $v_i$.
+-  The **Laplacian matrix** (or the graph Laplacian) is defined as $\boldsymbol{L} = \boldsymbol{D} - \boldsymbol{A}$.
+-   For example, the degree matrix and the Laplacian matrix for the previous graphs are:
+    $$
+    \boldsymbol{D} = \begin{bmatrix}
+    3 & 0 & 0 & 0 \\
+    0 & 2 & 0 & 0 \\
+    0 & 0 & 3 & 0 \\
+    0 & 0 & 0 & 2
+    \end{bmatrix} \quad \text{and} \quad
+    \boldsymbol{L} = \begin{bmatrix}
+    3 & -1 & -1 & -1 \\
+    -1 & 2 & -1 & 0 \\
+    -1 & -1 & 3 & -1 \\
+    -1 & 0 & -1 & 2
+    \end{bmatrix}.
+    $$
+-   To balance the influence of heavy nodes (nodes with large degree), we can use the normalized Laplacian matrix:
+    $$
+    \boldsymbol{L} = \boldsymbol{I} - \boldsymbol{D}^{-1/2} \boldsymbol{A} \boldsymbol{D}^{-1/2} = 
+    \begin{bmatrix}
+    1 & -\frac{1}{3} & -\frac{1}{3} & -\frac{1}{3} \\
+    -\frac{1}{2} & 1 & -\frac{1}{2} & 0 \\
+    -\frac{1}{3} & -\frac{1}{3} & 1 & -\frac{1}{3} \\
+    -\frac{1}{2} & 0 & -\frac{1}{2} & 1
+    \end{bmatrix}.
+    $$
+
+## Weighted Graphs 
+
+::: {.columns}
+::: {.column width=50%}
+
+-   Depending on the application, we can have a weighted adjacency matrix where $A_{ij}$ is the weight of the edge $(v_i, v_j)$.
+-   For example, the weighted adjacency matrix of the graph on the right is:
+    $$
+    \boldsymbol{A} = \begin{bmatrix}
+    0 & 0.9 & -0.5 & -0.6 \\
+    0.9 & 0 & -0.3 & 0 \\
+    -0.5 & -0.3 & 0 & 0.2 \\
+    -0.6 & 0 & 0.2 & 0
+    \end{bmatrix}.
+    $$
+-   The weights can be 
+    -   correlation between nodes
+    -   distance between nodes
+-   The degree matrix and the Laplacian matrix can be computed similarly.
+
+:::
+
+::: {.column width=50%}
+
+![](images/lec12/graphs-2.png){fig-align="center" width=80%}
+
+:::
+:::
+
+## Properties of Graph Laplacian
+
+-   The Laplacian matrix relates to many useful properties of a graph. In particular, the **spectral graph theory** relates the properties of a graph to the spectrum (i.e., eigenvalues and eigenvectors) of the Laplacian matrix.
+-   Some of the most important properties of the Laplacian matrix are:
+    -   $L$ is symmetric[^note] and positive semi-definite.
+    -   The eigenvalues of $L$ are non-negative.
+    -   The smallest eigenvalue of $L$ is 0, and the corresponding eigenvector is the all-one vector, since the Laplacian matrix has a zero row sum.
+    -   The Laplacian matrix is singular.
+    -   The number of connected components of a graph is equal to the dimension of the null space of the Laplacian matrix.
+
+
+[^note]: For directed graphs, we use the symmetrized adjacency matrix $(\boldsymbol{A} + \boldsymbol{A}^{\top})/2$ to compute the Laplacian matrix.
+
+## Examples of Graph datasets
+
+
+-   Common examples of graph datasets include:
+    -   Social networks: nodes are individuals, and edges are relationships between them.
+    -   Citation networks: nodes are papers, and edges are citations between them.
+    -   Collaboration networks: nodes are authors, and edges are collaborations between them.
+-   In many applications, nodes have **attributes** associated with them.
+    -   For example, in a social network, an individual can have attributes such as age, ethnicity, gender, etc.
+    -   In a citation network, a paper can have attributes such as the title, abstract, authors, etc.
+-   In these case, the graph is called an **attributed graph**, $G = (V, E, X)$, where $X \in \R^{n \times p}$ is the attribute matrix, where $n$ is the number of nodes and $p$ is the number of attributes.
+-   When the attributes change dynamically over time, it is called a **spatial-temporal graph**, denoted $G = (V, E, X^{(t)})$, $t = 1, \ldots, T$.
+
+## Analysis of Graph data
+
+-   Node-level analysis:
+    -   Node classification/regression: predict the label/attribute of a node.
+    -   Node clustering: group nodes based on their attributes.
+-   Edge-level analysis:
+    -   Edge regression: predict strength of an edge.
+    -   Link prediction: predict the existence of an edge between two nodes.
+-   Graph-level analysis:
+    -   Graph classification: predict the label of a graph.
+    -   Community detection: identify communities in a graph.
+-   In general, the analysis of graph data can be categorized into:
+    -   **spectral-based** methods: based on the spectral information of the graph, i.e., the graph Laplacian.
+    -   **spatial-based** methods: operate directly on the node attributes without transforming them to the spectral domain.
+
+## Example: Social Media Content Recommendation
+
+-   Graph construction:
+    -   Nodes represent users.
+    -   Edges represent relationships or interactions (friendship, follows, likes, comments, etc.).
+    -   Node attributes: user profiles, interests, demographics, etc.
+-   Social Network Analysis Metrics: derive useful metrics to inform recommendations.
+    -   **Centrality**: Identifies influential users (e.g., degree centrality, betweenness centrality). 
+    -   **Community Detection**: Identifies clusters of users who are closely connected. 
+    -   **Homophily**: Identifies similarities between users (e.g., interests, demographics). 
+    -   **Link Prediction**: Determines potential future interactions between users. 
+-   Recommendation algorithms: Collaborative Filtering
+    -   **User-based**: If users A and B have similar preferences, you can recommend posts liked by B to A. This can be improved by considering the network neighbors of A.
+    -   **Content-based**: If users who liked item X (e.g., a post or product) also liked item Y, the system can recommend item Y to users who liked item X.
+
+
+## Graph Convolution
+
+-   A graph convolution can be seen as a generalization of the convolution operation to graph data:
+    -   In an image, each pixel is taken to be a node.
+    -   An edge connects two neighboring pixels.
+
+![](images/lec12/graph_conv.png){fig-align="center" width=80%}
+
+::: aside
+Image source: Figure 1 in Wu *et al.* (2021).
+:::
+
+## ConvGNN for Node Classification
+
+![](images/lec12/convGNN_node.png){fig-align="center" width=100%}
+
+-   The `Gconv` is the graph convolution. By choosing different convolution filters, we can have different types of graph convolutions.
+-   The nonlinear activation function ReLU is applied to the output attributes element-wise.
+
+::: aside
+Image source: Figure 2 (a) in Wu *et al.* (2021).
+:::
+
+
+## Spatial-based Convolution
+
+-   Analogous to the convolutional operation of a conventional CNN on an image, spatial-based methods define graph convolutions based on a node’s spatial relations.
+-   The spatial-based graph convolutions convolve the central node’s representation with its neighbors’ representations to derive the updated representation for the central node.
+-   For example, the NN4G[^nn4g] used 
+$$
+\mathbf{H}^{(k)}=f\left(\mathbf{X} \mathbf{W}^{(k)}+\sum_{i=1}^{k-1} \mathbf{A} \mathbf{H}^{(i)} \mathbf{\Theta}^{(k, i)}\right)
+$$
+where 
+    -   $\mathbf{X} \in \R^{n \times p}$ is the input feature matrix, 
+    -   $\mathbf{A} \in \R^{n \times n}$ is the adjacency matrix, 
+    -   $\mathbf{H}^{(k)} \in \R^{n \times p}$ is the output feature matrix,
+    -   $\mathbf{W}^{(k)} \in \R^{p \times p}$ and $\mathbf{\Theta}^{(k, i)} \in \R^{p \times p}$ are the weight matrices,
+    -   $f$ is the activation function, e.g., ReLU.
+
+[^nn4g]: A. Micheli (2009). "Neural Network for Graphs: A Contextual Constructive Approach," in IEEE Transactions on Neural Networks, vol. 20, no. 3, pp. 498-511.
+
+
+## Spectral-based Convolution
+
+-   The **spectral-based** convolution are based on the spectral information of the nodes.
+-   Let $G = (V, E, \boldsymbol{X})$ be an attributed graph, $\boldsymbol{X} \in \R^{n \times p}$ and $\boldsymbol{L}$ be the normalized Laplacian matrix.
+-   Let $\boldsymbol{L} = \boldsymbol{U} \boldsymbol{\Lambda} \boldsymbol{U}^\top$ be the eigendecomposition of $\boldsymbol{L}$, where $\boldsymbol{U} \in \R^{n \times n}$ is the matrix of eigenvectors and $\boldsymbol{\Lambda} \in \R^{n \times n}$ is the diagonal matrix of eigenvalues.
+-   The attribute matrix $\boldsymbol{X}$ can be transformed to the spectral domain as $\widetilde{\boldsymbol{X}} = \mc{F}(\boldsymbol{X}) = \boldsymbol{U}^\top \boldsymbol{X} \in \R^{n \times p}$, which is called the **graph Fourier transform**.
+-   The inverse graph Fourier transform is $\boldsymbol{X} = \mc{F}^{-1}(\widetilde{\boldsymbol{X}}) = \boldsymbol{U} \widetilde{\boldsymbol{X}}$.
+-   The spectral convolution for a feature $\boldsymbol{x} \in \R^{n}$ is defined as: 
+    $$
+    \boldsymbol{x} \star_G \boldsymbol{g} = \mc{F}^{-1}(\mc{F}(\boldsymbol{x}) \odot \mc{F}(\boldsymbol{g})) = \boldsymbol{U} (\boldsymbol{U}^\top \boldsymbol{x} \odot \boldsymbol{U}^\top \boldsymbol{g})
+    $$
+    where $\boldsymbol{g} \in \R^n$ is the convolution filter and $\odot$ is the element-wise product.
+-   Denote $\boldsymbol{g}_{\theta} = \text{diag}(\boldsymbol{U}^{\top}\boldsymbol{g})$, the spectral convolution can be written as:
+    $$
+    \boldsymbol{x} \star_G \boldsymbol{g} = \boldsymbol{U} \boldsymbol{g}_{\theta} \boldsymbol{U}^\top \boldsymbol{x}.
+    $$
+
+
+
+## ConvGNN for Graph Classification
+
+![](images/lec12/convGNN_graph.png){fig-align="center" width=100%}
+
+::: aside
+Image source: Figure 2 (b) in Wu *et al.* (2021).
+:::
+
+## Graph Pooling
+
+-   Graph pooling is used to reduce the size of the graph while preserving the important information.
+-   There are many ways to perform graph pooling, e.g., selecting the top-$k$ nodes, clustering nodes, etc.
+-   The `Readout` permutation-invariant graph operation that outputs a fixed-length representation of graphs.
+
+![](images/lec12/graph_pooling.png){fig-align="center" width=100%}
+
+
+::: aside
+Image source: Figure 1 in Liu et al. (2023) [Graph Pooling for Graph Neural Networks: Progress, Challenges, and Opportunities](https://arxiv.org/abs/2204.07321)
+:::
+
+## Graph Autoencoder (GAE)
+
+![](images/lec12/GAE.png){fig-align="center" width=100%}
+
+-   GAEs are deep neural architectures that map nodes into a latent feature space and decode graph information from latent representations. 
+-   GAEs can be used to learn network embeddings or generate new graphs
+
+::: aside
+Image source: Figure 2 (c) in Wu *et al.* (2021).
+:::
+
+## Graph Generation
+
+-   Graph generative models are used to generate new graphs that are similar to the training graphs.
+-   All the generative models we have seen so far (e.g., VAE, GAN, diffusion model, and transformer) can be modified to generate graphs.
+-   **AlphaFold**, developed by Google DeepMind, is a deep generative model for graphs. 
+-   Co-founder and CEO of Google DeepMind and Isomorphic Labs Sir Demis Hassabis, and Google DeepMind Director Dr. John Jumper were co-awarded the 2024 Nobel Prize in Chemistry for their work developing AlphaFold.
+-   Protein structure as a graph: 
+    -   nodes are amino acids,
+    -   edges are interactions between them.
+
+
+
+## Spatial-Temporal GNN (STGNN)
+
+![](images/lec12/STGNN.png){fig-align="center" width=100%}
+
+-   A graph convolutional layer is followed by a 1-D-CNN layer.
+-   The graph convolutional layer operates on $\boldsymbol{A}$ and $\boldsymbol{X}^{(t)}$ to capture the spatial dependence.
+-   The 1-D-CNN layer slides over $\boldsymbol{X}$ along the time axis to capture the temporal dependence.
+
+::: aside
+Image source: Figure 2 (d) in Wu *et al.* (2021).
+:::
+
+## References
+
+### Attention and Transformer
+-   Vaswani et al. (2017) [Attention is all you need.](https://arxiv.org/abs/1706.03762) In *NeurIPS*.
+-   Devlin et al. (2019) [BERT: Pre-training of Deep Bidirectional Transformers for
+Language Understanding](https://arxiv.org/abs/1810.04805)
+-   Cordonnier et al. (2020) [On the relationship between self-attention and convolutional layers.](https://arxiv.org/pdf/1911.03584) In *ICLR*.
+-   [Attention? Attention!](https://lilianweng.github.io/posts/2018-06-24-attention/) by Lilian Weng (2018)
+-   [The Transformer Family](https://lilianweng.github.io/posts/2020-04-07-the-transformer-family/) by Lilian Weng (2020)
+-   [The Transformer Family Version 2.0](https://lilianweng.github.io/posts/2023-01-27-the-transformer-family-v2/) by Lilian Weng (2023)
+
+
+### Graph Neural Networks
+-   Wu et al. (2021) [A Comprehensive Survey on Graph Neural Networks.](https://ieeexplore.ieee.org/abstract/document/9046288)
+
+
+### Datasets
+
+-   Stanford Large Network Dataset Collection: <https://snap.stanford.edu>

@@ -19,7 +19,7 @@ title: "Statistical Deep Learning (Fall 2024)"
 | 11 | 11/12 | Recurrent Networks | [Slide](slides/09-rnn.qmd) | D2L Ch. 9, 10 & DL Ch. 10 |
 | 12 | 11/19 | Generative Models: Autoencoder | [Slide](slides/10-generative_model.qmd) | DL Ch. 13, 14 |
 | 13 | 11/26 | Generative Models: GAN, Flow-based models, Diffusion models | [Slide](slides/11-generative_model_2.qmd) |  |
-| 14 | 12/3 | Additional Topics: Attention Mechanisms and Gaussian Process |  | D2L Ch. 11, 18 |
+| 14 | 12/3 | Attention Mechanism and Graph Neural Networks | [Slide](slides/12-gnn.qmd) | |
 | 15-16 | 12/10-17 | Final Project Presentation |  |  | 
 
 : {tbl-colwidths="\[5, 10, 60, 10, 25\]" .striped}
